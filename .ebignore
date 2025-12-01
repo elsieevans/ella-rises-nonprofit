@@ -1,0 +1,37 @@
+# Elastic Beanstalk ignore file
+# These files won't be included in the deployment package
+
+# Git
+.git
+.gitignore
+
+# Development files
+.env
+.env.local
+.env.development
+nodemon.json
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Local development
+node_modules
+
+# Test files
+test/
+tests/
+*.test.js
+*.spec.js
+coverage/
+

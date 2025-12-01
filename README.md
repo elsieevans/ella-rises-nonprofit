@@ -183,6 +183,149 @@ npm run seed       # Seed database with demo data
 - Input validation
 - Role-based access control
 
+## AWS Elastic Beanstalk Deployment
+
+### Prerequisites
+
+1. **AWS Account** with access to Elastic Beanstalk, RDS, and Certificate Manager
+2. **AWS CLI** installed and configured
+3. **EB CLI** installed (`pip install awsebcli`)
+
+### Step 1: Create an SSL Certificate
+
+1. Go to **AWS Certificate Manager (ACM)** in your target region
+2. Click **Request a certificate** → **Request a public certificate**
+3. Enter your domain name (e.g., `yourdomain.com`, `www.yourdomain.com`)
+4. Choose **DNS validation** (recommended)
+5. Add the CNAME records to your DNS provider
+6. Wait for validation (usually 5-30 minutes)
+7. Copy the **Certificate ARN** (looks like `arn:aws:acm:us-east-1:123456789:certificate/abc-123-xyz`)
+
+### Step 2: Update Configuration
+
+Edit `.ebextensions/01-https-lb.config` and replace `YOUR_CERTIFICATE_ARN` with your actual certificate ARN:
+
+```yaml
+aws:elbv2:listener:443:
+  SSLCertificateArns: arn:aws:acm:us-east-1:123456789:certificate/your-cert-id
+```
+
+### Step 3: Create RDS Database (PostgreSQL)
+
+1. Go to **Amazon RDS** → **Create database**
+2. Choose **PostgreSQL** (version 14+)
+3. Select **Free tier** or appropriate size
+4. Set database name: `ella_rises`
+5. Set master username and password
+6. Note the **Endpoint** after creation
+
+### Step 4: Initialize Elastic Beanstalk
+
+```bash
+# Initialize EB in your project
+eb init
+
+# Select region, platform (Node.js), and create new application
+# Choose Node.js 18 or higher
+```
+
+### Step 5: Create Environment
+
+```bash
+# Create environment with load balancer
+eb create ella-rises-prod --elb-type application
+```
+
+### Step 6: Set Environment Variables
+
+Set sensitive variables via the EB Console or CLI:
+
+```bash
+eb setenv \
+  NODE_ENV=production \
+  SESSION_SECRET=your-very-secure-random-string-min-32-chars \
+  DB_HOST=your-rds-endpoint.region.rds.amazonaws.com \
+  DB_PORT=5432 \
+  DB_USER=your_db_username \
+  DB_PASSWORD=your_db_password \
+  DB_NAME=ella_rises
+```
+
+### Step 7: Configure Security Groups
+
+Ensure your RDS security group allows inbound PostgreSQL (port 5432) from your Elastic Beanstalk security group.
+
+### Step 8: Run Migrations
+
+SSH into your EB instance to run migrations:
+
+```bash
+eb ssh
+
+# On the instance
+cd /var/app/current
+npm run migrate
+npm run seed  # Optional: seed demo data
+```
+
+### Step 9: Configure DNS
+
+Point your domain to the Elastic Beanstalk environment:
+- Create a CNAME record pointing to your EB URL, or
+- Use Route 53 with an Alias record
+
+### Deployment Commands
+
+```bash
+# Deploy latest code
+eb deploy
+
+# View logs
+eb logs
+
+# SSH into instance
+eb ssh
+
+# Open in browser
+eb open
+
+# Check status
+eb status
+
+# View environment health
+eb health
+```
+
+### Configuration Files
+
+- `.ebextensions/01-https-lb.config` - Load balancer & HTTPS setup
+- `.ebextensions/02-https-redirect.config` - HTTP to HTTPS redirect
+- `.ebextensions/03-env-vars.config` - Environment variables template
+- `.platform/nginx/conf.d/proxy.conf` - Nginx proxy settings
+- `Procfile` - Tells EB how to start the app
+- `.ebignore` - Files to exclude from deployment
+
+### Troubleshooting
+
+**SSL not working?**
+- Verify certificate ARN is correct in `01-https-lb.config`
+- Ensure certificate is validated and in the same region as EB
+- Check certificate covers your domain
+
+**Database connection fails?**
+- Verify RDS security group allows EB instances
+- Check environment variables are set correctly
+- Ensure RDS is publicly accessible or in same VPC
+
+**HTTP redirect not working?**
+- Clear browser cache
+- Check nginx logs: `eb ssh` then `cat /var/log/nginx/error.log`
+
+**View detailed logs:**
+```bash
+eb logs --all
+```
+
 ## Future Enhancements
 
 - Email notifications (nodemailer)

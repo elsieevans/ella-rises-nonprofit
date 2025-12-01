@@ -8,6 +8,12 @@ const path = require('path');
 
 const app = express();
 
+// Trust proxy - required for HTTPS behind AWS Load Balancer
+// This ensures req.secure, req.protocol work correctly
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 // Security middleware
 app.use(helmet({
   contentSecurityPolicy: {
