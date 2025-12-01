@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ella Rises - Empowering young women to pursue higher education and STEAM careers through mentoring, workshops, and leadership opportunities.">
+  <title><%= typeof title !== 'undefined' ? title : 'Ella Rises' %></title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="/css/main.css">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Skip to main content link for accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  
+  <!-- Navigation -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a href="/" class="nav-logo" aria-label="Ella Rises Home">
+        <span class="logo-text">ELLA</span>
+        <span class="logo-accent">RISES</span>
+      </a>
+      
+      <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span class="hamburger"></span>
+      </button>
+      
+      <ul class="nav-menu" role="menubar">
+        <li role="none"><a href="/" class="nav-link" role="menuitem">Home</a></li>
+        <li role="none"><a href="/mission" class="nav-link" role="menuitem">Our Mission</a></li>
+        <li role="none"><a href="/programs" class="nav-link" role="menuitem">Programs</a></li>
+        <li role="none"><a href="/team" class="nav-link" role="menuitem">Our Team</a></li>
+        <li role="none"><a href="/get-involved" class="nav-link" role="menuitem">Get Involved</a></li>
+        <li role="none"><a href="/contact" class="nav-link" role="menuitem">Contact</a></li>
+        <% if (user) { %>
+          <li role="none"><a href="/portal/dashboard" class="nav-link" role="menuitem">Portal</a></li>
+          <li role="none"><a href="/auth/logout" class="nav-link" role="menuitem">Logout</a></li>
+        <% } else { %>
+          <li role="none"><a href="/auth/login" class="nav-link nav-link--secondary" role="menuitem">Login</a></li>
+        <% } %>
+        <li role="none"><a href="/donate" class="nav-link nav-cta" role="menuitem">Donate</a></li>
+      </ul>
+    </div>
+  </nav>
+  
+  <!-- Flash Messages -->
+  <% if (success_msg && success_msg.length > 0) { %>
+    <div class="flash-message flash-success" role="alert">
+      <span><%= success_msg %></span>
+      <button class="flash-close" aria-label="Close message">&times;</button>
+    </div>
+  <% } %>
+  
+  <% if (error_msg && error_msg.length > 0) { %>
+    <div class="flash-message flash-error" role="alert">
+      <span><%= error_msg %></span>
+      <button class="flash-close" aria-label="Close message">&times;</button>
+    </div>
+  <% } %>
+  
+  <% if (error && error.length > 0) { %>
+    <div class="flash-message flash-error" role="alert">
+      <span><%= error %></span>
+      <button class="flash-close" aria-label="Close message">&times;</button>
+    </div>
+  <% } %>
+  
+  <main id="main-content">
+

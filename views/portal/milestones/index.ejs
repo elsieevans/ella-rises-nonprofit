@@ -1,0 +1,74 @@
+<%- include('../../partials/portal-header', { currentPage: 'milestones', pageTitle: 'Milestones' }) %>
+
+<div class="page-actions">
+  <% if (user && user.role === 'manager') { %>
+    <a href="/portal/milestones/new" class="btn btn-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Milestone
+    </a>
+  <% } %>
+</div>
+
+<!-- Filters -->
+<div class="filters-card">
+  <form class="filters-form" method="GET" action="/portal/milestones">
+    <div class="filter-group">
+      <label for="category">Category</label>
+      <select id="category" name="category">
+        <option value="">All Categories</option>
+        <% categories.forEach(c => { %>
+          <option value="<%= c %>" <%= filters.category === c ? 'selected' : '' %>><%= c %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label for="status">Status</label>
+      <select id="status" name="status">
+        <option value="">All</option>
+        <option value="active" <%= filters.status === 'active' ? 'selected' : '' %>>Active</option>
+        <option value="inactive" <%= filters.status === 'inactive' ? 'selected' : '' %>>Inactive</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-secondary">Filter</button>
+    <a href="/portal/milestones" class="btn btn-outline">Clear</a>
+  </form>
+</div>
+
+<!-- Milestones Grid -->
+<div class="milestones-grid">
+  <% if (milestones && milestones.length > 0) { %>
+    <% milestones.forEach(m => { %>
+      <article class="milestone-card">
+        <div class="milestone-header">
+          <div class="milestone-badge milestone-badge--<%= m.category %>">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+          </div>
+          <div class="milestone-points"><%= m.points %> pts</div>
+        </div>
+        <h3 class="milestone-name"><%= m.name %></h3>
+        <span class="milestone-category"><%= m.category %></span>
+        <p class="milestone-description"><%= m.description || 'No description' %></p>
+        <div class="milestone-footer">
+          <span class="milestone-achieved">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            <%= m.achievement_count %> achieved
+          </span>
+          <span class="status-badge <%= m.is_active ? 'status-active' : 'status-inactive' %>">
+            <%= m.is_active ? 'Active' : 'Inactive' %>
+          </span>
+        </div>
+        <div class="milestone-actions">
+          <a href="/portal/milestones/<%= m.id %>" class="btn btn-outline btn-sm">View</a>
+          <% if (user && user.role === 'manager') { %>
+            <a href="/portal/milestones/<%= m.id %>/edit" class="btn btn-secondary btn-sm">Edit</a>
+          <% } %>
+        </div>
+      </article>
+    <% }) %>
+  <% } else { %>
+    <p class="no-data">No milestones found</p>
+  <% } %>
+</div>
+
+<%- include('../../partials/portal-footer') %>
+

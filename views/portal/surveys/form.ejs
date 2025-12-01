@@ -1,0 +1,109 @@
+<%- include('../../partials/portal-header', { currentPage: 'surveys', pageTitle: isEdit ? 'Edit Survey' : 'Add Survey' }) %>
+
+<div class="page-actions">
+  <a href="/portal/surveys" class="btn btn-outline">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    Back to Surveys
+  </a>
+</div>
+
+<div class="form-card">
+  <form action="/portal/surveys<%= isEdit ? '/' + survey.id : '' %>" method="POST" class="crud-form">
+    <div class="form-section">
+      <h3>Survey Information</h3>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="event_id">Event</label>
+          <select id="event_id" name="event_id">
+            <option value="">Select Event (Optional)</option>
+            <% events.forEach(e => { %>
+              <option value="<%= e.id %>" <%= survey.event_id == e.id ? 'selected' : '' %>><%= e.title %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="participant_id">Participant</label>
+          <select id="participant_id" name="participant_id">
+            <option value="">Select Participant (Optional)</option>
+            <% participants.forEach(p => { %>
+              <option value="<%= p.id %>" <%= survey.participant_id == p.id ? 'selected' : '' %>><%= p.first_name %> <%= p.last_name %></option>
+            <% }) %>
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="survey_date">Survey Date <span class="required">*</span></label>
+        <input type="date" id="survey_date" name="survey_date" value="<%= survey.survey_date ? new Date(survey.survey_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0] %>" required>
+      </div>
+    </div>
+    
+    <div class="form-section">
+      <h3>Scores</h3>
+      
+      <div class="form-group">
+        <label for="satisfaction_score">Satisfaction Score (1-5) <span class="required">*</span></label>
+        <div class="score-input">
+          <input type="range" id="satisfaction_score" name="satisfaction_score" min="1" max="5" value="<%= survey.satisfaction_score || 3 %>" oninput="this.nextElementSibling.textContent = this.value">
+          <span class="score-display"><%= survey.satisfaction_score || 3 %></span>
+        </div>
+        <small>1 = Very Dissatisfied, 5 = Very Satisfied</small>
+      </div>
+      
+      <div class="form-group">
+        <label for="usefulness_score">Usefulness Score (1-5) <span class="required">*</span></label>
+        <div class="score-input">
+          <input type="range" id="usefulness_score" name="usefulness_score" min="1" max="5" value="<%= survey.usefulness_score || 3 %>" oninput="this.nextElementSibling.textContent = this.value">
+          <span class="score-display"><%= survey.usefulness_score || 3 %></span>
+        </div>
+        <small>1 = Not Useful, 5 = Very Useful</small>
+      </div>
+      
+      <div class="form-group">
+        <label for="recommendation_score">Recommendation Score (1-10) <span class="required">*</span></label>
+        <div class="score-input">
+          <input type="range" id="recommendation_score" name="recommendation_score" min="1" max="10" value="<%= survey.recommendation_score || 5 %>" oninput="this.nextElementSibling.textContent = this.value">
+          <span class="score-display"><%= survey.recommendation_score || 5 %></span>
+        </div>
+        <small>How likely to recommend to others? (NPS)</small>
+      </div>
+    </div>
+    
+    <div class="form-section">
+      <h3>Feedback</h3>
+      
+      <div class="form-group">
+        <label for="what_liked">What did you like most?</label>
+        <textarea id="what_liked" name="what_liked" rows="3"><%= survey.what_liked || '' %></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="what_improve">What could be improved?</label>
+        <textarea id="what_improve" name="what_improve" rows="3"><%= survey.what_improve || '' %></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="additional_comments">Additional Comments</label>
+        <textarea id="additional_comments" name="additional_comments" rows="3"><%= survey.additional_comments || '' %></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input type="checkbox" name="would_attend_again" <%= !isEdit || survey.would_attend_again ? 'checked' : '' %>>
+          <span>Would attend similar events again</span>
+        </label>
+      </div>
+    </div>
+    
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        <%= isEdit ? 'Update Survey' : 'Add Survey' %>
+      </button>
+      <a href="/portal/surveys" class="btn btn-outline">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<%- include('../../partials/portal-footer') %>
+

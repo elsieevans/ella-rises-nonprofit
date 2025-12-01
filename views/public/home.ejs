@@ -1,0 +1,225 @@
+<%- include('../partials/header') %>
+
+<!-- Hero Section -->
+<section class="hero" aria-label="Hero section">
+  <div class="hero-background">
+    <div class="hero-gradient"></div>
+    <div class="hero-pattern"></div>
+  </div>
+  <div class="hero-content">
+    <span class="hero-label">Empowering the Next Generation</span>
+    <h1 class="hero-title">Inspiring Young Women to <span class="highlight">Rise</span> in STEAM</h1>
+    <p class="hero-description">Through mentoring, creative workshops, and leadership opportunities, we empower young women to pursue higher education and embrace their heritage.</p>
+    <div class="hero-cta">
+      <a href="/programs" class="btn btn-primary btn-lg">Explore Programs</a>
+      <a href="/donate" class="btn btn-secondary btn-lg">Support Our Mission</a>
+    </div>
+    <div class="hero-partners">
+      <span>In partnership with</span>
+      <div class="partner-logos">
+        <span class="partner-name">UVU</span>
+        <span class="partner-name">BYU</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Impact Stats -->
+<section class="stats-section" aria-label="Impact statistics">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-number"><%= stats.participants %>+</span>
+        <span class="stat-label">Young Women Empowered</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number"><%= stats.events %>+</span>
+        <span class="stat-label">Programs & Events</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number"><%= stats.milestones %>+</span>
+        <span class="stat-label">Milestones Achieved</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number">2</span>
+        <span class="stat-label">University Partners</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Mission Preview -->
+<section class="mission-preview" aria-labelledby="mission-heading">
+  <div class="container">
+    <div class="mission-grid">
+      <div class="mission-content">
+        <span class="section-label">Our Mission</span>
+        <h2 id="mission-heading">Building Confidence Through Education & Heritage</h2>
+        <p>Ella Rises aims to empower the rising generation of women to pursue higher education and embrace their heritage through mentoring, creative workshops, and leadership opportunities that build both technical competence and artistic confidence.</p>
+        <ul class="mission-points">
+          <li>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            STEAM education and workshops
+          </li>
+          <li>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Leadership development programs
+          </li>
+          <li>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Cultural heritage celebration
+          </li>
+          <li>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Mentoring & community support
+          </li>
+        </ul>
+        <a href="/mission" class="btn btn-outline">Learn More About Our Mission</a>
+      </div>
+      <div class="mission-visual">
+        <div class="visual-card visual-card--1">
+          <span class="visual-icon">🎓</span>
+          <span class="visual-text">Higher Education</span>
+        </div>
+        <div class="visual-card visual-card--2">
+          <span class="visual-icon">💻</span>
+          <span class="visual-text">STEAM Skills</span>
+        </div>
+        <div class="visual-card visual-card--3">
+          <span class="visual-icon">🎨</span>
+          <span class="visual-text">Cultural Arts</span>
+        </div>
+        <div class="visual-card visual-card--4">
+          <span class="visual-icon">⭐</span>
+          <span class="visual-text">Leadership</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Programs Preview -->
+<section class="programs-preview" aria-labelledby="programs-heading">
+  <div class="container">
+    <div class="section-header text-center">
+      <span class="section-label">Our Programs</span>
+      <h2 id="programs-heading">Discover What We Offer</h2>
+      <p>From coding workshops to cultural arts, we provide diverse opportunities for growth and learning.</p>
+    </div>
+    
+    <div class="programs-grid">
+      <article class="program-card">
+        <div class="program-icon program-icon--steam">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        <h3>STEAM Workshops</h3>
+        <p>Hands-on workshops in coding, robotics, engineering, and mathematics designed to build technical skills and confidence.</p>
+        <ul class="program-features">
+          <li>Python & Web Development</li>
+          <li>Robotics Competitions</li>
+          <li>Engineering Projects</li>
+        </ul>
+      </article>
+      
+      <article class="program-card">
+        <div class="program-icon program-icon--mentoring">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <h3>Mentoring Program</h3>
+        <p>Connect with successful women in STEM fields who provide guidance, support, and real-world insights.</p>
+        <ul class="program-features">
+          <li>One-on-One Mentoring</li>
+          <li>Career Guidance</li>
+          <li>Networking Events</li>
+        </ul>
+      </article>
+      
+      <article class="program-card">
+        <div class="program-icon program-icon--leadership">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <h3>Leadership Development</h3>
+        <p>Build leadership skills through public speaking, project management, and community engagement opportunities.</p>
+        <ul class="program-features">
+          <li>Public Speaking Training</li>
+          <li>Project Leadership</li>
+          <li>Ambassador Program</li>
+        </ul>
+      </article>
+      
+      <article class="program-card">
+        <div class="program-icon program-icon--arts">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+        </div>
+        <h3>Cultural Arts</h3>
+        <p>Celebrate and embrace cultural heritage through music, art, and creative expression programs.</p>
+        <ul class="program-features">
+          <li>Mariachi Music</li>
+          <li>Visual Arts</li>
+          <li>Heritage Projects</li>
+        </ul>
+      </article>
+    </div>
+    
+    <div class="text-center mt-lg">
+      <a href="/programs" class="btn btn-primary">View All Programs</a>
+    </div>
+  </div>
+</section>
+
+<!-- Upcoming Events -->
+<% if (upcomingEvents && upcomingEvents.length > 0) { %>
+<section class="events-preview" aria-labelledby="events-heading">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <span class="section-label">Upcoming Events</span>
+        <h2 id="events-heading">Join Us</h2>
+      </div>
+      <a href="/programs" class="btn btn-outline">View All Events</a>
+    </div>
+    
+    <div class="events-grid">
+      <% upcomingEvents.forEach(event => { %>
+        <article class="event-card">
+          <div class="event-date">
+            <span class="event-month"><%= new Date(event.event_date).toLocaleString('en-US', { month: 'short' }) %></span>
+            <span class="event-day"><%= new Date(event.event_date).getDate() %></span>
+          </div>
+          <div class="event-details">
+            <span class="event-type"><%= event.event_type.toUpperCase() %></span>
+            <h3 class="event-title"><%= event.title %></h3>
+            <p class="event-location">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <%= event.venue_name || event.location %>
+            </p>
+            <% if (event.start_time) { %>
+              <p class="event-time">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <%= event.start_time.substring(0, 5) %><% if (event.end_time) { %> - <%= event.end_time.substring(0, 5) %><% } %>
+              </p>
+            <% } %>
+          </div>
+        </article>
+      <% }) %>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<!-- Call to Action -->
+<section class="cta-section" aria-labelledby="cta-heading">
+  <div class="container">
+    <div class="cta-content">
+      <h2 id="cta-heading">Help Us Empower the Next Generation</h2>
+      <p>Your support enables us to provide STEAM education, mentoring, and leadership opportunities to young women who will shape our future.</p>
+      <div class="cta-buttons">
+        <a href="/donate" class="btn btn-cta btn-lg">Donate Now</a>
+        <a href="/get-involved" class="btn btn-light btn-lg">Get Involved</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>
+

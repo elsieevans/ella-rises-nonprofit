@@ -1,0 +1,105 @@
+<%- include('../../partials/portal-header', { currentPage: 'participants', pageTitle: 'Participants' }) %>
+
+<div class="page-actions">
+  <% if (user && user.role === 'manager') { %>
+    <a href="/portal/participants/new" class="btn btn-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Participant
+    </a>
+  <% } %>
+</div>
+
+<!-- Filters -->
+<div class="filters-card">
+  <form class="filters-form" method="GET" action="/portal/participants">
+    <div class="filter-group">
+      <label for="search">Search</label>
+      <input type="text" id="search" name="search" value="<%= filters.search || '' %>" placeholder="Name or email...">
+    </div>
+    <div class="filter-group">
+      <label for="grade">Grade Level</label>
+      <select id="grade" name="grade">
+        <option value="">All Grades</option>
+        <% grades.forEach(g => { %>
+          <option value="<%= g %>" <%= filters.grade === g ? 'selected' : '' %>><%= g %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label for="status">Status</label>
+      <select id="status" name="status">
+        <option value="">All</option>
+        <option value="active" <%= filters.status === 'active' ? 'selected' : '' %>>Active</option>
+        <option value="inactive" <%= filters.status === 'inactive' ? 'selected' : '' %>>Inactive</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-secondary">Filter</button>
+    <a href="/portal/participants" class="btn btn-outline">Clear</a>
+  </form>
+</div>
+
+<!-- Data Table -->
+<div class="table-card">
+  <div class="table-responsive">
+    <table class="data-table" role="table" aria-label="Participants list">
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Email</th>
+          <th scope="col">School</th>
+          <th scope="col">Grade</th>
+          <th scope="col">Enrollment</th>
+          <th scope="col">Status</th>
+          <th scope="col" class="actions-col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (participants && participants.length > 0) { %>
+          <% participants.forEach(p => { %>
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="user-avatar"><%= p.first_name.charAt(0) %><%= p.last_name.charAt(0) %></div>
+                  <span><%= p.first_name %> <%= p.last_name %></span>
+                </div>
+              </td>
+              <td><%= p.email %></td>
+              <td><%= p.school || '-' %></td>
+              <td><%= p.grade_level || '-' %></td>
+              <td><%= p.enrollment_date ? new Date(p.enrollment_date).toLocaleDateString() : '-' %></td>
+              <td>
+                <span class="status-badge <%= p.is_active ? 'status-active' : 'status-inactive' %>">
+                  <%= p.is_active ? 'Active' : 'Inactive' %>
+                </span>
+              </td>
+              <td class="actions-col">
+                <div class="action-buttons">
+                  <a href="/portal/participants/<%= p.id %>" class="btn-icon" title="View" aria-label="View participant">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </a>
+                  <% if (user && user.role === 'manager') { %>
+                    <a href="/portal/participants/<%= p.id %>/edit" class="btn-icon" title="Edit" aria-label="Edit participant">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </a>
+                    <form action="/portal/participants/<%= p.id %>/delete" method="POST" class="inline-form" onsubmit="return confirm('Are you sure you want to delete this participant?')">
+                      <button type="submit" class="btn-icon btn-icon--danger" title="Delete" aria-label="Delete participant">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                      </button>
+                    </form>
+                  <% } %>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="7" class="no-data">No participants found</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../../partials/portal-footer') %>
+

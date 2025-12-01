@@ -1,0 +1,273 @@
+<%- include('../partials/portal-header', { currentPage: 'dashboard', pageTitle: 'Dashboard' }) %>
+
+<!-- Dashboard Stats -->
+<div class="dashboard-stats">
+  <div class="stat-card stat-card--participants">
+    <div class="stat-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    </div>
+    <div class="stat-info">
+      <span class="stat-value"><%= stats.participants %></span>
+      <span class="stat-label">Active Participants</span>
+    </div>
+  </div>
+  
+  <div class="stat-card stat-card--events">
+    <div class="stat-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    </div>
+    <div class="stat-info">
+      <span class="stat-value"><%= stats.events %></span>
+      <span class="stat-label">Active Events</span>
+    </div>
+  </div>
+  
+  <div class="stat-card stat-card--surveys">
+    <div class="stat-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    </div>
+    <div class="stat-info">
+      <span class="stat-value"><%= stats.surveys %></span>
+      <span class="stat-label">Survey Responses</span>
+    </div>
+  </div>
+  
+  <div class="stat-card stat-card--donations">
+    <div class="stat-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    </div>
+    <div class="stat-info">
+      <span class="stat-value">$<%= parseFloat(stats.donations || 0).toLocaleString() %></span>
+      <span class="stat-label">Total Donations</span>
+    </div>
+  </div>
+  
+  <div class="stat-card stat-card--milestones">
+    <div class="stat-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+    </div>
+    <div class="stat-info">
+      <span class="stat-value"><%= stats.milestones %></span>
+      <span class="stat-label">Milestones Achieved</span>
+    </div>
+  </div>
+</div>
+
+<!-- Charts Section -->
+<div class="dashboard-grid">
+  <div class="dashboard-card dashboard-card--wide">
+    <div class="card-header">
+      <h2>Donation Trends</h2>
+    </div>
+    <div class="card-body">
+      <canvas id="donationChart" height="250"></canvas>
+    </div>
+  </div>
+  
+  <div class="dashboard-card">
+    <div class="card-header">
+      <h2>Events by Type</h2>
+    </div>
+    <div class="card-body">
+      <canvas id="eventTypeChart" height="250"></canvas>
+    </div>
+  </div>
+  
+  <div class="dashboard-card">
+    <div class="card-header">
+      <h2>Survey Scores</h2>
+    </div>
+    <div class="card-body">
+      <canvas id="surveyChart" height="250"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Data Section -->
+<div class="dashboard-grid dashboard-grid--three">
+  <!-- Recent Participants -->
+  <div class="dashboard-card">
+    <div class="card-header">
+      <h2>Recent Participants</h2>
+      <a href="/portal/participants" class="card-link">View All</a>
+    </div>
+    <div class="card-body">
+      <% if (recentParticipants && recentParticipants.length > 0) { %>
+        <ul class="recent-list">
+          <% recentParticipants.forEach(p => { %>
+            <li class="recent-item">
+              <div class="recent-avatar"><%= p.first_name.charAt(0) %><%= p.last_name.charAt(0) %></div>
+              <div class="recent-info">
+                <a href="/portal/participants/<%= p.id %>" class="recent-name"><%= p.first_name %> <%= p.last_name %></a>
+                <span class="recent-meta"><%= p.grade_level || 'N/A' %></span>
+              </div>
+            </li>
+          <% }) %>
+        </ul>
+      <% } else { %>
+        <p class="no-data">No participants yet</p>
+      <% } %>
+    </div>
+  </div>
+  
+  <!-- Upcoming Events -->
+  <div class="dashboard-card">
+    <div class="card-header">
+      <h2>Upcoming Events</h2>
+      <a href="/portal/events" class="card-link">View All</a>
+    </div>
+    <div class="card-body">
+      <% if (upcomingEvents && upcomingEvents.length > 0) { %>
+        <ul class="recent-list">
+          <% upcomingEvents.forEach(e => { %>
+            <li class="recent-item">
+              <div class="event-date-mini">
+                <span class="month"><%= new Date(e.event_date).toLocaleString('en-US', { month: 'short' }) %></span>
+                <span class="day"><%= new Date(e.event_date).getDate() %></span>
+              </div>
+              <div class="recent-info">
+                <a href="/portal/events/<%= e.id %>" class="recent-name"><%= e.title %></a>
+                <span class="recent-meta"><%= e.event_type %></span>
+              </div>
+            </li>
+          <% }) %>
+        </ul>
+      <% } else { %>
+        <p class="no-data">No upcoming events</p>
+      <% } %>
+    </div>
+  </div>
+  
+  <!-- Recent Donations -->
+  <div class="dashboard-card">
+    <div class="card-header">
+      <h2>Recent Donations</h2>
+      <a href="/portal/donations" class="card-link">View All</a>
+    </div>
+    <div class="card-body">
+      <% if (recentDonations && recentDonations.length > 0) { %>
+        <ul class="recent-list">
+          <% recentDonations.forEach(d => { %>
+            <li class="recent-item">
+              <div class="donation-amount">$<%= parseFloat(d.amount).toLocaleString() %></div>
+              <div class="recent-info">
+                <a href="/portal/donations/<%= d.id %>" class="recent-name"><%= d.is_anonymous ? 'Anonymous' : d.donor_name %></a>
+                <span class="recent-meta"><%= new Date(d.donation_date).toLocaleDateString() %></span>
+              </div>
+            </li>
+          <% }) %>
+        </ul>
+      <% } else { %>
+        <p class="no-data">No donations yet</p>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+  try {
+    const response = await fetch('/portal/dashboard/api/chart-data');
+    const data = await response.json();
+    
+    // Donation Trends Chart
+    const donationCtx = document.getElementById('donationChart').getContext('2d');
+    new Chart(donationCtx, {
+      type: 'line',
+      data: {
+        labels: data.donationsByMonth.map(d => d.month),
+        datasets: [{
+          label: 'Donations ($)',
+          data: data.donationsByMonth.map(d => parseFloat(d.total)),
+          borderColor: '#0d5c63',
+          backgroundColor: 'rgba(13, 92, 99, 0.1)',
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: value => '$' + value.toLocaleString()
+            }
+          }
+        }
+      }
+    });
+    
+    // Event Type Chart
+    const eventCtx = document.getElementById('eventTypeChart').getContext('2d');
+    new Chart(eventCtx, {
+      type: 'doughnut',
+      data: {
+        labels: data.eventsByType.map(e => e.event_type),
+        datasets: [{
+          data: data.eventsByType.map(e => parseInt(e.count)),
+          backgroundColor: [
+            '#0d5c63',
+            '#e8a4b4',
+            '#a8d5e5',
+            '#f5c6aa',
+            '#9bb7d4',
+            '#c5a3cf',
+            '#98c1a4'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+    
+    // Survey Scores Chart
+    const surveyCtx = document.getElementById('surveyChart').getContext('2d');
+    new Chart(surveyCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Satisfaction', 'Usefulness', 'Recommendation'],
+        datasets: [{
+          label: 'Average Score',
+          data: [
+            parseFloat(data.surveyScores?.avg_satisfaction || 0).toFixed(1),
+            parseFloat(data.surveyScores?.avg_usefulness || 0).toFixed(1),
+            parseFloat(data.surveyScores?.avg_recommendation || 0).toFixed(1)
+          ],
+          backgroundColor: ['#0d5c63', '#e8a4b4', '#a8d5e5']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 10
+          }
+        }
+      }
+    });
+    
+  } catch (error) {
+    console.error('Error loading chart data:', error);
+  }
+});
+</script>
+
+<%- include('../partials/portal-footer') %>
+

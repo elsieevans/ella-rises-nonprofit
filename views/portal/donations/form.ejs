@@ -1,0 +1,126 @@
+<%- include('../../partials/portal-header', { currentPage: 'donations', pageTitle: isEdit ? 'Edit Donation' : 'Add Donation' }) %>
+
+<div class="page-actions">
+  <a href="/portal/donations" class="btn btn-outline">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    Back to Donations
+  </a>
+</div>
+
+<div class="form-card">
+  <form action="/portal/donations<%= isEdit ? '/' + donation.id : '' %>" method="POST" class="crud-form">
+    <div class="form-section">
+      <h3>Donor Information</h3>
+      
+      <div class="form-group">
+        <label for="donor_name">Donor Name <span class="required">*</span></label>
+        <input type="text" id="donor_name" name="donor_name" value="<%= donation.donor_name || '' %>" required>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="donor_email">Email</label>
+          <input type="email" id="donor_email" name="donor_email" value="<%= donation.donor_email || '' %>">
+        </div>
+        <div class="form-group">
+          <label for="donor_phone">Phone</label>
+          <input type="tel" id="donor_phone" name="donor_phone" value="<%= donation.donor_phone || '' %>">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input type="checkbox" name="is_anonymous" <%= donation.is_anonymous ? 'checked' : '' %>>
+          <span>Anonymous Donation</span>
+        </label>
+      </div>
+    </div>
+    
+    <div class="form-section">
+      <h3>Donation Details</h3>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="amount">Amount <span class="required">*</span></label>
+          <div class="input-with-prefix">
+            <span class="input-prefix">$</span>
+            <input type="number" id="amount" name="amount" value="<%= donation.amount || '' %>" step="0.01" min="0" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="donation_date">Date <span class="required">*</span></label>
+          <input type="date" id="donation_date" name="donation_date" value="<%= donation.donation_date ? new Date(donation.donation_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0] %>" required>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="donation_type">Donation Type <span class="required">*</span></label>
+          <select id="donation_type" name="donation_type" required>
+            <% donationTypes.forEach(t => { %>
+              <option value="<%= t %>" <%= donation.donation_type === t ? 'selected' : '' %>><%= t %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="payment_method">Payment Method <span class="required">*</span></label>
+          <select id="payment_method" name="payment_method" required>
+            <% paymentMethods.forEach(m => { %>
+              <option value="<%= m %>" <%= donation.payment_method === m ? 'selected' : '' %>><%= m.replace('_', ' ') %></option>
+            <% }) %>
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="campaign">Campaign</label>
+          <input type="text" id="campaign" name="campaign" value="<%= donation.campaign || '' %>" list="campaign-list" placeholder="Enter or select campaign">
+          <datalist id="campaign-list">
+            <% campaigns.forEach(c => { %>
+              <option value="<%= c %>">
+            <% }) %>
+          </datalist>
+        </div>
+        <div class="form-group">
+          <label for="transaction_id">Transaction ID</label>
+          <input type="text" id="transaction_id" name="transaction_id" value="<%= donation.transaction_id || '' %>">
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-section">
+      <h3>Status & Notes</h3>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" name="receipt_sent" <%= donation.receipt_sent ? 'checked' : '' %>>
+            <span>Receipt Sent</span>
+          </label>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" name="thank_you_sent" <%= donation.thank_you_sent ? 'checked' : '' %>>
+            <span>Thank You Sent</span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="notes">Notes</label>
+        <textarea id="notes" name="notes" rows="3"><%= donation.notes || '' %></textarea>
+      </div>
+    </div>
+    
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        <%= isEdit ? 'Update Donation' : 'Add Donation' %>
+      </button>
+      <a href="/portal/donations" class="btn btn-outline">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<%- include('../../partials/portal-footer') %>
+

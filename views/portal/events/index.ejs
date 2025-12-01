@@ -1,0 +1,118 @@
+<%- include('../../partials/portal-header', { currentPage: 'events', pageTitle: 'Events' }) %>
+
+<div class="page-actions">
+  <% if (user && user.role === 'manager') { %>
+    <a href="/portal/events/new" class="btn btn-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Event
+    </a>
+  <% } %>
+</div>
+
+<!-- Filters -->
+<div class="filters-card">
+  <form class="filters-form" method="GET" action="/portal/events">
+    <div class="filter-group">
+      <label for="search">Search</label>
+      <input type="text" id="search" name="search" value="<%= filters.search || '' %>" placeholder="Title, location...">
+    </div>
+    <div class="filter-group">
+      <label for="type">Event Type</label>
+      <select id="type" name="type">
+        <option value="">All Types</option>
+        <% eventTypes.forEach(t => { %>
+          <option value="<%= t %>" <%= filters.type === t ? 'selected' : '' %>><%= t %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label for="status">Status</label>
+      <select id="status" name="status">
+        <option value="">All</option>
+        <option value="upcoming" <%= filters.status === 'upcoming' ? 'selected' : '' %>>Upcoming</option>
+        <option value="past" <%= filters.status === 'past' ? 'selected' : '' %>>Past</option>
+        <option value="active" <%= filters.status === 'active' ? 'selected' : '' %>>Active</option>
+        <option value="inactive" <%= filters.status === 'inactive' ? 'selected' : '' %>>Inactive</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-secondary">Filter</button>
+    <a href="/portal/events" class="btn btn-outline">Clear</a>
+  </form>
+</div>
+
+<!-- Data Table -->
+<div class="table-card">
+  <div class="table-responsive">
+    <table class="data-table" role="table" aria-label="Events list">
+      <thead>
+        <tr>
+          <th scope="col">Date</th>
+          <th scope="col">Title</th>
+          <th scope="col">Type</th>
+          <th scope="col">Location</th>
+          <th scope="col">Participants</th>
+          <th scope="col">Status</th>
+          <th scope="col" class="actions-col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (events && events.length > 0) { %>
+          <% events.forEach(e => { %>
+            <tr>
+              <td>
+                <div class="event-date-cell">
+                  <span class="date-month"><%= new Date(e.event_date).toLocaleString('en-US', { month: 'short' }) %></span>
+                  <span class="date-day"><%= new Date(e.event_date).getDate() %></span>
+                </div>
+              </td>
+              <td>
+                <strong><%= e.title %></strong>
+                <% if (e.start_time) { %>
+                  <br><small><%= e.start_time.substring(0, 5) %><% if (e.end_time) { %> - <%= e.end_time.substring(0, 5) %><% } %></small>
+                <% } %>
+              </td>
+              <td><span class="type-badge type-<%= e.event_type %>"><%= e.event_type %></span></td>
+              <td><%= e.venue_name || e.location || '-' %></td>
+              <td>
+                <% if (e.max_participants) { %>
+                  <%= e.current_participants || 0 %>/<%= e.max_participants %>
+                <% } else { %>
+                  <%= e.current_participants || 0 %>
+                <% } %>
+              </td>
+              <td>
+                <span class="status-badge <%= e.is_active ? 'status-active' : 'status-inactive' %>">
+                  <%= e.is_active ? 'Active' : 'Inactive' %>
+                </span>
+              </td>
+              <td class="actions-col">
+                <div class="action-buttons">
+                  <a href="/portal/events/<%= e.id %>" class="btn-icon" title="View" aria-label="View event">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </a>
+                  <% if (user && user.role === 'manager') { %>
+                    <a href="/portal/events/<%= e.id %>/edit" class="btn-icon" title="Edit" aria-label="Edit event">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </a>
+                    <form action="/portal/events/<%= e.id %>/delete" method="POST" class="inline-form" onsubmit="return confirm('Are you sure you want to delete this event?')">
+                      <button type="submit" class="btn-icon btn-icon--danger" title="Delete" aria-label="Delete event">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                      </button>
+                    </form>
+                  <% } %>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="7" class="no-data">No events found</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../../partials/portal-footer') %>
+

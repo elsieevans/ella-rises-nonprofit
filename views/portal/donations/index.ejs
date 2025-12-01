@@ -1,0 +1,126 @@
+<%- include('../../partials/portal-header', { currentPage: 'donations', pageTitle: 'Donations' }) %>
+
+<div class="page-actions">
+  <% if (user && user.role === 'manager') { %>
+    <a href="/portal/donations/new" class="btn btn-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Donation
+    </a>
+  <% } %>
+</div>
+
+<!-- Stats Cards -->
+<div class="stats-row">
+  <div class="mini-stat mini-stat--large">
+    <span class="mini-stat-value">$<%= parseFloat(stats.total || 0).toLocaleString() %></span>
+    <span class="mini-stat-label">Total Donations</span>
+  </div>
+  <div class="mini-stat">
+    <span class="mini-stat-value"><%= stats.count %></span>
+    <span class="mini-stat-label">Total Gifts</span>
+  </div>
+  <div class="mini-stat">
+    <span class="mini-stat-value">$<%= parseFloat(stats.average || 0).toLocaleString(undefined, {maximumFractionDigits: 0}) %></span>
+    <span class="mini-stat-label">Avg. Gift</span>
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="filters-card">
+  <form class="filters-form" method="GET" action="/portal/donations">
+    <div class="filter-group">
+      <label for="search">Search</label>
+      <input type="text" id="search" name="search" value="<%= filters.search || '' %>" placeholder="Donor name or email...">
+    </div>
+    <div class="filter-group">
+      <label for="type">Type</label>
+      <select id="type" name="type">
+        <option value="">All Types</option>
+        <% donationTypes.forEach(t => { %>
+          <option value="<%= t %>" <%= filters.type === t ? 'selected' : '' %>><%= t %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label for="campaign">Campaign</label>
+      <select id="campaign" name="campaign">
+        <option value="">All Campaigns</option>
+        <% campaigns.forEach(c => { %>
+          <option value="<%= c %>" <%= filters.campaign === c ? 'selected' : '' %>><%= c %></option>
+        <% }) %>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-secondary">Filter</button>
+    <a href="/portal/donations" class="btn btn-outline">Clear</a>
+  </form>
+</div>
+
+<!-- Data Table -->
+<div class="table-card">
+  <div class="table-responsive">
+    <table class="data-table" role="table" aria-label="Donations list">
+      <thead>
+        <tr>
+          <th scope="col">Date</th>
+          <th scope="col">Donor</th>
+          <th scope="col">Amount</th>
+          <th scope="col">Type</th>
+          <th scope="col">Campaign</th>
+          <th scope="col">Status</th>
+          <th scope="col" class="actions-col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (donations && donations.length > 0) { %>
+          <% donations.forEach(d => { %>
+            <tr>
+              <td><%= new Date(d.donation_date).toLocaleDateString() %></td>
+              <td>
+                <% if (d.is_anonymous) { %>
+                  <em>Anonymous</em>
+                <% } else { %>
+                  <strong><%= d.donor_name %></strong>
+                  <% if (d.donor_email) { %><br><small><%= d.donor_email %></small><% } %>
+                <% } %>
+              </td>
+              <td class="amount-cell">$<%= parseFloat(d.amount).toLocaleString() %></td>
+              <td><span class="type-badge type-<%= d.donation_type %>"><%= d.donation_type %></span></td>
+              <td><%= d.campaign || '-' %></td>
+              <td>
+                <% if (d.thank_you_sent) { %>
+                  <span class="status-badge status-active" title="Thank you sent">✓ Thanked</span>
+                <% } else { %>
+                  <span class="status-badge status-pending" title="Thank you pending">Pending</span>
+                <% } %>
+              </td>
+              <td class="actions-col">
+                <div class="action-buttons">
+                  <a href="/portal/donations/<%= d.id %>" class="btn-icon" title="View" aria-label="View donation">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </a>
+                  <% if (user && user.role === 'manager') { %>
+                    <a href="/portal/donations/<%= d.id %>/edit" class="btn-icon" title="Edit" aria-label="Edit donation">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </a>
+                    <form action="/portal/donations/<%= d.id %>/delete" method="POST" class="inline-form" onsubmit="return confirm('Delete this donation record?')">
+                      <button type="submit" class="btn-icon btn-icon--danger" title="Delete" aria-label="Delete donation">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                      </button>
+                    </form>
+                  <% } %>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="7" class="no-data">No donations found</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../../partials/portal-footer') %>
+

@@ -1,0 +1,227 @@
+<%- include('../partials/header') %>
+
+<!-- Page Header -->
+<section class="page-header page-header--donate">
+  <div class="container">
+    <h1>Donate</h1>
+    <p class="page-subtitle">Your generosity empowers young women to achieve their dreams</p>
+  </div>
+</section>
+
+<!-- Donation Impact -->
+<section class="donation-impact">
+  <div class="container">
+    <div class="section-header text-center">
+      <span class="section-label">Your Impact</span>
+      <h2>See How Your Donation Helps</h2>
+      <p>Every dollar goes directly to supporting our programs and participants.</p>
+    </div>
+    
+    <div class="impact-cards">
+      <div class="impact-card">
+        <span class="impact-amount">$25</span>
+        <h3>Workshop Supplies</h3>
+        <p>Provides materials for one participant to complete a STEAM workshop, including coding supplies and art materials.</p>
+      </div>
+      <div class="impact-card impact-card--featured">
+        <span class="impact-amount">$100</span>
+        <h3>Monthly Sponsorship</h3>
+        <p>Sponsors one participant for a full month of programming, including workshops, mentoring, and events.</p>
+      </div>
+      <div class="impact-card">
+        <span class="impact-amount">$500</span>
+        <h3>Complete Workshop</h3>
+        <p>Funds an entire workshop session for 20 participants, including instruction, materials, and venue.</p>
+      </div>
+      <div class="impact-card">
+        <span class="impact-amount">$1,000</span>
+        <h3>Annual Program Support</h3>
+        <p>Supports the mentoring program for one full year, connecting participants with industry professionals.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Donation Form -->
+<section class="donation-form-section">
+  <div class="container">
+    <div class="donation-grid">
+      <div class="donation-info">
+        <h2>Make a Donation</h2>
+        <p>Choose how you'd like to support Ella Rises. All donations are tax-deductible.</p>
+        
+        <div class="donation-types">
+          <div class="donation-type">
+            <h3>💳 Online Donation</h3>
+            <p>Make a secure online donation using the form. We accept all major credit cards.</p>
+          </div>
+          <div class="donation-type">
+            <h3>📬 Mail a Check</h3>
+            <p>Mail checks payable to "Ella Rises" to:<br>
+            Ella Rises<br>
+            123 Main Street<br>
+            Provo, UT 84601</p>
+          </div>
+          <div class="donation-type">
+            <h3>🏢 Corporate Giving</h3>
+            <p>Interested in corporate sponsorship or matching gifts? <a href="/contact">Contact us</a> to discuss partnership opportunities.</p>
+          </div>
+        </div>
+        
+        <div class="tax-info">
+          <h3>Tax Information</h3>
+          <p>Ella Rises is a 501(c)(3) non-profit organization. All donations are tax-deductible to the extent allowed by law. You will receive a receipt for your records.</p>
+          <p><strong>EIN:</strong> XX-XXXXXXX</p>
+        </div>
+      </div>
+      
+      <div class="donation-form-wrapper">
+        <form class="donation-form" action="/contact" method="GET">
+          <h3>Donation Details</h3>
+          
+          <div class="form-group">
+            <label>Select Amount</label>
+            <div class="amount-buttons">
+              <button type="button" class="amount-btn" data-amount="25">$25</button>
+              <button type="button" class="amount-btn" data-amount="50">$50</button>
+              <button type="button" class="amount-btn active" data-amount="100">$100</button>
+              <button type="button" class="amount-btn" data-amount="250">$250</button>
+              <button type="button" class="amount-btn" data-amount="500">$500</button>
+              <button type="button" class="amount-btn" data-amount="1000">$1,000</button>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="custom-amount">Or Enter Custom Amount</label>
+            <div class="custom-amount-input">
+              <span class="currency">$</span>
+              <input type="number" id="custom-amount" name="amount" min="1" placeholder="Enter amount">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Donation Frequency</label>
+            <div class="frequency-options">
+              <label class="radio-option">
+                <input type="radio" name="frequency" value="one-time" checked>
+                <span>One-Time</span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="frequency" value="monthly">
+                <span>Monthly</span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="frequency" value="annual">
+                <span>Annual</span>
+              </label>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="donor-name">Your Name</label>
+            <input type="text" id="donor-name" name="name" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="donor-email">Email Address</label>
+            <input type="email" id="donor-email" name="email" required>
+          </div>
+          
+          <div class="form-group">
+            <label class="checkbox-option">
+              <input type="checkbox" name="anonymous">
+              <span>Make this donation anonymous</span>
+            </label>
+          </div>
+          
+          <div class="form-group">
+            <label for="dedication">Dedicate This Gift (Optional)</label>
+            <input type="text" id="dedication" name="dedication" placeholder="In honor of...">
+          </div>
+          
+          <p class="form-note">Note: This is a demonstration form. For actual donations, please contact us directly or mail a check.</p>
+          
+          <button type="submit" class="btn btn-cta btn-lg btn-block">Continue to Payment</button>
+          
+          <p class="secure-note">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Secure, encrypted donation
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Monthly Giving -->
+<section class="monthly-giving">
+  <div class="container">
+    <div class="monthly-content">
+      <div class="monthly-text">
+        <span class="section-label">Sustaining Support</span>
+        <h2>Join Our Monthly Giving Circle</h2>
+        <p>Monthly donors provide reliable, sustainable support that allows us to plan and expand our programs with confidence.</p>
+        
+        <h3>Monthly Donor Benefits</h3>
+        <ul class="benefit-list">
+          <li>Exclusive quarterly impact reports</li>
+          <li>Invitations to special events</li>
+          <li>Recognition on our website (optional)</li>
+          <li>Direct updates from program participants</li>
+        </ul>
+      </div>
+      <div class="monthly-visual">
+        <div class="giving-circle-card">
+          <h3>🌟 Rising Star Circle</h3>
+          <p class="circle-amount">$25+/month</p>
+          <p>Join fellow supporters making a monthly impact</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Other Ways to Give -->
+<section class="other-giving">
+  <div class="container">
+    <div class="section-header text-center">
+      <span class="section-label">More Ways to Help</span>
+      <h2>Other Ways to Give</h2>
+    </div>
+    
+    <div class="giving-options">
+      <div class="giving-option">
+        <h3>🎁 In-Kind Donations</h3>
+        <p>Donate laptops, art supplies, robotics kits, or other materials that support our programs.</p>
+      </div>
+      <div class="giving-option">
+        <h3>📋 Planned Giving</h3>
+        <p>Include Ella Rises in your estate plans and create a lasting legacy of empowerment.</p>
+      </div>
+      <div class="giving-option">
+        <h3>🏬 Employer Matching</h3>
+        <p>Many employers match charitable donations. Check if your company offers matching gifts.</p>
+      </div>
+      <div class="giving-option">
+        <h3>📣 Fundraise</h3>
+        <p>Start a Facebook fundraiser or organize an event to raise money for Ella Rises.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-content">
+      <h2>Questions About Donating?</h2>
+      <p>We're happy to discuss how your gift can make the greatest impact.</p>
+      <div class="cta-buttons">
+        <a href="/contact" class="btn btn-cta btn-lg">Contact Us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>
+

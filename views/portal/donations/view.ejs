@@ -1,0 +1,112 @@
+<%- include('../../partials/portal-header', { currentPage: 'donations', pageTitle: 'Donation Details' }) %>
+
+<div class="page-actions">
+  <a href="/portal/donations" class="btn btn-outline">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    Back to Donations
+  </a>
+  <% if (user && user.role === 'manager') { %>
+    <a href="/portal/donations/<%= donation.id %>/edit" class="btn btn-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Edit
+    </a>
+  <% } %>
+</div>
+
+<div class="detail-grid detail-grid--two">
+  <!-- Amount Card -->
+  <div class="detail-card detail-card--highlight">
+    <div class="donation-amount-display">
+      <span class="currency">$</span>
+      <span class="amount"><%= parseFloat(donation.amount).toLocaleString() %></span>
+    </div>
+    <div class="donation-meta">
+      <span class="type-badge type-<%= donation.donation_type %>"><%= donation.donation_type %></span>
+      <span class="donation-date"><%= new Date(donation.donation_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+    </div>
+    <% if (donation.campaign) { %>
+      <p class="donation-campaign">Campaign: <strong><%= donation.campaign %></strong></p>
+    <% } %>
+  </div>
+  
+  <!-- Donor Info Card -->
+  <div class="detail-card">
+    <div class="card-header">
+      <h3>Donor Information</h3>
+    </div>
+    
+    <div class="detail-section">
+      <dl class="detail-list">
+        <dt>Name</dt>
+        <dd><%= donation.is_anonymous ? '<em>Anonymous</em>' : donation.donor_name %></dd>
+        <% if (!donation.is_anonymous) { %>
+          <dt>Email</dt>
+          <dd><%= donation.donor_email ? '<a href="mailto:' + donation.donor_email + '">' + donation.donor_email + '</a>' : '-' %></dd>
+          <dt>Phone</dt>
+          <dd><%= donation.donor_phone || '-' %></dd>
+        <% } %>
+      </dl>
+    </div>
+  </div>
+  
+  <!-- Payment Details Card -->
+  <div class="detail-card">
+    <div class="card-header">
+      <h3>Payment Details</h3>
+    </div>
+    
+    <div class="detail-section">
+      <dl class="detail-list">
+        <dt>Payment Method</dt>
+        <dd><%= donation.payment_method ? donation.payment_method.replace('_', ' ') : '-' %></dd>
+        <dt>Transaction ID</dt>
+        <dd><%= donation.transaction_id || '-' %></dd>
+        <dt>Date Received</dt>
+        <dd><%= new Date(donation.donation_date).toLocaleDateString() %></dd>
+      </dl>
+    </div>
+  </div>
+  
+  <!-- Status Card -->
+  <div class="detail-card">
+    <div class="card-header">
+      <h3>Status</h3>
+    </div>
+    
+    <div class="status-checklist">
+      <div class="status-item <%= donation.receipt_sent ? 'status-item--complete' : '' %>">
+        <span class="status-icon">
+          <% if (donation.receipt_sent) { %>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          <% } else { %>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+          <% } %>
+        </span>
+        <span>Receipt Sent</span>
+      </div>
+      <div class="status-item <%= donation.thank_you_sent ? 'status-item--complete' : '' %>">
+        <span class="status-icon">
+          <% if (donation.thank_you_sent) { %>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          <% } else { %>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+          <% } %>
+        </span>
+        <span>Thank You Sent</span>
+      </div>
+    </div>
+  </div>
+  
+  <% if (donation.notes) { %>
+  <!-- Notes Card -->
+  <div class="detail-card detail-card--wide">
+    <div class="card-header">
+      <h3>Notes</h3>
+    </div>
+    <p><%= donation.notes %></p>
+  </div>
+  <% } %>
+</div>
+
+<%- include('../../partials/portal-footer') %>
+

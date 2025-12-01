@@ -1,0 +1,123 @@
+<%- include('../../partials/portal-header', { currentPage: 'participants', pageTitle: isEdit ? 'Edit Participant' : 'Add Participant' }) %>
+
+<div class="page-actions">
+  <a href="/portal/participants" class="btn btn-outline">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    Back to Participants
+  </a>
+</div>
+
+<div class="form-card">
+  <form action="/portal/participants<%= isEdit ? '/' + participant.id : '' %>" method="POST" class="crud-form">
+    <div class="form-section">
+      <h3>Personal Information</h3>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="first_name">First Name <span class="required">*</span></label>
+          <input type="text" id="first_name" name="first_name" value="<%= participant.first_name || '' %>" required>
+        </div>
+        <div class="form-group">
+          <label for="last_name">Last Name <span class="required">*</span></label>
+          <input type="text" id="last_name" name="last_name" value="<%= participant.last_name || '' %>" required>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="email">Email <span class="required">*</span></label>
+          <input type="email" id="email" name="email" value="<%= participant.email || '' %>" required>
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone</label>
+          <input type="tel" id="phone" name="phone" value="<%= participant.phone || '' %>">
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="date_of_birth">Date of Birth</label>
+          <input type="date" id="date_of_birth" name="date_of_birth" value="<%= participant.date_of_birth ? new Date(participant.date_of_birth).toISOString().split('T')[0] : '' %>">
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-section">
+      <h3>School Information</h3>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="school">School</label>
+          <input type="text" id="school" name="school" value="<%= participant.school || '' %>">
+        </div>
+        <div class="form-group">
+          <label for="grade_level">Grade Level</label>
+          <select id="grade_level" name="grade_level">
+            <option value="">Select Grade</option>
+            <option value="6th Grade" <%= participant.grade_level === '6th Grade' ? 'selected' : '' %>>6th Grade</option>
+            <option value="7th Grade" <%= participant.grade_level === '7th Grade' ? 'selected' : '' %>>7th Grade</option>
+            <option value="8th Grade" <%= participant.grade_level === '8th Grade' ? 'selected' : '' %>>8th Grade</option>
+            <option value="9th Grade" <%= participant.grade_level === '9th Grade' ? 'selected' : '' %>>9th Grade</option>
+            <option value="10th Grade" <%= participant.grade_level === '10th Grade' ? 'selected' : '' %>>10th Grade</option>
+            <option value="11th Grade" <%= participant.grade_level === '11th Grade' ? 'selected' : '' %>>11th Grade</option>
+            <option value="12th Grade" <%= participant.grade_level === '12th Grade' ? 'selected' : '' %>>12th Grade</option>
+            <option value="College" <%= participant.grade_level === 'College' ? 'selected' : '' %>>College</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-section">
+      <h3>Parent/Guardian Information</h3>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="parent_guardian_name">Parent/Guardian Name</label>
+          <input type="text" id="parent_guardian_name" name="parent_guardian_name" value="<%= participant.parent_guardian_name || '' %>">
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="parent_guardian_email">Parent/Guardian Email</label>
+          <input type="email" id="parent_guardian_email" name="parent_guardian_email" value="<%= participant.parent_guardian_email || '' %>">
+        </div>
+        <div class="form-group">
+          <label for="parent_guardian_phone">Parent/Guardian Phone</label>
+          <input type="tel" id="parent_guardian_phone" name="parent_guardian_phone" value="<%= participant.parent_guardian_phone || '' %>">
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-section">
+      <h3>Additional Information</h3>
+      
+      <div class="form-group">
+        <label for="interests">Interests</label>
+        <textarea id="interests" name="interests" rows="3" placeholder="Coding, Robotics, Art, etc."><%= participant.interests || '' %></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="notes">Notes</label>
+        <textarea id="notes" name="notes" rows="3"><%= participant.notes || '' %></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input type="checkbox" name="is_active" <%= !isEdit || participant.is_active ? 'checked' : '' %>>
+          <span>Active Participant</span>
+        </label>
+      </div>
+    </div>
+    
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        <%= isEdit ? 'Update Participant' : 'Add Participant' %>
+      </button>
+      <a href="/portal/participants" class="btn btn-outline">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<%- include('../../partials/portal-footer') %>
+

@@ -1,0 +1,117 @@
+<%- include('../../partials/portal-header', { currentPage: 'events', pageTitle: isEdit ? 'Edit Event' : 'Add Event' }) %>
+
+<div class="page-actions">
+  <a href="/portal/events" class="btn btn-outline">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    Back to Events
+  </a>
+</div>
+
+<div class="form-card">
+  <form action="/portal/events<%= isEdit ? '/' + event.id : '' %>" method="POST" class="crud-form">
+    <div class="form-section">
+      <h3>Event Details</h3>
+      
+      <div class="form-group">
+        <label for="title">Event Title <span class="required">*</span></label>
+        <input type="text" id="title" name="title" value="<%= event.title || '' %>" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" rows="4"><%= event.description || '' %></textarea>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="event_type">Event Type <span class="required">*</span></label>
+          <select id="event_type" name="event_type" required>
+            <% eventTypes.forEach(t => { %>
+              <option value="<%= t %>" <%= event.event_type === t ? 'selected' : '' %>><%= t %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="event_date">Event Date <span class="required">*</span></label>
+          <input type="date" id="event_date" name="event_date" value="<%= event.event_date ? new Date(event.event_date).toISOString().split('T')[0] : '' %>" required>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="start_time">Start Time</label>
+          <input type="time" id="start_time" name="start_time" value="<%= event.start_time ? event.start_time.substring(0, 5) : '' %>">
+        </div>
+        <div class="form-group">
+          <label for="end_time">End Time</label>
+          <input type="time" id="end_time" name="end_time" value="<%= event.end_time ? event.end_time.substring(0, 5) : '' %>">
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-section">
+      <h3>Location</h3>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="venue_name">Venue Name</label>
+          <input type="text" id="venue_name" name="venue_name" value="<%= event.venue_name || '' %>" placeholder="e.g., Utah Valley University">
+        </div>
+        <div class="form-group">
+          <label for="location">Address/Room</label>
+          <input type="text" id="location" name="location" value="<%= event.location || '' %>" placeholder="e.g., Engineering Building, Room 201">
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-section">
+      <h3>Additional Information</h3>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="max_participants">Max Participants</label>
+          <input type="number" id="max_participants" name="max_participants" value="<%= event.max_participants || '' %>" min="1">
+        </div>
+        <div class="form-group">
+          <label for="instructor">Instructor/Leader</label>
+          <input type="text" id="instructor" name="instructor" value="<%= event.instructor || '' %>">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="partner_organization">Partner Organization</label>
+        <input type="text" id="partner_organization" name="partner_organization" value="<%= event.partner_organization || '' %>" placeholder="e.g., UVU, BYU">
+      </div>
+      
+      <div class="form-group">
+        <label for="notes">Notes</label>
+        <textarea id="notes" name="notes" rows="3"><%= event.notes || '' %></textarea>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" name="is_active" <%= !isEdit || event.is_active ? 'checked' : '' %>>
+            <span>Active Event</span>
+          </label>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" name="is_recurring" <%= event.is_recurring ? 'checked' : '' %>>
+            <span>Recurring Event</span>
+          </label>
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        <%= isEdit ? 'Update Event' : 'Add Event' %>
+      </button>
+      <a href="/portal/events" class="btn btn-outline">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<%- include('../../partials/portal-footer') %>
+
