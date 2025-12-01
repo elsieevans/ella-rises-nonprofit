@@ -21,8 +21,8 @@
    ============================================ */
 .portal-sidebar {
   width: 260px;
-  background: var(--color-gray-900);
-  color: var(--color-gray-400);
+  background: var(--color-primary);
+  color: rgba(255, 255, 255, 0.7);
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -45,25 +45,57 @@
 
 .sidebar-header {
   padding: var(--space-xl) var(--space-lg);
-  border-bottom: 1px solid var(--color-gray-800);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .sidebar-logo {
   display: flex;
-  align-items: baseline;
-  gap: var(--space-xs);
-  font-weight: 700;
-  font-size: var(--text-xl);
+  align-items: center;
   text-decoration: none;
   margin-bottom: var(--space-xs);
 }
 
+.sidebar-logo:hover {
+  text-decoration: none;
+}
+
+.sidebar-logo-img {
+  height: 65px;
+  width: auto;
+  transition: transform var(--transition-fast);
+}
+
+.sidebar-logo:hover .sidebar-logo-img {
+  transform: scale(1.02);
+}
+
+/* Legacy text logo support */
+.sidebar-logo .logo-ella {
+  font-family: var(--font-script);
+  font-size: 1.6rem;
+  color: var(--color-white);
+}
+
+.sidebar-logo .logo-heart {
+  color: var(--color-accent-rose);
+  font-size: 0.9rem;
+}
+
+.sidebar-logo .logo-rises {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  color: var(--color-white);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
 .sidebar-logo .logo-text {
+  font-family: var(--font-script);
   color: var(--color-white);
 }
 
 .sidebar-logo .logo-accent {
-  color: var(--color-secondary-pink);
+  color: var(--color-accent-rose);
 }
 
 .sidebar-subtitle {
@@ -97,13 +129,13 @@
 
 .sidebar-link:hover {
   color: var(--color-white);
-  background: var(--color-gray-800);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .sidebar-link.active {
   color: var(--color-white);
-  background: var(--color-gray-800);
-  border-left-color: var(--color-primary);
+  background: rgba(255, 255, 255, 0.1);
+  border-left-color: var(--color-accent-magenta);
 }
 
 .sidebar-link svg {
@@ -117,7 +149,7 @@
 
 .sidebar-footer {
   padding: var(--space-lg);
-  border-top: 1px solid var(--color-gray-800);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .user-info {
@@ -130,7 +162,7 @@
 .user-avatar {
   width: 40px;
   height: 40px;
-  background: var(--color-primary);
+  background: var(--color-accent-sage);
   color: var(--color-white);
   border-radius: var(--radius-full);
   display: flex;
@@ -218,7 +250,7 @@
 }
 
 .role-badge--manager {
-  background: var(--color-primary);
+  background: var(--color-accent-magenta);
   color: var(--color-white);
 }
 
@@ -285,11 +317,11 @@
   color: var(--color-white);
 }
 
-.stat-card--participants .stat-icon { background: var(--color-primary); }
-.stat-card--events .stat-icon { background: var(--color-secondary-pink); }
-.stat-card--surveys .stat-icon { background: var(--color-secondary-blue); }
-.stat-card--donations .stat-icon { background: #27ae60; }
-.stat-card--milestones .stat-icon { background: var(--color-secondary-peach); }
+.stat-card--participants .stat-icon { background: var(--color-accent-magenta); }
+.stat-card--events .stat-icon { background: var(--color-accent-sage); }
+.stat-card--surveys .stat-icon { background: var(--color-accent-lavender); }
+.stat-card--donations .stat-icon { background: var(--color-accent-peach); }
+.stat-card--milestones .stat-icon { background: var(--color-accent-rose); }
 
 .stat-info {
   flex: 1;
@@ -333,7 +365,7 @@
   display: block;
   font-size: var(--text-xl);
   font-weight: 700;
-  color: var(--color-primary);
+  color: var(--color-accent-magenta);
 }
 
 .mini-stat-label {
@@ -440,7 +472,7 @@
 .recent-avatar {
   width: 36px;
   height: 36px;
-  background: var(--color-primary);
+  background: var(--color-accent-sage);
   color: var(--color-white);
   border-radius: var(--radius-full);
   display: flex;
@@ -479,7 +511,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: var(--color-primary);
+  background: var(--color-accent-sage);
   color: var(--color-white);
   padding: var(--space-sm);
   border-radius: var(--radius-sm);
@@ -500,7 +532,7 @@
 
 .donation-amount {
   font-weight: 700;
-  color: #27ae60;
+  color: var(--color-accent-sage);
   font-size: var(--text-sm);
 }
 
@@ -609,10 +641,10 @@
   gap: var(--space-md);
 }
 
-.user-avatar {
+.user-cell .user-avatar {
   width: 32px;
   height: 32px;
-  background: var(--color-primary);
+  background: var(--color-accent-sage);
   color: var(--color-white);
   border-radius: var(--radius-full);
   display: flex;
@@ -633,7 +665,7 @@
 .date-month {
   font-size: var(--text-xs);
   text-transform: uppercase;
-  color: var(--color-primary);
+  color: var(--color-accent-magenta);
   font-weight: 600;
 }
 
@@ -644,7 +676,7 @@
 
 .amount-cell {
   font-weight: 600;
-  color: #27ae60;
+  color: var(--color-accent-sage);
 }
 
 /* Status Badges */
@@ -675,17 +707,17 @@
   text-transform: capitalize;
 }
 
-.type-workshop { background: var(--color-primary); color: white; }
-.type-mentoring { background: var(--color-secondary-pink); color: var(--color-gray-900); }
-.type-leadership { background: var(--color-secondary-peach); color: var(--color-gray-900); }
+.type-workshop { background: var(--color-accent-magenta); color: white; }
+.type-mentoring { background: var(--color-accent-rose); color: var(--color-gray-900); }
+.type-leadership { background: var(--color-accent-peach); color: var(--color-gray-900); }
 .type-steam { background: var(--color-primary); color: white; }
-.type-arts { background: var(--color-secondary-blue); color: var(--color-gray-900); }
-.type-community { background: var(--color-gray-700); color: white; }
+.type-arts { background: var(--color-accent-lavender); color: white; }
+.type-community { background: var(--color-accent-sage); color: white; }
 .type-other { background: var(--color-gray-400); color: white; }
-.type-one-time { background: var(--color-info-light); color: var(--color-info); }
-.type-monthly { background: var(--color-success-light); color: var(--color-success); }
-.type-annual { background: var(--color-primary); color: white; }
-.type-in-kind { background: var(--color-secondary-peach); color: var(--color-gray-900); }
+.type-one-time { background: var(--color-accent-sky); color: var(--color-primary); }
+.type-monthly { background: var(--color-accent-sage); color: white; }
+.type-annual { background: var(--color-accent-magenta); color: white; }
+.type-in-kind { background: var(--color-accent-peach); color: var(--color-gray-900); }
 
 /* Score Badges */
 .score-badge {
@@ -727,7 +759,7 @@
 }
 
 .btn-icon:hover {
-  background: var(--color-primary);
+  background: var(--color-accent-sage);
   color: var(--color-white);
 }
 
@@ -833,7 +865,7 @@
   -webkit-appearance: none;
   width: 20px;
   height: 20px;
-  background: var(--color-primary);
+  background: var(--color-accent-magenta);
   border-radius: var(--radius-full);
   cursor: pointer;
 }
@@ -841,7 +873,7 @@
 .score-display {
   font-size: var(--text-xl);
   font-weight: 700;
-  color: var(--color-primary);
+  color: var(--color-accent-magenta);
   min-width: 30px;
   text-align: center;
 }
@@ -884,7 +916,7 @@
 }
 
 .detail-card--highlight {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+  background: var(--color-accent-sage);
   color: var(--color-white);
   text-align: center;
 }
@@ -899,7 +931,7 @@
 .detail-avatar {
   width: 64px;
   height: 64px;
-  background: var(--color-primary);
+  background: var(--color-accent-sage);
   color: var(--color-white);
   border-radius: var(--radius-full);
   display: flex;
@@ -970,7 +1002,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: var(--color-primary);
+  background: var(--color-accent-sage);
   color: var(--color-white);
   padding: var(--space-lg);
   border-radius: var(--radius-md);
@@ -1019,7 +1051,7 @@
 .score-value {
   font-size: var(--text-xl);
   font-weight: 700;
-  color: var(--color-primary);
+  color: var(--color-accent-magenta);
 }
 
 /* Survey List */
@@ -1089,12 +1121,12 @@
   color: var(--color-white);
 }
 
-.milestone-badge--academic { background: #3498db; }
-.milestone-badge--leadership { background: #f1c40f; }
+.milestone-badge--academic { background: var(--color-accent-sky); }
+.milestone-badge--leadership { background: var(--color-accent-peach); }
 .milestone-badge--technical { background: var(--color-primary); }
-.milestone-badge--artistic { background: var(--color-secondary-pink); }
-.milestone-badge--community { background: #27ae60; }
-.milestone-badge--personal { background: var(--color-secondary-peach); }
+.milestone-badge--artistic { background: var(--color-accent-rose); }
+.milestone-badge--community { background: var(--color-accent-sage); }
+.milestone-badge--personal { background: var(--color-accent-lavender); }
 
 .milestone-info {
   flex: 1;
@@ -1262,7 +1294,7 @@
 }
 
 .milestone-points {
-  background: var(--color-primary);
+  background: var(--color-accent-magenta);
   color: var(--color-white);
   padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-sm);
