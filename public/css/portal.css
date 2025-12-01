@@ -43,16 +43,47 @@
   }
 }
 
+/* Sidebar Mobile Overlay */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+@media (max-width: 768px) {
+  .sidebar-overlay {
+    display: block;
+    pointer-events: none;
+  }
+  
+  .sidebar-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  
+  /* Prevent body scroll when sidebar is open */
+  body.sidebar-open {
+    overflow: hidden;
+  }
+}
+
 .sidebar-header {
   padding: var(--space-xl) var(--space-lg);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
 }
 
 .sidebar-logo {
   display: flex;
   align-items: center;
+  justify-content: center;
   text-decoration: none;
   margin-bottom: var(--space-xs);
+  width: 100%;
 }
 
 .sidebar-logo:hover {
@@ -60,7 +91,7 @@
 }
 
 .sidebar-logo-img {
-  height: 65px;
+  height: 85px;
   width: auto;
   transition: transform var(--transition-fast);
 }
@@ -288,24 +319,46 @@
    ============================================ */
 .dashboard-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--space-lg);
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-md);
   margin-bottom: var(--space-xl);
+}
+
+@media (max-width: 1200px) {
+  .dashboard-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-stats {
+    grid-template-columns: 1fr;
+  }
 }
 
 .stat-card {
   background: var(--color-white);
-  padding: var(--space-xl);
+  padding: var(--space-md);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: var(--space-lg);
+  justify-content: center;
+  gap: var(--space-sm);
+  text-align: center;
+  min-height: 120px;
 }
 
 .stat-icon {
-  width: 56px;
-  height: 56px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
@@ -315,6 +368,8 @@
 
 .stat-icon svg {
   color: var(--color-white);
+  width: 20px;
+  height: 20px;
 }
 
 .stat-card--participants .stat-icon { background: var(--color-accent-magenta); }
@@ -324,20 +379,21 @@
 .stat-card--milestones .stat-icon { background: var(--color-accent-rose); }
 
 .stat-info {
-  flex: 1;
+  text-align: center;
 }
 
 .stat-value {
   display: block;
-  font-size: var(--text-2xl);
+  font-size: var(--text-lg);
   font-weight: 700;
   color: var(--color-gray-900);
   line-height: 1.2;
 }
 
 .stat-label {
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
   color: var(--color-gray-600);
+  line-height: 1.3;
 }
 
 /* Mini Stats Row */
@@ -677,6 +733,45 @@
 .amount-cell {
   font-weight: 600;
   color: var(--color-accent-sage);
+}
+
+/* Donor cell styling */
+.donor-cell {
+  max-width: 200px;
+}
+
+.donor-cell strong {
+  display: block;
+  word-break: break-word;
+  line-height: 1.3;
+}
+
+.donor-cell small {
+  display: block;
+  word-break: break-all;
+  color: var(--color-gray-500);
+  margin-top: 2px;
+}
+
+@media (max-width: 768px) {
+  .donor-cell {
+    max-width: none;
+    text-align: right;
+  }
+  
+  .donor-cell strong {
+    text-align: right;
+  }
+}
+
+/* Mobile-only table cells - hidden on desktop, shown on mobile */
+.mobile-only-cell {
+  display: none;
+}
+
+/* Desktop-only elements - shown on desktop, hidden on mobile */
+.desktop-only {
+  display: block;
 }
 
 /* Status Badges */
@@ -1377,6 +1472,19 @@
 /* ============================================
    Responsive Adjustments
    ============================================ */
+
+/* Medium screens */
+@media (max-width: 968px) {
+  .portal-topbar {
+    padding: var(--space-sm) var(--space-md);
+  }
+  
+  .topbar-title {
+    font-size: var(--text-lg);
+  }
+}
+
+/* Mobile screens */
 @media (max-width: 768px) {
   .portal-content {
     padding: var(--space-md);
@@ -1400,6 +1508,635 @@
   
   .filter-group {
     width: 100%;
+  }
+  
+  /* Page Actions - Stack on mobile */
+  .page-actions {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+  
+  .page-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* Top bar adjustments */
+  .portal-topbar {
+    padding: var(--space-sm) var(--space-md);
+    gap: var(--space-sm);
+  }
+  
+  .topbar-title {
+    font-size: var(--text-base);
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .role-badge {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: 9px;
+  }
+  
+  /* Mobile overlay for sidebar */
+  .portal-sidebar.active::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: -1;
+  }
+  
+  /* Stats Row Mobile */
+  .stats-row {
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+  
+  .mini-stat {
+    min-width: unset;
+    width: 100%;
+  }
+  
+  .mini-stat--large {
+    flex: unset;
+  }
+  
+  /* Form sections mobile */
+  .form-section {
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-lg);
+  }
+  
+  .form-section h3 {
+    font-size: var(--text-base);
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .form-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* Event header mobile */
+  .event-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-lg);
+  }
+  
+  .event-date-large {
+    align-self: flex-start;
+  }
+  
+  /* Detail header mobile */
+  .detail-header {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+  
+  /* Survey scores mobile */
+  .survey-scores {
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+  
+  .score-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) 0;
+    border-bottom: 1px solid var(--color-gray-200);
+  }
+  
+  .score-item:last-child {
+    border-bottom: none;
+  }
+  
+  /* Scores display mobile */
+  .scores-display {
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+  
+  .score-circle {
+    width: 60px;
+    height: 60px;
+    font-size: var(--text-xl);
+  }
+  
+  /* Donation meta mobile */
+  .donation-meta {
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+  
+  /* Card footer forms mobile */
+  .card-footer form.inline-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+  
+  .card-footer .form-row {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+  
+  .card-footer select,
+  .card-footer input {
+    width: 100%;
+  }
+  
+  .card-footer .btn {
+    width: 100%;
+  }
+}
+
+/* Small mobile screens */
+@media (max-width: 480px) {
+  .portal-content {
+    padding: var(--space-sm);
+  }
+  
+  .dashboard-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .stat-card {
+    min-height: 100px;
+    padding: var(--space-md);
+  }
+  
+  .detail-avatar {
+    width: 48px;
+    height: 48px;
+    font-size: var(--text-base);
+  }
+  
+  .detail-title h2 {
+    font-size: var(--text-lg);
+  }
+  
+  /* Milestone detail header mobile */
+  .milestone-detail-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .milestone-badge-large {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* ============================================
+   Mobile Card Layout for Tables
+   ============================================ */
+@media (max-width: 768px) {
+  /* Hide table headers on mobile */
+  .data-table thead {
+    display: none;
+  }
+  
+  .data-table,
+  .data-table tbody,
+  .data-table tr,
+  .data-table td {
+    display: block;
+    width: 100%;
+  }
+  
+  .data-table tbody tr {
+    margin-bottom: var(--space-md);
+    border-radius: var(--radius-md);
+    background: var(--color-white);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-md);
+    border: 1px solid var(--color-gray-200);
+  }
+  
+  .data-table tbody tr:nth-child(even) {
+    background: var(--color-white);
+  }
+  
+  .data-table tbody tr:hover {
+    background: var(--color-gray-50);
+  }
+  
+  .data-table td {
+    padding: var(--space-sm) 0;
+    border-bottom: 1px solid var(--color-gray-100);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: right;
+  }
+  
+  .data-table td:last-child {
+    border-bottom: none;
+  }
+  
+  /* Add labels from data attributes */
+  .data-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--color-gray-600);
+    text-align: left;
+    flex-shrink: 0;
+    margin-right: var(--space-md);
+  }
+  
+  /* Actions column mobile styling */
+  .data-table td.actions-col {
+    justify-content: center;
+    padding-top: var(--space-md);
+    margin-top: var(--space-sm);
+    border-top: 1px solid var(--color-gray-200);
+    border-bottom: none;
+  }
+  
+  .data-table td.actions-col::before {
+    display: none;
+  }
+  
+  .action-buttons {
+    width: 100%;
+    justify-content: center;
+    gap: var(--space-md);
+  }
+  
+  /* User cell in mobile table */
+  .data-table td .user-cell {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  
+  /* Event date cell mobile */
+  .data-table td .event-date-cell {
+    flex-direction: row;
+    gap: var(--space-xs);
+  }
+  
+  /* Amount cell */
+  .data-table .amount-cell {
+    font-size: var(--text-base);
+  }
+  
+  /* Show mobile-only cells on mobile */
+  .mobile-only-cell {
+    display: flex;
+  }
+  
+  /* Hide desktop-only elements on mobile */
+  .desktop-only {
+    display: none !important;
+  }
+  
+  /* Email cell styling on mobile */
+  .data-table td[data-label="Email"] {
+    word-break: break-all;
+  }
+  
+  /* Larger touch targets for icon buttons */
+  .btn-icon {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+  }
+  
+  .btn-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* ============================================
+   Mobile Milestones Grid
+   ============================================ */
+@media (max-width: 768px) {
+  .milestones-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+  
+  .milestone-card {
+    padding: var(--space-lg);
+  }
+  
+  .milestone-header {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+  
+  .milestone-badge {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .milestone-name {
+    font-size: var(--text-base);
+  }
+  
+  .milestone-description {
+    font-size: var(--text-sm);
+  }
+  
+  .milestone-footer {
+    flex-direction: column;
+    gap: var(--space-sm);
+    align-items: flex-start;
+  }
+  
+  .milestone-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+  
+  .milestone-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ============================================
+   Mobile Filter Improvements
+   ============================================ */
+@media (max-width: 768px) {
+  .filters-card {
+    padding: var(--space-md);
+  }
+  
+  .filters-form {
+    gap: var(--space-md);
+  }
+  
+  .filter-group {
+    min-width: unset;
+  }
+  
+  .filter-group input,
+  .filter-group select {
+    padding: var(--space-md);
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+  
+  .filters-form .btn {
+    width: 100%;
+    padding: var(--space-md);
+  }
+}
+
+/* ============================================
+   Mobile Recent Lists
+   ============================================ */
+@media (max-width: 768px) {
+  .recent-item {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+  
+  .recent-info {
+    flex: 1;
+    min-width: calc(100% - 60px);
+  }
+  
+  .recent-name {
+    font-size: var(--text-sm);
+  }
+  
+  /* Event list mobile */
+  .event-item {
+    flex-wrap: wrap;
+  }
+  
+  .event-info {
+    flex: 1;
+    min-width: calc(100% - 80px);
+  }
+  
+  /* Milestone list mobile */
+  .milestone-item {
+    flex-wrap: wrap;
+  }
+  
+  .milestone-info {
+    flex: 1;
+    min-width: calc(100% - 80px);
+  }
+}
+
+/* ============================================
+   Mobile Form Row Improvements
+   ============================================ */
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+  
+  .form-group {
+    width: 100%;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+  
+  .input-with-prefix {
+    flex-direction: row;
+  }
+  
+  .input-prefix {
+    padding: var(--space-sm) var(--space-md);
+  }
+}
+
+/* ============================================
+   Mobile Dashboard Cards
+   ============================================ */
+@media (max-width: 768px) {
+  .dashboard-card {
+    border-radius: var(--radius-md);
+  }
+  
+  .card-header {
+    padding: var(--space-md);
+    flex-direction: column;
+    gap: var(--space-sm);
+    align-items: flex-start;
+  }
+  
+  .card-header h2,
+  .card-header h3 {
+    font-size: var(--text-sm);
+  }
+  
+  .card-body {
+    padding: var(--space-md);
+  }
+  
+  .card-footer {
+    padding: var(--space-md);
+  }
+}
+
+/* ============================================
+   Mobile Detail View Improvements
+   ============================================ */
+@media (max-width: 768px) {
+  .detail-list {
+    gap: var(--space-sm);
+  }
+  
+  .detail-list dt {
+    font-size: var(--text-xs);
+  }
+  
+  .detail-list dd {
+    font-size: var(--text-sm);
+  }
+  
+  .detail-section {
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-md);
+  }
+  
+  .detail-section h3 {
+    font-size: var(--text-xs);
+    margin-bottom: var(--space-sm);
+  }
+  
+  .detail-section h4 {
+    font-size: var(--text-sm);
+  }
+  
+  /* Horizontal list becomes vertical on mobile */
+  .detail-list--horizontal {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
+   Mobile Survey List
+   ============================================ */
+@media (max-width: 768px) {
+  .survey-list {
+    max-height: none;
+  }
+  
+  .survey-item {
+    padding: var(--space-md);
+  }
+  
+  .survey-scores-mini {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+  
+  .survey-scores-mini span {
+    flex: 1;
+    min-width: 80px;
+    text-align: center;
+    padding: var(--space-xs);
+    background: var(--color-gray-100);
+    border-radius: var(--radius-sm);
+  }
+}
+
+/* ============================================
+   Touch Friendly Enhancements
+   ============================================ */
+@media (max-width: 768px) {
+  /* Ensure minimum touch target size (44x44px) */
+  .sidebar-link {
+    min-height: 48px;
+    padding: var(--space-md) var(--space-lg);
+  }
+  
+  .status-badge,
+  .type-badge,
+  .score-badge {
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--text-xs);
+  }
+  
+  /* Checkbox and radio touch targets */
+  .checkbox-label {
+    padding: var(--space-sm) 0;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .checkbox-label input[type="checkbox"],
+  .checkbox-label input[type="radio"] {
+    width: 24px;
+    height: 24px;
+  }
+  
+  /* Score input touch friendly */
+  .score-input {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .score-input input[type="range"] {
+    height: 32px;
+  }
+  
+  .score-display {
+    text-align: center;
+    padding: var(--space-sm);
+    background: var(--color-gray-100);
+    border-radius: var(--radius-sm);
+  }
+}
+
+/* ============================================
+   Print Styles
+   ============================================ */
+@media print {
+  .portal-sidebar,
+  .portal-topbar,
+  .sidebar-toggle,
+  .page-actions,
+  .filters-card,
+  .action-buttons,
+  .btn {
+    display: none !important;
+  }
+  
+  .portal-main {
+    margin-left: 0;
+  }
+  
+  .portal-content {
+    padding: 0;
+  }
+  
+  .data-table thead {
+    display: table-header-group;
+  }
+  
+  .data-table,
+  .data-table tbody,
+  .data-table tr,
+  .data-table td {
+    display: revert;
+  }
+  
+  .data-table td::before {
+    display: none;
   }
 }
 

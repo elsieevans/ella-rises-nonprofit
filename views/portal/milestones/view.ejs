@@ -64,11 +64,11 @@
           <tbody>
             <% achievers.forEach(a => { %>
               <tr>
-                <td>
+                <td data-label="Participant">
                   <a href="/portal/participants/<%= a.id %>"><%= a.first_name %> <%= a.last_name %></a>
                 </td>
-                <td><%= new Date(a.achieved_date).toLocaleDateString() %></td>
-                <td><%= a.verified_by_first ? a.verified_by_first + ' ' + a.verified_by_last : '-' %></td>
+                <td data-label="Date Achieved"><%= new Date(a.achieved_date).toLocaleDateString() %></td>
+                <td data-label="Verified By"><%= a.verified_by_first ? a.verified_by_first + ' ' + a.verified_by_last : '-' %></td>
               </tr>
             <% }) %>
           </tbody>

@@ -9,17 +9,50 @@ document.addEventListener('DOMContentLoaded', function() {
   // ============================================
   const sidebarToggle = document.querySelector('.sidebar-toggle');
   const sidebar = document.querySelector('.portal-sidebar');
+  const portalMain = document.querySelector('.portal-main');
+  
+  // Create mobile overlay element
+  let sidebarOverlay = document.querySelector('.sidebar-overlay');
+  if (!sidebarOverlay && sidebar) {
+    sidebarOverlay = document.createElement('div');
+    sidebarOverlay.className = 'sidebar-overlay';
+    sidebarOverlay.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(sidebarOverlay);
+  }
   
   if (sidebarToggle && sidebar) {
+    function openSidebar() {
+      sidebar.classList.add('active');
+      if (sidebarOverlay) sidebarOverlay.classList.add('active');
+      document.body.classList.add('sidebar-open');
+      sidebarToggle.setAttribute('aria-expanded', 'true');
+    }
+    
+    function closeSidebar() {
+      sidebar.classList.remove('active');
+      if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+      document.body.classList.remove('sidebar-open');
+      sidebarToggle.setAttribute('aria-expanded', 'false');
+    }
+    
     sidebarToggle.addEventListener('click', function() {
-      sidebar.classList.toggle('active');
+      if (sidebar.classList.contains('active')) {
+        closeSidebar();
+      } else {
+        openSidebar();
+      }
     });
+    
+    // Close sidebar when clicking overlay
+    if (sidebarOverlay) {
+      sidebarOverlay.addEventListener('click', closeSidebar);
+    }
     
     // Close sidebar when clicking outside on mobile
     document.addEventListener('click', function(e) {
       if (window.innerWidth <= 768) {
         if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
-          sidebar.classList.remove('active');
+          closeSidebar();
         }
       }
     });
@@ -27,8 +60,25 @@ document.addEventListener('DOMContentLoaded', function() {
     // Close sidebar on escape key
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape' && sidebar.classList.contains('active')) {
-        sidebar.classList.remove('active');
+        closeSidebar();
         sidebarToggle.focus();
+      }
+    });
+    
+    // Close sidebar when clicking a link (for mobile nav)
+    const sidebarLinks = sidebar.querySelectorAll('.sidebar-link');
+    sidebarLinks.forEach(function(link) {
+      link.addEventListener('click', function() {
+        if (window.innerWidth <= 768) {
+          closeSidebar();
+        }
+      });
+    });
+    
+    // Handle window resize - close sidebar if expanding to desktop
+    window.addEventListener('resize', function() {
+      if (window.innerWidth > 768 && sidebar.classList.contains('active')) {
+        closeSidebar();
       }
     });
   }

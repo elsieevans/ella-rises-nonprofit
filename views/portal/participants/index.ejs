@@ -57,17 +57,17 @@
         <% if (participants && participants.length > 0) { %>
           <% participants.forEach(p => { %>
             <tr>
-              <td>
+              <td data-label="Name">
                 <div class="user-cell">
                   <div class="user-avatar"><%= p.first_name.charAt(0) %><%= p.last_name.charAt(0) %></div>
                   <span><%= p.first_name %> <%= p.last_name %></span>
                 </div>
               </td>
-              <td><%= p.email %></td>
-              <td><%= p.school || '-' %></td>
-              <td><%= p.grade_level || '-' %></td>
-              <td><%= p.enrollment_date ? new Date(p.enrollment_date).toLocaleDateString() : '-' %></td>
-              <td>
+              <td data-label="Email"><%= p.email %></td>
+              <td data-label="School"><%= p.school || '-' %></td>
+              <td data-label="Grade"><%= p.grade_level || '-' %></td>
+              <td data-label="Enrolled"><%= p.enrollment_date ? new Date(p.enrollment_date).toLocaleDateString() : '-' %></td>
+              <td data-label="Status">
                 <span class="status-badge <%= p.is_active ? 'status-active' : 'status-inactive' %>">
                   <%= p.is_active ? 'Active' : 'Inactive' %>
                 </span>

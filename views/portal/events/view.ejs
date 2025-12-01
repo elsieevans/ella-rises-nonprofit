@@ -102,14 +102,14 @@
           <tbody>
             <% participants.forEach(p => { %>
               <tr>
-                <td>
+                <td data-label="Name">
                   <a href="/portal/participants/<%= p.id %>"><%= p.first_name %> <%= p.last_name %></a>
                 </td>
-                <td>
+                <td data-label="Status">
                   <span class="status-badge status-<%= p.status %>"><%= p.status %></span>
                 </td>
                 <% if (user && user.role === 'manager') { %>
-                  <td>
+                  <td data-label="Update" class="actions-col">
                     <form action="/portal/events/<%= event.id %>/participants/<%= p.ep_id %>/status" method="POST" class="inline-form">
                       <select name="status" onchange="this.form.submit()">
                         <option value="registered" <%= p.status === 'registered' ? 'selected' : '' %>>Registered</option>

@@ -59,28 +59,28 @@
         <% if (events && events.length > 0) { %>
           <% events.forEach(e => { %>
             <tr>
-              <td>
+              <td data-label="Date">
                 <div class="event-date-cell">
                   <span class="date-month"><%= new Date(e.event_date).toLocaleString('en-US', { month: 'short' }) %></span>
                   <span class="date-day"><%= new Date(e.event_date).getDate() %></span>
                 </div>
               </td>
-              <td>
+              <td data-label="Event">
                 <strong><%= e.title %></strong>
                 <% if (e.start_time) { %>
                   <br><small><%= e.start_time.substring(0, 5) %><% if (e.end_time) { %> - <%= e.end_time.substring(0, 5) %><% } %></small>
                 <% } %>
               </td>
-              <td><span class="type-badge type-<%= e.event_type %>"><%= e.event_type %></span></td>
-              <td><%= e.venue_name || e.location || '-' %></td>
-              <td>
+              <td data-label="Type"><span class="type-badge type-<%= e.event_type %>"><%= e.event_type %></span></td>
+              <td data-label="Location"><%= e.venue_name || e.location || '-' %></td>
+              <td data-label="Participants">
                 <% if (e.max_participants) { %>
                   <%= e.current_participants || 0 %>/<%= e.max_participants %>
                 <% } else { %>
                   <%= e.current_participants || 0 %>
                 <% } %>
               </td>
-              <td>
+              <td data-label="Status">
                 <span class="status-badge <%= e.is_active ? 'status-active' : 'status-inactive' %>">
                   <%= e.is_active ? 'Active' : 'Inactive' %>
                 </span>

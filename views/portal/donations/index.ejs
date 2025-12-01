@@ -74,19 +74,26 @@
         <% if (donations && donations.length > 0) { %>
           <% donations.forEach(d => { %>
             <tr>
-              <td><%= new Date(d.donation_date).toLocaleDateString() %></td>
-              <td>
+              <td data-label="Date"><%= new Date(d.donation_date).toLocaleDateString() %></td>
+              <td data-label="Donor" class="donor-cell">
                 <% if (d.is_anonymous) { %>
                   <em>Anonymous</em>
                 <% } else { %>
                   <strong><%= d.donor_name %></strong>
-                  <% if (d.donor_email) { %><br><small><%= d.donor_email %></small><% } %>
+                  <% if (d.donor_email) { %><small class="desktop-only"><%= d.donor_email %></small><% } %>
                 <% } %>
               </td>
-              <td class="amount-cell">$<%= parseFloat(d.amount).toLocaleString() %></td>
-              <td><span class="type-badge type-<%= d.donation_type %>"><%= d.donation_type %></span></td>
-              <td><%= d.campaign || '-' %></td>
-              <td>
+              <td data-label="Email" class="mobile-only-cell">
+                <% if (!d.is_anonymous && d.donor_email) { %>
+                  <%= d.donor_email %>
+                <% } else { %>
+                  -
+                <% } %>
+              </td>
+              <td data-label="Amount" class="amount-cell">$<%= parseFloat(d.amount).toLocaleString() %></td>
+              <td data-label="Type"><span class="type-badge type-<%= d.donation_type %>"><%= d.donation_type %></span></td>
+              <td data-label="Campaign"><%= d.campaign || '-' %></td>
+              <td data-label="Status">
                 <% if (d.thank_you_sent) { %>
                   <span class="status-badge status-active" title="Thank you sent">✓ Thanked</span>
                 <% } else { %>

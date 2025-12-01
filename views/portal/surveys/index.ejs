@@ -74,12 +74,12 @@
         <% if (surveys && surveys.length > 0) { %>
           <% surveys.forEach(s => { %>
             <tr>
-              <td><%= s.survey_date ? new Date(s.survey_date).toLocaleDateString() : '-' %></td>
-              <td><%= s.event_title || '-' %></td>
-              <td><%= s.first_name ? s.first_name + ' ' + s.last_name : '-' %></td>
-              <td><span class="score-badge score-<%= s.satisfaction_score >= 4 ? 'high' : s.satisfaction_score >= 3 ? 'medium' : 'low' %>"><%= s.satisfaction_score %>/5</span></td>
-              <td><span class="score-badge score-<%= s.usefulness_score >= 4 ? 'high' : s.usefulness_score >= 3 ? 'medium' : 'low' %>"><%= s.usefulness_score %>/5</span></td>
-              <td><span class="score-badge score-<%= s.recommendation_score >= 8 ? 'high' : s.recommendation_score >= 5 ? 'medium' : 'low' %>"><%= s.recommendation_score %>/10</span></td>
+              <td data-label="Date"><%= s.survey_date ? new Date(s.survey_date).toLocaleDateString() : '-' %></td>
+              <td data-label="Event"><%= s.event_title || '-' %></td>
+              <td data-label="Participant"><%= s.first_name ? s.first_name + ' ' + s.last_name : '-' %></td>
+              <td data-label="Satisfaction"><span class="score-badge score-<%= s.satisfaction_score >= 4 ? 'high' : s.satisfaction_score >= 3 ? 'medium' : 'low' %>"><%= s.satisfaction_score %>/5</span></td>
+              <td data-label="Usefulness"><span class="score-badge score-<%= s.usefulness_score >= 4 ? 'high' : s.usefulness_score >= 3 ? 'medium' : 'low' %>"><%= s.usefulness_score %>/5</span></td>
+              <td data-label="NPS"><span class="score-badge score-<%= s.recommendation_score >= 8 ? 'high' : s.recommendation_score >= 5 ? 'medium' : 'low' %>"><%= s.recommendation_score %>/10</span></td>
               <td class="actions-col">
                 <div class="action-buttons">
                   <a href="/portal/surveys/<%= s.id %>" class="btn-icon" title="View" aria-label="View survey">
