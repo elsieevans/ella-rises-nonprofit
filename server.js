@@ -5,6 +5,7 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const helmet = require('helmet');
 const path = require('path');
+const db = require('./config/database');
 
 const app = express();
 
@@ -98,16 +99,29 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log('======================================');
-  console.log('SERVER STARTUP');
-  console.log('======================================');
-  console.log(`Ella Rises server running on port ${PORT}`);
-  console.log(`Visit http://localhost:${PORT}`);
-  console.log('NODE_ENV:', process.env.NODE_ENV || 'NOT SET');
-  console.log('Environment:', process.env.NODE_ENV || 'development');
-  console.log('======================================');
-});
+const startServer = async () => {
+  try {
+    // Run migrations on startup
+    console.log('Checking database migrations...');
+    await db.migrate.latest();
+    console.log('Database migrations completed.');
+  } catch (err) {
+    console.error('Migration failed on startup:', err);
+  }
+
+  app.listen(PORT, () => {
+    console.log('======================================');
+    console.log('SERVER STARTUP');
+    console.log('======================================');
+    console.log(`Ella Rises server running on port ${PORT}`);
+    console.log(`Visit http://localhost:${PORT}`);
+    console.log('NODE_ENV:', process.env.NODE_ENV || 'NOT SET');
+    console.log('Environment:', process.env.NODE_ENV || 'development');
+    console.log('======================================');
+  });
+};
+
+startServer();
 
 module.exports = app;
 
