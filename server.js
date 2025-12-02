@@ -101,12 +101,10 @@ const PORT = process.env.PORT || 3000;
 
 const startServer = async () => {
   try {
-    // Run migrations on startup
-    console.log('Checking database migrations...');
-    await db.migrate.latest();
-    console.log('Database migrations completed.');
+    // Migrations are managed manually
+    console.log('Database migrations skipped (manual management).');
   } catch (err) {
-    console.error('Migration failed on startup:', err);
+    console.error('Startup error:', err);
   }
 
   app.listen(PORT, () => {

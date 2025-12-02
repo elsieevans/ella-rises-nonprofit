@@ -22,7 +22,7 @@ A professional Node.js/Express web application for managing Ella Rises, a non-pr
 - **Donations**: Track donations, campaigns, and donor information
 
 ### User Roles
-- **Manager**: Full CRUD access to all data
+- **Admin**: Full CRUD access to all data
 - **Common User**: View-only access to all data
 
 ## Tech Stack
@@ -85,7 +85,7 @@ npm start
 ## Demo Credentials
 
 After running seeds:
-- **Manager**: manager@ellarises.org / password123
+- **Admin**: manager@ellarises.org / password123
 - **Viewer**: user@ellarises.org / password123
 
 ## Project Structure

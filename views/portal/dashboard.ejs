@@ -8,7 +8,7 @@
     </div>
     <div class="stat-info">
       <span class="stat-value"><%= stats.participants %></span>
-      <span class="stat-label">Active Participants</span>
+      <span class="stat-label">Total Participants</span>
     </div>
   </div>
   
@@ -18,7 +18,7 @@
     </div>
     <div class="stat-info">
       <span class="stat-value"><%= stats.events %></span>
-      <span class="stat-label">Active Events</span>
+      <span class="stat-label">Total Events</span>
     </div>
   </div>
   
@@ -56,8 +56,22 @@
 <!-- Charts Section -->
 <div class="dashboard-grid">
   <div class="dashboard-card dashboard-card--wide">
-    <div class="card-header">
-      <h2>Donation Trends</h2>
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+      <div style="display: flex; align-items: baseline; gap: 10px;">
+        <h2>Donation Trends</h2>
+        <span id="yearTotalDisplay" style="font-size: 1.1rem; color: #0d5c63; font-weight: bold;"></span>
+      </div>
+      <div class="filter-control">
+        <select id="donationYearFilter" class="form-select" style="padding: 5px 10px; border-radius: 4px; border: 1px solid #ddd;">
+          <% if (availableYears && availableYears.length > 0) { %>
+            <% availableYears.forEach(year => { %>
+              <option value="<%= year %>"><%= year %></option>
+            <% }) %>
+          <% } else { %>
+            <option value="<%= new Date().getFullYear() %>"><%= new Date().getFullYear() %></option>
+          <% } %>
+        </select>
+      </div>
     </div>
     <div class="card-body">
       <canvas id="donationChart" height="250"></canvas>
@@ -96,10 +110,10 @@
         <ul class="recent-list">
           <% recentParticipants.forEach(p => { %>
             <li class="recent-item">
-              <div class="recent-avatar"><%= p.first_name.charAt(0) %><%= p.last_name.charAt(0) %></div>
+              <div class="recent-avatar"><%= p.ParticipantFirstName.charAt(0) %><%= p.ParticipantLastName.charAt(0) %></div>
               <div class="recent-info">
-                <a href="/portal/participants/<%= p.id %>" class="recent-name"><%= p.first_name %> <%= p.last_name %></a>
-                <span class="recent-meta"><%= p.grade_level || 'N/A' %></span>
+                <a href="/portal/participants/<%= p.ParticipantID %>" class="recent-name"><%= p.ParticipantFirstName %> <%= p.ParticipantLastName %></a>
+                <span class="recent-meta"><%= p.ParticipantSchool || 'N/A' %></span>
               </div>
             </li>
           <% }) %>
@@ -122,12 +136,12 @@
           <% upcomingEvents.forEach(e => { %>
             <li class="recent-item">
               <div class="event-date-mini">
-                <span class="month"><%= new Date(e.event_date).toLocaleString('en-US', { month: 'short' }) %></span>
-                <span class="day"><%= new Date(e.event_date).getDate() %></span>
+                <span class="month"><%= new Date(e.EventDateTimeStart).toLocaleString('en-US', { month: 'short' }) %></span>
+                <span class="day"><%= new Date(e.EventDateTimeStart).getDate() %></span>
               </div>
               <div class="recent-info">
-                <a href="/portal/events/<%= e.id %>" class="recent-name"><%= e.title %></a>
-                <span class="recent-meta"><%= e.event_type %></span>
+                <a href="/portal/events/<%= e.EventID %>" class="recent-name"><%= e.EventName %></a>
+                <span class="recent-meta"><%= e.EventType || 'Event' %></span>
               </div>
             </li>
           <% }) %>
@@ -149,10 +163,10 @@
         <ul class="recent-list">
           <% recentDonations.forEach(d => { %>
             <li class="recent-item">
-              <div class="donation-amount">$<%= parseFloat(d.amount).toLocaleString() %></div>
+              <div class="donation-amount">$<%= parseFloat(d.DonationAmount).toLocaleString() %></div>
               <div class="recent-info">
-                <a href="/portal/donations/<%= d.id %>" class="recent-name"><%= d.is_anonymous ? 'Anonymous' : d.donor_name %></a>
-                <span class="recent-meta"><%= new Date(d.donation_date).toLocaleDateString() %></span>
+                <a href="/portal/donations/<%= d.DonationID %>" class="recent-name"><%= d.ParticipantFirstName %> <%= d.ParticipantLastName %></a>
+                <span class="recent-meta"><%= new Date(d.DonationDate).toLocaleDateString() %></span>
               </div>
             </li>
           <% }) %>
@@ -165,49 +179,97 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', async function() {
-  try {
-    const response = await fetch('/portal/dashboard/api/chart-data');
-    const data = await response.json();
-    
-    // Donation Trends Chart
-    const donationCtx = document.getElementById('donationChart').getContext('2d');
-    new Chart(donationCtx, {
-      type: 'line',
-      data: {
-        labels: data.donationsByMonth.map(d => d.month),
-        datasets: [{
-          label: 'Donations ($)',
-          data: data.donationsByMonth.map(d => parseFloat(d.total)),
-          borderColor: '#0d5c63',
-          backgroundColor: 'rgba(13, 92, 99, 0.1)',
-          fill: true,
-          tension: 0.4
-        }]
+let donationChart = null;
+
+async function fetchChartData(year) {
+  const url = year ? `/portal/dashboard/api/chart-data?year=${year}` : '/portal/dashboard/api/chart-data';
+  const response = await fetch(url);
+  return await response.json();
+}
+
+function initDonationChart(data) {
+  // Update total display
+  const totalDisplay = document.getElementById('yearTotalDisplay');
+  if (totalDisplay) {
+    const total = parseFloat(data.yearTotal || 0);
+    totalDisplay.textContent = `Total: $${total.toLocaleString()}`;
+  }
+
+  const donationCtx = document.getElementById('donationChart').getContext('2d');
+  
+  if (donationChart) {
+    donationChart.destroy();
+  }
+
+  donationChart = new Chart(donationCtx, {
+    type: 'line',
+    data: {
+      labels: data.donationsByMonth.map(d => d.month),
+      datasets: [{
+        label: 'Donations ($)',
+        data: data.donationsByMonth.map(d => parseFloat(d.total)),
+        borderColor: '#0d5c63',
+        backgroundColor: 'rgba(13, 92, 99, 0.1)',
+        fill: true,
+        tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              callback: value => '$' + value.toLocaleString()
-            }
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: value => '$' + value.toLocaleString()
           }
         }
       }
-    });
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', async function() {
+  try {
+    const yearSelect = document.getElementById('donationYearFilter');
+    
+    // Set default selection to most recent available year or current year if not already set
+    if (yearSelect && yearSelect.options.length > 0) {
+      // The availableYears are already sorted desc in the backend, so the first option is the most recent year
+      // But let's check if the current year exists in the options first
+      const currentYear = new Date().getFullYear().toString();
+      let hasCurrentYear = false;
+      for(let i=0; i<yearSelect.options.length; i++) {
+        if(yearSelect.options[i].value === currentYear) {
+            yearSelect.value = currentYear;
+            hasCurrentYear = true;
+            break;
+        }
+      }
+      
+      // If current year is not in list (e.g. no data yet for 2025), select the first option (most recent year with data)
+      if (!hasCurrentYear) {
+          yearSelect.selectedIndex = 0;
+      }
+    }
+
+    const initialYear = yearSelect ? yearSelect.value : new Date().getFullYear();
+    
+    // Initial data fetch
+    const data = await fetchChartData(initialYear);
+    
+    // Initialize Donation Chart
+    initDonationChart(data);
     
     // Event Type Chart
     const eventCtx = document.getElementById('eventTypeChart').getContext('2d');
     new Chart(eventCtx, {
       type: 'doughnut',
       data: {
-        labels: data.eventsByType.map(e => e.event_type),
+        labels: data.eventsByType.map(e => e.EventType),
         datasets: [{
           data: data.eventsByType.map(e => parseInt(e.count)),
           backgroundColor: [
@@ -262,6 +324,15 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
       }
     });
+
+    // Event listener for year filter
+    if (yearSelect) {
+      yearSelect.addEventListener('change', async function() {
+         const newYear = this.value;
+         const newData = await fetchChartData(newYear);
+         initDonationChart(newData);
+      });
+    }
     
   } catch (error) {
     console.error('Error loading chart data:', error);
@@ -270,4 +341,3 @@ document.addEventListener('DOMContentLoaded', async function() {
 </script>
 
 <%- include('../partials/portal-footer') %>
-

@@ -7,28 +7,36 @@ const db = require('../config/database');
 router.get('/', isAuthenticated, async (req, res) => {
   try {
     // Get counts for dashboard cards
-    const participantCount = await db('participants').where('is_active', true).count('id as count').first();
-    const eventCount = await db('events').where('is_active', true).count('id as count').first();
-    const surveyCount = await db('surveys').count('id as count').first();
-    const donationTotal = await db('donations').sum('amount as total').first();
-    const milestoneCount = await db('participant_milestones').count('id as count').first();
+    const participantCount = await db('Participant').count('ParticipantID as count').first();
+    const eventCount = await db('Event').count('EventID as count').first();
+    const surveyCount = await db('Survey').count('SurveyID as count').first();
+    const donationTotal = await db('Donation').sum('DonationAmount as total').first();
+    const milestoneCount = await db('Milestone').count('MilestoneID as count').first();
     
+    // Get available years for donations
+    const availableYears = await db('Donation')
+      .select(db.raw('EXTRACT(YEAR FROM "DonationDate") as year'))
+      .distinct()
+      .orderBy('year', 'desc');
+
     // Get recent participants
-    const recentParticipants = await db('participants')
-      .where('is_active', true)
-      .orderBy('created_at', 'desc')
+    const recentParticipants = await db('Participant')
+      .orderBy('ParticipantID', 'desc') // Assuming ID or we lack a created_at
       .limit(5);
     
     // Get upcoming events
-    const upcomingEvents = await db('events')
-      .where('is_active', true)
-      .where('event_date', '>=', new Date().toISOString().split('T')[0])
-      .orderBy('event_date', 'asc')
+    const upcomingEvents = await db('Event')
+      .join('EventDetails', 'Event.EventDetailsID', 'EventDetails.EventDetailsID')
+      .select('Event.*', 'EventDetails.EventName')
+      .where('Event.EventDateTimeStart', '>=', new Date())
+      .orderBy('Event.EventDateTimeStart', 'asc')
       .limit(5);
     
     // Get recent donations
-    const recentDonations = await db('donations')
-      .orderBy('donation_date', 'desc')
+    const recentDonations = await db('Donation')
+      .leftJoin('Participant', 'Donation.ParticipantID', 'Participant.ParticipantID')
+      .select('Donation.*', 'Participant.ParticipantFirstName', 'Participant.ParticipantLastName')
+      .orderBy('Donation.DonationDate', 'desc')
       .limit(5);
     
     res.render('portal/dashboard', {
@@ -40,6 +48,7 @@ router.get('/', isAuthenticated, async (req, res) => {
         donations: donationTotal?.total || 0,
         milestones: milestoneCount?.count || 0
       },
+      availableYears: availableYears.map(y => y.year),
       recentParticipants,
       upcomingEvents,
       recentDonations
@@ -50,6 +59,7 @@ router.get('/', isAuthenticated, async (req, res) => {
     res.render('portal/dashboard', {
       title: 'Dashboard - Ella Rises Portal',
       stats: { participants: 0, events: 0, surveys: 0, donations: 0, milestones: 0 },
+      availableYears: [],
       recentParticipants: [],
       upcomingEvents: [],
       recentDonations: []
@@ -60,46 +70,55 @@ router.get('/', isAuthenticated, async (req, res) => {
 // API endpoint for chart data
 router.get('/api/chart-data', isAuthenticated, async (req, res) => {
   try {
+    const year = req.query.year || new Date().getFullYear();
+
     // Donation trends by month
-    const donationsByMonth = await db('donations')
-      .select(db.raw("TO_CHAR(donation_date, 'YYYY-MM') as month"))
-      .sum('amount as total')
-      .groupByRaw("TO_CHAR(donation_date, 'YYYY-MM')")
+    const donationsByMonth = await db('Donation')
+      .whereRaw('EXTRACT(YEAR FROM "DonationDate") = ?', [year])
+      .select(db.raw("TO_CHAR(\"DonationDate\", 'YYYY-MM') as month"))
+      .sum('DonationAmount as total')
+      .groupByRaw("TO_CHAR(\"DonationDate\", 'YYYY-MM')")
       .orderBy('month', 'asc');
+      
+    // Calculate total for the year
+    const yearTotal = donationsByMonth.reduce((sum, record) => sum + parseFloat(record.total || 0), 0);
     
     // Events by type
-    const eventsByType = await db('events')
-      .select('event_type')
-      .count('id as count')
-      .where('is_active', true)
-      .groupBy('event_type');
+    const eventsByType = await db('Event')
+      .join('EventDetails', 'Event.EventDetailsID', 'EventDetails.EventDetailsID')
+      .select('EventDetails.EventType')
+      .count('Event.EventID as count')
+      .groupBy('EventDetails.EventType');
     
     // Survey satisfaction scores
-    const surveyScores = await db('surveys')
+    const surveyScores = await db('Survey')
       .select(
-        db.raw('AVG(satisfaction_score) as avg_satisfaction'),
-        db.raw('AVG(usefulness_score) as avg_usefulness'),
-        db.raw('AVG(recommendation_score) as avg_recommendation')
+        db.raw('AVG("SurveySatisfactionScore") as avg_satisfaction'),
+        db.raw('AVG("SurveyUsefulnessScore") as avg_usefulness'),
+        db.raw('AVG("SurveyRecommendationScore") as avg_recommendation')
       )
       .first();
     
-    // Milestones by category
-    const milestonesByCategory = await db('milestones as m')
-      .leftJoin('participant_milestones as pm', 'm.id', 'pm.milestone_id')
-      .select('m.category')
-      .count('pm.id as achieved_count')
-      .groupBy('m.category');
+    // Milestones by Title (replacing Category)
+    const milestonesByCategory = await db('Milestone')
+      .select('MilestoneTitle as category')
+      .count('MilestoneID as achieved_count')
+      .groupBy('MilestoneTitle')
+      .orderBy('achieved_count', 'desc')
+      .limit(5);
     
-    // Participants by grade level
-    const participantsByGrade = await db('participants')
-      .select('grade_level')
-      .count('id as count')
-      .where('is_active', true)
-      .whereNotNull('grade_level')
-      .groupBy('grade_level');
+    // Participants by School (replacing Grade)
+    const participantsByGrade = await db('Participant')
+      .select('ParticipantSchool as grade_level')
+      .count('ParticipantID as count')
+      .whereNotNull('ParticipantSchool')
+      .groupBy('ParticipantSchool')
+      .orderBy('count', 'desc')
+      .limit(5);
     
     res.json({
       donationsByMonth,
+      yearTotal,
       eventsByType,
       surveyScores,
       milestonesByCategory,
@@ -112,4 +131,3 @@ router.get('/api/chart-data', isAuthenticated, async (req, res) => {
 });
 
 module.exports = router;
-

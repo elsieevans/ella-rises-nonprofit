@@ -3,47 +3,43 @@ const router = express.Router();
 const { isAuthenticated, isManager } = require('../middleware/auth');
 const db = require('../config/database');
 
-// List all milestones
+// List all milestone achievements
 router.get('/', isAuthenticated, async (req, res) => {
   try {
-    const { category, status } = req.query;
+    const { search } = req.query;
     
-    let query = db('milestones').orderBy('sort_order', 'asc');
+    let query = db('Milestone')
+      .leftJoin('Participant', 'Milestone.ParticipantID', 'Participant.ParticipantID')
+      .select(
+        'Milestone.*',
+        'Participant.ParticipantFirstName',
+        'Participant.ParticipantLastName'
+      )
+      .orderBy('Milestone.MilestoneDate', 'desc');
     
-    if (category) {
-      query = query.where('category', category);
-    }
-    
-    if (status === 'active') {
-      query = query.where('is_active', true);
-    } else if (status === 'inactive') {
-      query = query.where('is_active', false);
+    if (search) {
+      query = query.where(function() {
+        this.where('Milestone.MilestoneTitle', 'ilike', `%${search}%`)
+          .orWhere('Participant.ParticipantFirstName', 'ilike', `%${search}%`)
+          .orWhere('Participant.ParticipantLastName', 'ilike', `%${search}%`);
+      });
     }
     
     const milestones = await query;
     
-    // Get achievement counts for each milestone
-    const achievementCounts = await db('participant_milestones')
-      .select('milestone_id')
-      .count('id as count')
-      .groupBy('milestone_id');
-    
-    const countsMap = {};
-    achievementCounts.forEach(a => {
-      countsMap[a.milestone_id] = parseInt(a.count);
-    });
-    
-    milestones.forEach(m => {
-      m.achievement_count = countsMap[m.id] || 0;
-    });
-    
-    const categories = ['academic', 'leadership', 'technical', 'artistic', 'community', 'personal'];
-    
+    // Aggregate counts by Title (to show "Popular Milestones")
+    const counts = await db('Milestone')
+      .select('MilestoneTitle')
+      .count('MilestoneID as count')
+      .groupBy('MilestoneTitle')
+      .orderBy('count', 'desc')
+      .limit(5);
+
     res.render('portal/milestones/index', {
       title: 'Milestones - Ella Rises Portal',
       milestones,
-      categories,
-      filters: { category, status }
+      popular: counts,
+      filters: { search }
     });
   } catch (error) {
     console.error('Error fetching milestones:', error);
@@ -53,30 +49,37 @@ router.get('/', isAuthenticated, async (req, res) => {
 });
 
 // New milestone form
-router.get('/new', isAuthenticated, isManager, (req, res) => {
-  res.render('portal/milestones/form', {
-    title: 'Add Milestone - Ella Rises Portal',
-    milestone: {},
-    isEdit: false,
-    categories: ['academic', 'leadership', 'technical', 'artistic', 'community', 'personal']
-  });
+router.get('/new', isAuthenticated, isManager, async (req, res) => {
+  try {
+    const participants = await db('Participant')
+      .select('ParticipantID', 'ParticipantFirstName', 'ParticipantLastName')
+      .orderBy('ParticipantLastName');
+
+    res.render('portal/milestones/form', {
+      title: 'Add Milestone - Ella Rises Portal',
+      milestone: {},
+      participants,
+      isEdit: false
+    });
+  } catch (error) {
+    console.error('Error loading form:', error);
+    req.flash('error_msg', 'Error loading form');
+    res.redirect('/portal/milestones');
+  }
 });
 
 // Create milestone
 router.post('/', isAuthenticated, isManager, async (req, res) => {
   try {
     const {
-      name, description, category, points, badge_icon, is_active, sort_order
+      participant_id, title, date, milestone_no
     } = req.body;
     
-    await db('milestones').insert({
-      name,
-      description,
-      category,
-      points: parseInt(points) || 0,
-      badge_icon,
-      is_active: is_active === 'on',
-      sort_order: parseInt(sort_order) || 0
+    await db('Milestone').insert({
+      "ParticipantID": participant_id,
+      "MilestoneTitle": title,
+      "MilestoneDate": date || new Date(),
+      "MilestoneNo": parseInt(milestone_no) || null
     });
     
     req.flash('success_msg', 'Milestone created successfully');
@@ -91,32 +94,24 @@ router.post('/', isAuthenticated, isManager, async (req, res) => {
 // View milestone details
 router.get('/:id', isAuthenticated, async (req, res) => {
   try {
-    const milestone = await db('milestones').where('id', req.params.id).first();
+    const milestone = await db('Milestone')
+      .leftJoin('Participant', 'Milestone.ParticipantID', 'Participant.ParticipantID')
+      .where('Milestone.MilestoneID', req.params.id)
+      .select(
+        'Milestone.*',
+        'Participant.ParticipantFirstName',
+        'Participant.ParticipantLastName'
+      )
+      .first();
     
     if (!milestone) {
       req.flash('error_msg', 'Milestone not found');
       return res.redirect('/portal/milestones');
     }
     
-    // Get participants who achieved this milestone
-    const achievers = await db('participant_milestones as pm')
-      .join('participants as p', 'pm.participant_id', 'p.id')
-      .leftJoin('users as u', 'pm.verified_by', 'u.id')
-      .where('pm.milestone_id', req.params.id)
-      .select(
-        'p.*',
-        'pm.achieved_date',
-        'pm.notes as achievement_notes',
-        'pm.id as pm_id',
-        'u.first_name as verified_by_first',
-        'u.last_name as verified_by_last'
-      )
-      .orderBy('pm.achieved_date', 'desc');
-    
     res.render('portal/milestones/view', {
-      title: `${milestone.name} - Ella Rises Portal`,
-      milestone,
-      achievers
+      title: 'Milestone Details - Ella Rises Portal',
+      milestone
     });
   } catch (error) {
     console.error('Error fetching milestone:', error);
@@ -128,18 +123,22 @@ router.get('/:id', isAuthenticated, async (req, res) => {
 // Edit milestone form
 router.get('/:id/edit', isAuthenticated, isManager, async (req, res) => {
   try {
-    const milestone = await db('milestones').where('id', req.params.id).first();
+    const milestone = await db('Milestone').where('MilestoneID', req.params.id).first();
     
     if (!milestone) {
       req.flash('error_msg', 'Milestone not found');
       return res.redirect('/portal/milestones');
     }
     
+    const participants = await db('Participant')
+      .select('ParticipantID', 'ParticipantFirstName', 'ParticipantLastName')
+      .orderBy('ParticipantLastName');
+    
     res.render('portal/milestones/form', {
       title: 'Edit Milestone - Ella Rises Portal',
       milestone,
-      isEdit: true,
-      categories: ['academic', 'leadership', 'technical', 'artistic', 'community', 'personal']
+      participants,
+      isEdit: true
     });
   } catch (error) {
     console.error('Error fetching milestone:', error);
@@ -152,18 +151,14 @@ router.get('/:id/edit', isAuthenticated, isManager, async (req, res) => {
 router.post('/:id', isAuthenticated, isManager, async (req, res) => {
   try {
     const {
-      name, description, category, points, badge_icon, is_active, sort_order
+      participant_id, title, date, milestone_no
     } = req.body;
     
-    await db('milestones').where('id', req.params.id).update({
-      name,
-      description,
-      category,
-      points: parseInt(points) || 0,
-      badge_icon,
-      is_active: is_active === 'on',
-      sort_order: parseInt(sort_order) || 0,
-      updated_at: new Date()
+    await db('Milestone').where('MilestoneID', req.params.id).update({
+      "ParticipantID": participant_id,
+      "MilestoneTitle": title,
+      "MilestoneDate": date || new Date(),
+      "MilestoneNo": parseInt(milestone_no) || null
     });
     
     req.flash('success_msg', 'Milestone updated successfully');
@@ -178,7 +173,7 @@ router.post('/:id', isAuthenticated, isManager, async (req, res) => {
 // Delete milestone
 router.post('/:id/delete', isAuthenticated, isManager, async (req, res) => {
   try {
-    await db('milestones').where('id', req.params.id).del();
+    await db('Milestone').where('MilestoneID', req.params.id).del();
     req.flash('success_msg', 'Milestone deleted successfully');
     res.redirect('/portal/milestones');
   } catch (error) {
@@ -189,4 +184,3 @@ router.post('/:id/delete', isAuthenticated, isManager, async (req, res) => {
 });
 
 module.exports = router;
-

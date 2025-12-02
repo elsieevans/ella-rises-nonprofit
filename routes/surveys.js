@@ -8,42 +8,44 @@ router.get('/', isAuthenticated, async (req, res) => {
   try {
     const { event_id, score_filter } = req.query;
     
-    let query = db('surveys as s')
-      .leftJoin('events as e', 's.event_id', 'e.id')
-      .leftJoin('participants as p', 's.participant_id', 'p.id')
+    let query = db('Survey')
+      .leftJoin('Event', 'Survey.EventID', 'Event.EventID')
+      .leftJoin('EventDetails', 'Event.EventDetailsID', 'EventDetails.EventDetailsID')
+      .leftJoin('Participant', 'Survey.ParticipantID', 'Participant.ParticipantID')
       .select(
-        's.*',
-        'e.title as event_title',
-        'p.first_name',
-        'p.last_name'
+        'Survey.*',
+        'EventDetails.EventName as event_title',
+        'Participant.ParticipantFirstName',
+        'Participant.ParticipantLastName'
       )
-      .orderBy('s.survey_date', 'desc');
+      .orderBy('Survey.SurveySubmissionDate', 'desc');
     
     if (event_id) {
-      query = query.where('s.event_id', event_id);
+      query = query.where('Survey.EventID', event_id);
     }
     
     if (score_filter === 'high') {
-      query = query.where('s.recommendation_score', '>=', 8);
+      query = query.where('Survey.SurveyRecommendationScore', '>=', 8);
     } else if (score_filter === 'medium') {
-      query = query.whereBetween('s.recommendation_score', [5, 7]);
+      query = query.whereBetween('Survey.SurveyRecommendationScore', [5, 7]);
     } else if (score_filter === 'low') {
-      query = query.where('s.recommendation_score', '<', 5);
+      query = query.where('Survey.SurveyRecommendationScore', '<', 5);
     }
     
     const surveys = await query;
     
     // Get events for filter dropdown
-    const events = await db('events')
-      .select('id', 'title')
-      .orderBy('event_date', 'desc');
+    const events = await db('Event')
+      .join('EventDetails', 'Event.EventDetailsID', 'EventDetails.EventDetailsID')
+      .select('Event.EventID', 'EventDetails.EventName', 'Event.EventDateTimeStart')
+      .orderBy('Event.EventDateTimeStart', 'desc');
     
     // Get aggregate stats
-    const stats = await db('surveys')
+    const stats = await db('Survey')
       .select(
-        db.raw('AVG(satisfaction_score) as avg_satisfaction'),
-        db.raw('AVG(usefulness_score) as avg_usefulness'),
-        db.raw('AVG(recommendation_score) as avg_recommendation'),
+        db.raw('AVG("SurveySatisfactionScore") as avg_satisfaction'),
+        db.raw('AVG("SurveyUsefulnessScore") as avg_usefulness'),
+        db.raw('AVG("SurveyRecommendationScore") as avg_recommendation'),
         db.raw('COUNT(*) as total_responses')
       )
       .first();
@@ -51,7 +53,7 @@ router.get('/', isAuthenticated, async (req, res) => {
     res.render('portal/surveys/index', {
       title: 'Surveys - Ella Rises Portal',
       surveys,
-      events,
+      events: events.map(e => ({ id: e.EventID, title: e.EventName })),
       stats,
       filters: { event_id, score_filter }
     });
@@ -65,18 +67,19 @@ router.get('/', isAuthenticated, async (req, res) => {
 // New survey form
 router.get('/new', isAuthenticated, isManager, async (req, res) => {
   try {
-    const events = await db('events')
-      .where('is_active', true)
-      .orderBy('event_date', 'desc');
+    const events = await db('Event')
+      .join('EventDetails', 'Event.EventDetailsID', 'EventDetails.EventDetailsID')
+      .select('Event.EventID', 'EventDetails.EventName')
+      .orderBy('Event.EventDateTimeStart', 'desc');
     
-    const participants = await db('participants')
-      .where('is_active', true)
-      .orderBy('last_name');
+    const participants = await db('Participant')
+      .select('ParticipantID', 'ParticipantFirstName', 'ParticipantLastName')
+      .orderBy('ParticipantLastName');
     
     res.render('portal/surveys/form', {
       title: 'Add Survey - Ella Rises Portal',
       survey: {},
-      events,
+      events: events.map(e => ({ id: e.EventID, title: e.EventName })),
       participants,
       isEdit: false
     });
@@ -92,21 +95,29 @@ router.post('/', isAuthenticated, isManager, async (req, res) => {
   try {
     const {
       event_id, participant_id, satisfaction_score, usefulness_score,
-      recommendation_score, what_liked, what_improve, additional_comments,
-      would_attend_again, survey_date
+      recommendation_score, instructor_score, comments, survey_date
     } = req.body;
     
-    await db('surveys').insert({
-      event_id: event_id || null,
-      participant_id: participant_id || null,
-      satisfaction_score: parseInt(satisfaction_score),
-      usefulness_score: parseInt(usefulness_score),
-      recommendation_score: parseInt(recommendation_score),
-      what_liked,
-      what_improve,
-      additional_comments,
-      would_attend_again: would_attend_again === 'on',
-      survey_date: survey_date || new Date()
+    // Calculate NPS Bucket
+    let npsBucket = 'Passive';
+    const recScore = parseInt(recommendation_score);
+    if (recScore >= 9) npsBucket = 'Promoter';
+    else if (recScore <= 6) npsBucket = 'Detractor';
+
+    // Calculate Overall Score (simple average)
+    const overallScore = Math.round((parseInt(satisfaction_score) + parseInt(usefulness_score) + parseInt(instructor_score || 0) + recScore) / 4);
+
+    await db('Survey').insert({
+      "EventID": event_id || null,
+      "ParticipantID": participant_id || null,
+      "SurveySatisfactionScore": parseInt(satisfaction_score),
+      "SurveyUsefulnessScore": parseInt(usefulness_score),
+      "SurveyInstructorScore": parseInt(instructor_score) || 0,
+      "SurveyRecommendationScore": recScore,
+      "SurveyOverallScore": overallScore,
+      "SurveyNPSBucket": npsBucket,
+      "SurveyComments": comments,
+      "SurveySubmissionDate": survey_date || new Date()
     });
     
     req.flash('success_msg', 'Survey added successfully');
@@ -121,17 +132,18 @@ router.post('/', isAuthenticated, isManager, async (req, res) => {
 // View survey details
 router.get('/:id', isAuthenticated, async (req, res) => {
   try {
-    const survey = await db('surveys as s')
-      .leftJoin('events as e', 's.event_id', 'e.id')
-      .leftJoin('participants as p', 's.participant_id', 'p.id')
-      .where('s.id', req.params.id)
+    const survey = await db('Survey')
+      .leftJoin('Event', 'Survey.EventID', 'Event.EventID')
+      .leftJoin('EventDetails', 'Event.EventDetailsID', 'EventDetails.EventDetailsID')
+      .leftJoin('Participant', 'Survey.ParticipantID', 'Participant.ParticipantID')
+      .where('Survey.SurveyID', req.params.id)
       .select(
-        's.*',
-        'e.title as event_title',
-        'e.event_date',
-        'p.first_name',
-        'p.last_name',
-        'p.email as participant_email'
+        'Survey.*',
+        'EventDetails.EventName as event_title',
+        'Event.EventDateTimeStart as event_date',
+        'Participant.ParticipantFirstName',
+        'Participant.ParticipantLastName',
+        'Participant.ParticipantEmail'
       )
       .first();
     
@@ -154,20 +166,26 @@ router.get('/:id', isAuthenticated, async (req, res) => {
 // Edit survey form
 router.get('/:id/edit', isAuthenticated, isManager, async (req, res) => {
   try {
-    const survey = await db('surveys').where('id', req.params.id).first();
+    const survey = await db('Survey').where('SurveyID', req.params.id).first();
     
     if (!survey) {
       req.flash('error_msg', 'Survey not found');
       return res.redirect('/portal/surveys');
     }
     
-    const events = await db('events').orderBy('event_date', 'desc');
-    const participants = await db('participants').orderBy('last_name');
+    const events = await db('Event')
+      .join('EventDetails', 'Event.EventDetailsID', 'EventDetails.EventDetailsID')
+      .select('Event.EventID', 'EventDetails.EventName')
+      .orderBy('Event.EventDateTimeStart', 'desc');
+
+    const participants = await db('Participant')
+      .select('ParticipantID', 'ParticipantFirstName', 'ParticipantLastName')
+      .orderBy('ParticipantLastName');
     
     res.render('portal/surveys/form', {
       title: 'Edit Survey - Ella Rises Portal',
       survey,
-      events,
+      events: events.map(e => ({ id: e.EventID, title: e.EventName })),
       participants,
       isEdit: true
     });
@@ -183,22 +201,28 @@ router.post('/:id', isAuthenticated, isManager, async (req, res) => {
   try {
     const {
       event_id, participant_id, satisfaction_score, usefulness_score,
-      recommendation_score, what_liked, what_improve, additional_comments,
-      would_attend_again, survey_date
+      recommendation_score, instructor_score, comments, survey_date
     } = req.body;
     
-    await db('surveys').where('id', req.params.id).update({
-      event_id: event_id || null,
-      participant_id: participant_id || null,
-      satisfaction_score: parseInt(satisfaction_score),
-      usefulness_score: parseInt(usefulness_score),
-      recommendation_score: parseInt(recommendation_score),
-      what_liked,
-      what_improve,
-      additional_comments,
-      would_attend_again: would_attend_again === 'on',
-      survey_date: survey_date || new Date(),
-      updated_at: new Date()
+    // Calculate NPS Bucket
+    let npsBucket = 'Passive';
+    const recScore = parseInt(recommendation_score);
+    if (recScore >= 9) npsBucket = 'Promoter';
+    else if (recScore <= 6) npsBucket = 'Detractor';
+
+    const overallScore = Math.round((parseInt(satisfaction_score) + parseInt(usefulness_score) + parseInt(instructor_score || 0) + recScore) / 4);
+
+    await db('Survey').where('SurveyID', req.params.id).update({
+      "EventID": event_id || null,
+      "ParticipantID": participant_id || null,
+      "SurveySatisfactionScore": parseInt(satisfaction_score),
+      "SurveyUsefulnessScore": parseInt(usefulness_score),
+      "SurveyInstructorScore": parseInt(instructor_score) || 0,
+      "SurveyRecommendationScore": recScore,
+      "SurveyOverallScore": overallScore,
+      "SurveyNPSBucket": npsBucket,
+      "SurveyComments": comments,
+      "SurveySubmissionDate": survey_date || new Date()
     });
     
     req.flash('success_msg', 'Survey updated successfully');
@@ -213,7 +237,7 @@ router.post('/:id', isAuthenticated, isManager, async (req, res) => {
 // Delete survey
 router.post('/:id/delete', isAuthenticated, isManager, async (req, res) => {
   try {
-    await db('surveys').where('id', req.params.id).del();
+    await db('Survey').where('SurveyID', req.params.id).del();
     req.flash('success_msg', 'Survey deleted successfully');
     res.redirect('/portal/surveys');
   } catch (error) {
@@ -224,4 +248,3 @@ router.post('/:id/delete', isAuthenticated, isManager, async (req, res) => {
 });
 
 module.exports = router;
-

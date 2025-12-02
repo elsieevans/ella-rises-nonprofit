@@ -123,7 +123,6 @@
         </ul>
         
         <h3>Ambassador Program</h3>
-        <p>Our Ambassador Program allows experienced participants to become leaders within Ella Rises, mentoring newer members and helping organize events.</p>
         <ul class="detail-list">
           <li><strong>Requirements:</strong> 1+ year participation, 5+ events attended</li>
           <li><strong>Commitment:</strong> 4 hours/month</li>
@@ -149,23 +148,15 @@
     
     <div class="program-content">
       <div class="program-description">
-        <p>Our cultural arts programs celebrate heritage and identity through music, visual arts, and creative projects. We believe that embracing one's culture is a source of strength and inspiration.</p>
+        <p>Our cultural arts programs celebrate heritage and identity through music, visual arts, and creative projects.</p>
         
         <h3>Arts Programs</h3>
         <ul class="feature-list">
-          <li>Mariachi music instruction (guitar, violin, trumpet)</li>
+          <li>Mariachi music instruction</li>
           <li>Visual arts and heritage projects</li>
           <li>Creative writing workshops</li>
           <li>Dance and performance</li>
           <li>Cultural celebration events</li>
-        </ul>
-        
-        <h3>Program Details</h3>
-        <ul class="detail-list">
-          <li><strong>Ages:</strong> All ages welcome</li>
-          <li><strong>Schedule:</strong> Weekly sessions and special events</li>
-          <li><strong>Location:</strong> Community Centers across Utah County</li>
-          <li><strong>Instruments:</strong> Provided for workshop participants</li>
         </ul>
       </div>
     </div>
@@ -185,29 +176,27 @@
         <% events.slice(0, 6).forEach(event => { %>
           <article class="event-list-item">
             <div class="event-date-box">
-              <span class="month"><%= new Date(event.event_date).toLocaleString('en-US', { month: 'short' }) %></span>
-              <span class="day"><%= new Date(event.event_date).getDate() %></span>
-              <span class="year"><%= new Date(event.event_date).getFullYear() %></span>
+              <span class="month"><%= new Date(event.EventDateTimeStart).toLocaleString('en-US', { month: 'short' }) %></span>
+              <span class="day"><%= new Date(event.EventDateTimeStart).getDate() %></span>
+              <span class="year"><%= new Date(event.EventDateTimeStart).getFullYear() %></span>
             </div>
             <div class="event-info">
-              <span class="event-badge event-badge--<%= event.event_type %>"><%= event.event_type %></span>
-              <h3><%= event.title %></h3>
-              <p><%= event.description ? event.description.substring(0, 150) + '...' : '' %></p>
+              <span class="event-badge event-badge--<%= (event.EventType || 'other').toLowerCase() %>"><%= event.EventType %></span>
+              <h3><%= event.EventName %></h3>
+              <p><%= event.EventDescription ? event.EventDescription.substring(0, 150) + '...' : '' %></p>
               <div class="event-meta">
                 <span>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                  <%= event.venue_name || event.location %>
+                  <%= event.EventLocation || 'TBD' %>
                 </span>
-                <% if (event.start_time) { %>
-                  <span>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    <%= event.start_time.substring(0, 5) %>
-                  </span>
-                <% } %>
-                <% if (event.max_participants) { %>
+                <span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  <%= new Date(event.EventDateTimeStart).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %>
+                </span>
+                <% if (event.EventCapacity) { %>
                   <span>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-                    <%= event.current_participants || 0 %>/<%= event.max_participants %> spots
+                    <%= event.EventCapacity %> spots
                   </span>
                 <% } %>
               </div>
@@ -236,4 +225,3 @@
 </section>
 
 <%- include('../partials/footer') %>
-

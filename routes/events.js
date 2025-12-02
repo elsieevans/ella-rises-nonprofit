@@ -8,28 +8,32 @@ router.get('/', isAuthenticated, async (req, res) => {
   try {
     const { search, type, status } = req.query;
     
-    let query = db('events').orderBy('event_date', 'desc');
+    let query = db('Event')
+      .join('EventDetails', 'Event.EventDetailsID', 'EventDetails.EventDetailsID')
+      .select(
+        'Event.*',
+        'EventDetails.EventName',
+        'EventDetails.EventType',
+        'EventDetails.EventDescription',
+        'EventDetails.EventDefaultCapacity'
+      )
+      .orderBy('Event.EventDateTimeStart', 'desc');
     
     if (search) {
       query = query.where(function() {
-        this.where('title', 'ilike', `%${search}%`)
-          .orWhere('location', 'ilike', `%${search}%`)
-          .orWhere('instructor', 'ilike', `%${search}%`);
+        this.where('EventDetails.EventName', 'ilike', `%${search}%`)
+          .orWhere('Event.EventLocation', 'ilike', `%${search}%`);
       });
     }
     
     if (type) {
-      query = query.where('event_type', type);
+      query = query.where('EventDetails.EventType', type);
     }
     
-    if (status === 'active') {
-      query = query.where('is_active', true);
-    } else if (status === 'inactive') {
-      query = query.where('is_active', false);
-    } else if (status === 'upcoming') {
-      query = query.where('event_date', '>=', new Date().toISOString().split('T')[0]);
+    if (status === 'upcoming') {
+      query = query.where('Event.EventDateTimeStart', '>=', new Date());
     } else if (status === 'past') {
-      query = query.where('event_date', '<', new Date().toISOString().split('T')[0]);
+      query = query.where('Event.EventDateTimeStart', '<', new Date());
     }
     
     const events = await query;
@@ -64,26 +68,34 @@ router.post('/', isAuthenticated, isManager, async (req, res) => {
   try {
     const {
       title, description, event_type, event_date, start_time, end_time,
-      location, venue_name, max_participants, instructor, partner_organization,
-      is_active, is_recurring, notes
+      location, max_participants
     } = req.body;
     
-    await db('events').insert({
-      title,
-      description,
-      event_type,
-      event_date,
-      start_time: start_time || null,
-      end_time: end_time || null,
-      location,
-      venue_name,
-      max_participants: max_participants || null,
-      current_participants: 0,
-      instructor,
-      partner_organization,
-      is_active: is_active === 'on',
-      is_recurring: is_recurring === 'on',
-      notes
+    // Transaction to ensure consistency
+    await db.transaction(async (trx) => {
+      // 1. Create EventDetails
+      const [eventDetails] = await trx('EventDetails').insert({
+        "EventName": title,
+        "EventDescription": description,
+        "EventType": event_type,
+        "EventDefaultCapacity": max_participants || 0
+      }).returning('EventDetailsID'); // returning ID for Postgres
+
+      const eventDetailsId = eventDetails.EventDetailsID || eventDetails; // Handle returning object or value
+
+      // Combine date and time
+      const startDateTime = event_date && start_time ? `${event_date}T${start_time}` : null;
+      const endDateTime = event_date && end_time ? `${event_date}T${end_time}` : null;
+
+      // 2. Create Event
+      await trx('Event').insert({
+        "EventDetailsID": eventDetailsId,
+        "EventDateTimeStart": startDateTime,
+        "EventDateTimeEnd": endDateTime,
+        "EventLocation": location,
+        "EventCapacity": max_participants,
+        "RegistrationCreatedAt": new Date()
+      });
     });
     
     req.flash('success_msg', 'Event created successfully');
@@ -98,46 +110,55 @@ router.post('/', isAuthenticated, isManager, async (req, res) => {
 // View event details
 router.get('/:id', isAuthenticated, async (req, res) => {
   try {
-    const event = await db('events').where('id', req.params.id).first();
+    const event = await db('Event')
+      .join('EventDetails', 'Event.EventDetailsID', 'EventDetails.EventDetailsID')
+      .where('Event.EventID', req.params.id)
+      .select(
+        'Event.*',
+        'EventDetails.EventName',
+        'EventDetails.EventType',
+        'EventDetails.EventDescription',
+        'EventDetails.EventDefaultCapacity'
+      )
+      .first();
     
     if (!event) {
       req.flash('error_msg', 'Event not found');
       return res.redirect('/portal/events');
     }
     
-    // Get registered participants
-    const participants = await db('event_participants as ep')
-      .join('participants as p', 'ep.participant_id', 'p.id')
-      .where('ep.event_id', req.params.id)
-      .select('p.*', 'ep.status', 'ep.registered_at', 'ep.id as ep_id')
-      .orderBy('p.last_name');
+    // Get registered participants via Registration table
+    const participants = await db('Registration')
+      .join('Participant', 'Registration.ParticipantID', 'Participant.ParticipantID')
+      .where('Registration.EventID', req.params.id)
+      .select('Participant.*', 'Registration.RegistrationStatus', 'Registration.RegistrationCheckInTime', 'Registration.RegistrationID')
+      .orderBy('Participant.ParticipantLastName');
     
     // Get surveys for this event
-    const surveys = await db('surveys as s')
-      .leftJoin('participants as p', 's.participant_id', 'p.id')
-      .where('s.event_id', req.params.id)
-      .select('s.*', 'p.first_name', 'p.last_name')
-      .orderBy('s.survey_date', 'desc');
+    const surveys = await db('Survey')
+      .leftJoin('Participant', 'Survey.ParticipantID', 'Participant.ParticipantID')
+      .where('Survey.EventID', req.params.id)
+      .select('Survey.*', 'Participant.ParticipantFirstName', 'Participant.ParticipantLastName')
+      .orderBy('Survey.SurveySubmissionDate', 'desc');
     
     // Calculate survey stats
-    const surveyStats = await db('surveys')
-      .where('event_id', req.params.id)
+    const surveyStats = await db('Survey')
+      .where('EventID', req.params.id)
       .select(
-        db.raw('AVG(satisfaction_score) as avg_satisfaction'),
-        db.raw('AVG(usefulness_score) as avg_usefulness'),
-        db.raw('AVG(recommendation_score) as avg_recommendation'),
+        db.raw('AVG("SurveySatisfactionScore") as avg_satisfaction'),
+        db.raw('AVG("SurveyUsefulnessScore") as avg_usefulness'),
+        db.raw('AVG("SurveyRecommendationScore") as avg_recommendation'),
         db.raw('COUNT(*) as total_responses')
       )
       .first();
     
-    // Get available participants to register
-    const availableParticipants = await db('participants')
-      .where('is_active', true)
-      .whereNotIn('id', participants.map(p => p.id))
-      .orderBy('last_name');
+    // Get available participants (simple list, not checking double booking for now)
+    const availableParticipants = await db('Participant')
+      .whereNotIn('ParticipantID', participants.map(p => p.ParticipantID))
+      .orderBy('ParticipantLastName');
     
     res.render('portal/events/view', {
-      title: `${event.title} - Ella Rises Portal`,
+      title: `${event.EventName} - Ella Rises Portal`,
       event,
       participants,
       surveys,
@@ -154,7 +175,17 @@ router.get('/:id', isAuthenticated, async (req, res) => {
 // Edit event form
 router.get('/:id/edit', isAuthenticated, isManager, async (req, res) => {
   try {
-    const event = await db('events').where('id', req.params.id).first();
+    const event = await db('Event')
+      .join('EventDetails', 'Event.EventDetailsID', 'EventDetails.EventDetailsID')
+      .where('Event.EventID', req.params.id)
+      .select(
+        'Event.*',
+        'EventDetails.EventName',
+        'EventDetails.EventType',
+        'EventDetails.EventDescription',
+        'EventDetails.EventDefaultCapacity'
+      )
+      .first();
     
     if (!event) {
       req.flash('error_msg', 'Event not found');
@@ -179,26 +210,34 @@ router.post('/:id', isAuthenticated, isManager, async (req, res) => {
   try {
     const {
       title, description, event_type, event_date, start_time, end_time,
-      location, venue_name, max_participants, instructor, partner_organization,
-      is_active, is_recurring, notes
+      location, max_participants
     } = req.body;
     
-    await db('events').where('id', req.params.id).update({
-      title,
-      description,
-      event_type,
-      event_date,
-      start_time: start_time || null,
-      end_time: end_time || null,
-      location,
-      venue_name,
-      max_participants: max_participants || null,
-      instructor,
-      partner_organization,
-      is_active: is_active === 'on',
-      is_recurring: is_recurring === 'on',
-      notes,
-      updated_at: new Date()
+    // Get EventDetailsID
+    const event = await db('Event').where('EventID', req.params.id).first();
+    if (!event) {
+      throw new Error('Event not found');
+    }
+
+    await db.transaction(async (trx) => {
+      // Update EventDetails
+      await trx('EventDetails').where('EventDetailsID', event.EventDetailsID).update({
+        "EventName": title,
+        "EventDescription": description,
+        "EventType": event_type,
+        "EventDefaultCapacity": max_participants
+      });
+
+      const startDateTime = event_date && start_time ? `${event_date}T${start_time}` : null;
+      const endDateTime = event_date && end_time ? `${event_date}T${end_time}` : null;
+
+      // Update Event
+      await trx('Event').where('EventID', req.params.id).update({
+        "EventDateTimeStart": startDateTime,
+        "EventDateTimeEnd": endDateTime,
+        "EventLocation": location,
+        "EventCapacity": max_participants
+      });
     });
     
     req.flash('success_msg', 'Event updated successfully');
@@ -213,7 +252,8 @@ router.post('/:id', isAuthenticated, isManager, async (req, res) => {
 // Delete event
 router.post('/:id/delete', isAuthenticated, isManager, async (req, res) => {
   try {
-    await db('events').where('id', req.params.id).del();
+    // Delete Event (EventDetails might persist if shared, but we'll assume 1:1 for now or leave it)
+    await db('Event').where('EventID', req.params.id).del();
     req.flash('success_msg', 'Event deleted successfully');
     res.redirect('/portal/events');
   } catch (error) {
@@ -223,19 +263,17 @@ router.post('/:id/delete', isAuthenticated, isManager, async (req, res) => {
   }
 });
 
-// Register participant for event
+// Register participant
 router.post('/:id/participants', isAuthenticated, isManager, async (req, res) => {
   try {
     const { participant_id } = req.body;
     
-    await db('event_participants').insert({
-      event_id: req.params.id,
-      participant_id,
-      status: 'registered'
+    await db('Registration').insert({
+      "EventID": req.params.id,
+      "ParticipantID": participant_id,
+      "RegistrationStatus": 'registered',
+      "RegistrationCheckInTime": null
     });
-    
-    // Update current participants count
-    await db('events').where('id', req.params.id).increment('current_participants', 1);
     
     req.flash('success_msg', 'Participant registered successfully');
     res.redirect(`/portal/events/${req.params.id}`);
@@ -246,14 +284,15 @@ router.post('/:id/participants', isAuthenticated, isManager, async (req, res) =>
   }
 });
 
-// Update participant status
-router.post('/:id/participants/:epId/status', isAuthenticated, isManager, async (req, res) => {
+// Update participant status (Check-in)
+router.post('/:id/participants/:regId/status', isAuthenticated, isManager, async (req, res) => {
   try {
     const { status } = req.body;
     
-    await db('event_participants').where('id', req.params.epId).update({
-      status,
-      attended_at: status === 'attended' ? new Date() : null
+    await db('Registration').where('RegistrationID', req.params.regId).update({
+      "RegistrationStatus": status,
+      "RegistrationCheckInTime": status === 'attended' ? new Date() : null,
+      "RegistrationAttendedFlag": status === 'attended' ? 1 : 0
     });
     
     req.flash('success_msg', 'Participant status updated');
@@ -266,11 +305,9 @@ router.post('/:id/participants/:epId/status', isAuthenticated, isManager, async 
 });
 
 // Remove participant from event
-router.post('/:id/participants/:epId/delete', isAuthenticated, isManager, async (req, res) => {
+router.post('/:id/participants/:regId/delete', isAuthenticated, isManager, async (req, res) => {
   try {
-    await db('event_participants').where('id', req.params.epId).del();
-    await db('events').where('id', req.params.id).decrement('current_participants', 1);
-    
+    await db('Registration').where('RegistrationID', req.params.regId).del();
     req.flash('success_msg', 'Participant removed from event');
     res.redirect(`/portal/events/${req.params.id}`);
   } catch (error) {
@@ -281,4 +318,3 @@ router.post('/:id/participants/:epId/delete', isAuthenticated, isManager, async 
 });
 
 module.exports = router;
-

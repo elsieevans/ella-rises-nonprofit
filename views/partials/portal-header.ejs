@@ -76,7 +76,7 @@
         </div>
         <div class="user-details">
           <span class="user-name"><%= user ? user.first_name + ' ' + user.last_name : 'User' %></span>
-          <span class="user-role"><%= user ? (user.role === 'manager' ? 'Manager' : 'Viewer') : '' %></span>
+          <span class="user-role"><%= user ? (user.role === 'Admin' ? 'Admin' : 'Viewer') : '' %></span>
         </div>
       </div>
       <a href="/" class="sidebar-link sidebar-link--small">
@@ -99,8 +99,8 @@
       </button>
       <h1 class="topbar-title"><%= typeof pageTitle !== 'undefined' ? pageTitle : 'Dashboard' %></h1>
       <div class="topbar-actions">
-        <% if (user && user.role === 'manager') { %>
-          <span class="role-badge role-badge--manager">Manager</span>
+        <% if (user && user.role === 'Admin') { %>
+          <span class="role-badge role-badge--admin">Admin</span>
         <% } else { %>
           <span class="role-badge role-badge--viewer">Viewer</span>
         <% } %>

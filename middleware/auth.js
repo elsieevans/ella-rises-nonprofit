@@ -7,9 +7,9 @@ const isAuthenticated = (req, res, next) => {
   res.redirect('/auth/login');
 };
 
-// Check if user is a manager
+// Check if user is an Admin
 const isManager = (req, res, next) => {
-  if (req.session && req.session.user && req.session.user.role === 'manager') {
+  if (req.session && req.session.user && req.session.user.role === 'Admin') {
     return next();
   }
   req.flash('error_msg', 'You do not have permission to perform this action');
@@ -24,12 +24,12 @@ const isAuthenticatedAPI = (req, res, next) => {
   res.status(401).json({ error: 'Unauthorized' });
 };
 
-// Check if user is manager (for API routes)
+// Check if user is Admin (for API routes)
 const isManagerAPI = (req, res, next) => {
-  if (req.session && req.session.user && req.session.user.role === 'manager') {
+  if (req.session && req.session.user && req.session.user.role === 'Admin') {
     return next();
   }
-  res.status(403).json({ error: 'Forbidden - Manager access required' });
+  res.status(403).json({ error: 'Forbidden - Admin access required' });
 };
 
 module.exports = {

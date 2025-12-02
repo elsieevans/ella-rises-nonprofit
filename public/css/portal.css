@@ -280,7 +280,7 @@
   letter-spacing: 0.5px;
 }
 
-.role-badge--manager {
+.role-badge--admin {
   background: var(--color-accent-magenta);
   color: var(--color-white);
 }
@@ -294,6 +294,12 @@
 .portal-content {
   flex: 1;
   padding: var(--space-xl);
+  padding-top: var(--space-4xl);
+}
+
+/* Ensure first child has proper spacing from top */
+.portal-content > :first-child {
+  margin-top: var(--space-xl);
 }
 
 /* Portal Footer */
@@ -666,7 +672,6 @@
   font-size: var(--text-sm);
   color: var(--color-gray-700);
   border-bottom: 2px solid var(--color-gray-200);
-  white-space: nowrap;
   position: sticky;
   top: 0;
 }
@@ -1487,7 +1492,7 @@
 /* Mobile screens */
 @media (max-width: 768px) {
   .portal-content {
-    padding: var(--space-md);
+    padding: var(--space-3xl) var(--space-md) var(--space-md) var(--space-md);
   }
   
   .form-card {
@@ -1663,7 +1668,7 @@
 /* Small mobile screens */
 @media (max-width: 480px) {
   .portal-content {
-    padding: var(--space-sm);
+    padding: var(--space-2xl) var(--space-sm) var(--space-sm) var(--space-sm);
   }
   
   .dashboard-stats {
@@ -1815,6 +1820,78 @@
   .btn-icon svg {
     width: 20px;
     height: 20px;
+  }
+}
+
+/* ============================================
+   Participants Table Responsive Adjustments
+   ============================================ */
+
+/* Make participants table fit on screen without horizontal scroll */
+.data-table th,
+.data-table td {
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+/* Set maximum widths for specific columns to control overflow */
+.data-table th:nth-child(1),
+.data-table td:nth-child(1) {
+  min-width: 140px;
+  max-width: 200px;
+}
+
+.data-table th:nth-child(2),
+.data-table td:nth-child(2) {
+  min-width: 150px;
+  max-width: 220px;
+  word-break: break-word;
+}
+
+.data-table th:nth-child(3),
+.data-table td:nth-child(3) {
+  min-width: 120px;
+  max-width: 180px;
+}
+
+.data-table th:nth-child(4),
+.data-table td:nth-child(4) {
+  min-width: 120px;
+  max-width: 180px;
+}
+
+.data-table th:nth-child(5),
+.data-table td:nth-child(5) {
+  min-width: 100px;
+  max-width: 150px;
+}
+
+.data-table th:nth-child(6),
+.data-table td:nth-child(6) {
+  width: 140px;
+  min-width: 140px;
+}
+
+/* Reduce padding on table cells for better space efficiency */
+@media (max-width: 1400px) {
+  .data-table th,
+  .data-table td {
+    padding: var(--space-sm) var(--space-md);
+  }
+}
+
+/* On medium screens, hide less critical columns */
+@media (max-width: 1200px) {
+  .data-table th:nth-child(5),
+  .data-table td:nth-child(5) {
+    display: none; /* Hide City column */
+  }
+}
+
+@media (max-width: 992px) {
+  .data-table th:nth-child(4),
+  .data-table td:nth-child(4) {
+    display: none; /* Hide Employer column */
   }
 }
 

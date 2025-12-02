@@ -6,15 +6,16 @@ const db = require('../config/database');
 router.get('/', async (req, res) => {
   try {
     // Get some stats for the landing page
-    const participantCount = await db('participants').where('is_active', true).count('id as count').first();
-    const eventCount = await db('events').where('is_active', true).count('id as count').first();
-    const milestoneCount = await db('participant_milestones').count('id as count').first();
+    const participantCount = await db('Participant').count('ParticipantID as count').first();
+    const eventCount = await db('Event').count('EventID as count').first();
+    const milestoneCount = await db('Milestone').count('MilestoneID as count').first();
     
     // Get upcoming events
-    const upcomingEvents = await db('events')
-      .where('is_active', true)
-      .where('event_date', '>=', new Date().toISOString().split('T')[0])
-      .orderBy('event_date', 'asc')
+    const upcomingEvents = await db('Event')
+      .join('EventDetails', 'Event.EventDetailsID', 'EventDetails.EventDetailsID')
+      .select('Event.*', 'EventDetails.EventName')
+      .where('Event.EventDateTimeStart', '>=', new Date())
+      .orderBy('Event.EventDateTimeStart', 'asc')
       .limit(3);
     
     res.render('public/home', {
@@ -46,9 +47,10 @@ router.get('/mission', (req, res) => {
 // Programs page
 router.get('/programs', async (req, res) => {
   try {
-    const events = await db('events')
-      .where('is_active', true)
-      .orderBy('event_date', 'desc');
+    const events = await db('Event')
+      .join('EventDetails', 'Event.EventDetailsID', 'EventDetails.EventDetailsID')
+      .select('Event.*', 'EventDetails.*')
+      .orderBy('Event.EventDateTimeStart', 'desc');
     
     res.render('public/programs', {
       title: 'Programs - Ella Rises',
@@ -102,4 +104,3 @@ router.post('/contact', async (req, res) => {
 });
 
 module.exports = router;
-

@@ -1,12 +1,12 @@
-<%- include('../../partials/portal-header', { currentPage: 'events', pageTitle: event.title }) %>
+<%- include('../../partials/portal-header', { currentPage: 'events', pageTitle: event.EventName }) %>
 
 <div class="page-actions">
   <a href="/portal/events" class="btn btn-outline">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
     Back to Events
   </a>
-  <% if (user && user.role === 'manager') { %>
-    <a href="/portal/events/<%= event.id %>/edit" class="btn btn-primary">
+  <% if (user && user.role === 'Admin') { %>
+    <a href="/portal/events/<%= event.EventID %>/edit" class="btn btn-primary">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
       Edit
     </a>
@@ -18,23 +18,20 @@
   <div class="detail-card detail-card--wide">
     <div class="event-header">
       <div class="event-date-large">
-        <span class="month"><%= new Date(event.event_date).toLocaleString('en-US', { month: 'short' }) %></span>
-        <span class="day"><%= new Date(event.event_date).getDate() %></span>
-        <span class="year"><%= new Date(event.event_date).getFullYear() %></span>
+        <span class="month"><%= new Date(event.EventDateTimeStart).toLocaleString('en-US', { month: 'short' }) %></span>
+        <span class="day"><%= new Date(event.EventDateTimeStart).getDate() %></span>
+        <span class="year"><%= new Date(event.EventDateTimeStart).getFullYear() %></span>
       </div>
       <div class="event-title-section">
-        <span class="type-badge type-<%= event.event_type %>"><%= event.event_type %></span>
-        <h2><%= event.title %></h2>
-        <span class="status-badge <%= event.is_active ? 'status-active' : 'status-inactive' %>">
-          <%= event.is_active ? 'Active' : 'Inactive' %>
-        </span>
+        <span class="type-badge type-<%= event.EventType %>"><%= event.EventType %></span>
+        <h2><%= event.EventName %></h2>
       </div>
     </div>
     
-    <% if (event.description) { %>
+    <% if (event.EventDescription) { %>
     <div class="detail-section">
       <h3>Description</h3>
-      <p><%= event.description %></p>
+      <p><%= event.EventDescription %></p>
     </div>
     <% } %>
     
@@ -42,23 +39,16 @@
       <h3>Event Details</h3>
       <dl class="detail-list detail-list--horizontal">
         <dt>Date</dt>
-        <dd><%= new Date(event.event_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></dd>
+        <dd><%= new Date(event.EventDateTimeStart).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></dd>
         <dt>Time</dt>
         <dd>
-          <% if (event.start_time) { %>
-            <%= event.start_time.substring(0, 5) %><% if (event.end_time) { %> - <%= event.end_time.substring(0, 5) %><% } %>
-          <% } else { %>
-            -
-          <% } %>
+          <%= new Date(event.EventDateTimeStart).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %>
+          <% if (event.EventDateTimeEnd) { %> - <%= new Date(event.EventDateTimeEnd).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %><% } %>
         </dd>
         <dt>Location</dt>
-        <dd><%= event.venue_name || '-' %><% if (event.location) { %><br><small><%= event.location %></small><% } %></dd>
-        <dt>Instructor</dt>
-        <dd><%= event.instructor || '-' %></dd>
-        <dt>Partner</dt>
-        <dd><%= event.partner_organization || '-' %></dd>
+        <dd><%= event.EventLocation || '-' %></dd>
         <dt>Capacity</dt>
-        <dd><%= event.current_participants || 0 %><% if (event.max_participants) { %> / <%= event.max_participants %><% } %></dd>
+        <dd><%= event.EventCapacity ? event.EventCapacity + ' max' : 'Unlimited' %></dd>
       </dl>
     </div>
     
@@ -96,26 +86,26 @@
             <tr>
               <th>Name</th>
               <th>Status</th>
-              <% if (user && user.role === 'manager') { %><th>Actions</th><% } %>
+              <% if (user && user.role === 'Admin') { %><th>Actions</th><% } %>
             </tr>
           </thead>
           <tbody>
             <% participants.forEach(p => { %>
               <tr>
                 <td data-label="Name">
-                  <a href="/portal/participants/<%= p.id %>"><%= p.first_name %> <%= p.last_name %></a>
+                  <a href="/portal/participants/<%= p.ParticipantID %>"><%= p.ParticipantFirstName %> <%= p.ParticipantLastName %></a>
                 </td>
                 <td data-label="Status">
-                  <span class="status-badge status-<%= p.status %>"><%= p.status %></span>
+                  <span class="status-badge status-<%= p.RegistrationStatus %>"><%= p.RegistrationStatus %></span>
                 </td>
-                <% if (user && user.role === 'manager') { %>
+                <% if (user && user.role === 'Admin') { %>
                   <td data-label="Update" class="actions-col">
-                    <form action="/portal/events/<%= event.id %>/participants/<%= p.ep_id %>/status" method="POST" class="inline-form">
+                    <form action="/portal/events/<%= event.EventID %>/participants/<%= p.RegistrationID %>/status" method="POST" class="inline-form">
                       <select name="status" onchange="this.form.submit()">
-                        <option value="registered" <%= p.status === 'registered' ? 'selected' : '' %>>Registered</option>
-                        <option value="attended" <%= p.status === 'attended' ? 'selected' : '' %>>Attended</option>
-                        <option value="no-show" <%= p.status === 'no-show' ? 'selected' : '' %>>No-Show</option>
-                        <option value="cancelled" <%= p.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+                        <option value="registered" <%= p.RegistrationStatus === 'registered' ? 'selected' : '' %>>Registered</option>
+                        <option value="attended" <%= p.RegistrationStatus === 'attended' ? 'selected' : '' %>>Attended</option>
+                        <option value="no-show" <%= p.RegistrationStatus === 'no-show' ? 'selected' : '' %>>No-Show</option>
+                        <option value="cancelled" <%= p.RegistrationStatus === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
                       </select>
                     </form>
                   </td>
@@ -129,14 +119,14 @@
       <p class="no-data">No participants registered</p>
     <% } %>
     
-    <% if (user && user.role === 'manager' && availableParticipants && availableParticipants.length > 0) { %>
+    <% if (user && user.role === 'Admin' && availableParticipants && availableParticipants.length > 0) { %>
       <div class="card-footer">
         <h4>Register Participant</h4>
-        <form action="/portal/events/<%= event.id %>/participants" method="POST" class="inline-form">
+        <form action="/portal/events/<%= event.EventID %>/participants" method="POST" class="inline-form">
           <select name="participant_id" required>
             <option value="">Select participant...</option>
             <% availableParticipants.forEach(p => { %>
-              <option value="<%= p.id %>"><%= p.first_name %> <%= p.last_name %></option>
+              <option value="<%= p.ParticipantID %>"><%= p.ParticipantFirstName %> <%= p.ParticipantLastName %></option>
             <% }) %>
           </select>
           <button type="submit" class="btn btn-secondary btn-sm">Register</button>
@@ -156,15 +146,15 @@
         <% surveys.forEach(s => { %>
           <li class="survey-item">
             <div class="survey-scores-mini">
-              <span title="Satisfaction">😊 <%= s.satisfaction_score %>/5</span>
-              <span title="Usefulness">📚 <%= s.usefulness_score %>/5</span>
-              <span title="Recommendation">👍 <%= s.recommendation_score %>/10</span>
+              <span title="Satisfaction">😊 <%= s.SurveySatisfactionScore %>/5</span>
+              <span title="Usefulness">📚 <%= s.SurveyUsefulnessScore %>/5</span>
+              <span title="Recommendation">👍 <%= s.SurveyRecommendationScore %>/10</span>
             </div>
-            <% if (s.first_name) { %>
-              <span class="survey-respondent"><%= s.first_name %> <%= s.last_name %></span>
+            <% if (s.ParticipantFirstName) { %>
+              <span class="survey-respondent"><%= s.ParticipantFirstName %> <%= s.ParticipantLastName %></span>
             <% } %>
-            <% if (s.what_liked) { %>
-              <p class="survey-feedback">"<%= s.what_liked.substring(0, 100) %><%= s.what_liked.length > 100 ? '...' : '' %>"</p>
+            <% if (s.SurveyComments) { %>
+              <p class="survey-feedback">"<%= s.SurveyComments.substring(0, 100) %><%= s.SurveyComments.length > 100 ? '...' : '' %>"</p>
             <% } %>
           </li>
         <% }) %>
@@ -176,4 +166,3 @@
 </div>
 
 <%- include('../../partials/portal-footer') %>
-

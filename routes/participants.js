@@ -6,41 +6,37 @@ const db = require('../config/database');
 // List all participants
 router.get('/', isAuthenticated, async (req, res) => {
   try {
-    const { search, grade, status } = req.query;
+    const { search, school } = req.query;
     
-    let query = db('participants').orderBy('last_name', 'asc');
+    let query = db('Participant').orderBy('ParticipantLastName', 'asc');
     
     if (search) {
       query = query.where(function() {
-        this.where('first_name', 'ilike', `%${search}%`)
-          .orWhere('last_name', 'ilike', `%${search}%`)
-          .orWhere('email', 'ilike', `%${search}%`);
+        this.where('ParticipantFirstName', 'ilike', `%${search}%`)
+          .orWhere('ParticipantLastName', 'ilike', `%${search}%`)
+          .orWhere('ParticipantEmail', 'ilike', `%${search}%`);
       });
     }
     
-    if (grade) {
-      query = query.where('grade_level', grade);
+    if (school) {
+      query = query.where('ParticipantSchool', 'ilike', `%${school}%`);
     }
     
-    if (status === 'active') {
-      query = query.where('is_active', true);
-    } else if (status === 'inactive') {
-      query = query.where('is_active', false);
-    }
+    // Status filter removed as is_active column is missing
     
     const participants = await query;
     
-    // Get unique grade levels for filter
-    const grades = await db('participants')
-      .distinct('grade_level')
-      .whereNotNull('grade_level')
-      .orderBy('grade_level');
+    // Get unique schools for filter
+    const schools = await db('Participant')
+      .distinct('ParticipantSchool')
+      .whereNotNull('ParticipantSchool')
+      .orderBy('ParticipantSchool');
     
     res.render('portal/participants/index', {
       title: 'Participants - Ella Rises Portal',
       participants,
-      grades: grades.map(g => g.grade_level),
-      filters: { search, grade, status }
+      schools: schools.map(s => s.ParticipantSchool),
+      filters: { search, school }
     });
   } catch (error) {
     console.error('Error fetching participants:', error);
@@ -63,25 +59,30 @@ router.post('/', isAuthenticated, isManager, async (req, res) => {
   try {
     const {
       first_name, last_name, email, phone, date_of_birth,
-      school, grade_level, parent_guardian_name, parent_guardian_email,
-      parent_guardian_phone, interests, notes, is_active
+      school, employer, field_of_interest, 
+      city, state, zip, role
     } = req.body;
     
-    await db('participants').insert({
-      first_name,
-      last_name,
-      email,
-      phone,
-      date_of_birth: date_of_birth || null,
-      school,
-      grade_level,
-      parent_guardian_name,
-      parent_guardian_email,
-      parent_guardian_phone,
-      interests,
-      notes,
-      is_active: is_active === 'on',
-      enrollment_date: new Date()
+    // Validate required fields
+    if (!first_name || !last_name || !email) {
+      req.flash('error_msg', 'First Name, Last Name, and Email are required');
+      return res.redirect('/portal/participants/new');
+    }
+
+    await db('Participant').insert({
+      "ParticipantFirstName": first_name,
+      "ParticipantLastName": last_name,
+      "ParticipantEmail": email,
+      "ParticipantPhone": phone,
+      "ParticipantDOB": date_of_birth || null,
+      "ParticipantSchool": school,
+      "ParticipantEmployer": employer,
+      "ParticipantFieldOfInterest": field_of_interest,
+      "ParticipantCity": city,
+      "ParticipantState": state,
+      "ParticipantZip": zip,
+      "ParticipantRole": role || 'participant'
+      // Missing: password (if required for login, assuming default or handled elsewhere)
     });
     
     req.flash('success_msg', 'Participant added successfully');
@@ -96,39 +97,40 @@ router.post('/', isAuthenticated, isManager, async (req, res) => {
 // View participant details
 router.get('/:id', isAuthenticated, async (req, res) => {
   try {
-    const participant = await db('participants').where('id', req.params.id).first();
+    const participant = await db('Participant').where('ParticipantID', req.params.id).first();
     
     if (!participant) {
       req.flash('error_msg', 'Participant not found');
       return res.redirect('/portal/participants');
     }
     
-    // Get participant's milestones
-    const milestones = await db('participant_milestones as pm')
-      .join('milestones as m', 'pm.milestone_id', 'm.id')
-      .where('pm.participant_id', req.params.id)
-      .select('m.*', 'pm.achieved_date', 'pm.notes as achievement_notes', 'pm.id as pm_id')
-      .orderBy('pm.achieved_date', 'desc');
+    // Get participant's milestones (direct from Milestone table)
+    const milestones = await db('Milestone')
+      .where('ParticipantID', req.params.id)
+      .orderBy('MilestoneDate', 'desc');
     
     // Get participant's event history
-    const events = await db('event_participants as ep')
-      .join('events as e', 'ep.event_id', 'e.id')
-      .where('ep.participant_id', req.params.id)
-      .select('e.*', 'ep.status', 'ep.registered_at')
-      .orderBy('e.event_date', 'desc');
+    // Join Registration -> Event -> EventDetails
+    const events = await db('Registration')
+      .join('Event', 'Registration.EventID', 'Event.EventID')
+      .join('EventDetails', 'Event.EventDetailsID', 'EventDetails.EventDetailsID')
+      .where('Registration.ParticipantID', req.params.id)
+      .select(
+        'EventDetails.EventName',
+        'Event.EventDateTimeStart',
+        'Registration.RegistrationStatus',
+        'Registration.RegistrationCheckInTime'
+      )
+      .orderBy('Event.EventDateTimeStart', 'desc');
     
-    // Get available milestones for assignment
-    const availableMilestones = await db('milestones')
-      .where('is_active', true)
-      .whereNotIn('id', milestones.map(m => m.id))
-      .orderBy('sort_order');
+    // Available milestones logic removed as there's no definition table
     
     res.render('portal/participants/view', {
-      title: `${participant.first_name} ${participant.last_name} - Ella Rises Portal`,
+      title: `${participant.ParticipantFirstName} ${participant.ParticipantLastName} - Ella Rises Portal`,
       participant,
       milestones,
       events,
-      availableMilestones
+      availableMilestones: [] // Empty array to prevent view error
     });
   } catch (error) {
     console.error('Error fetching participant:', error);
@@ -140,7 +142,7 @@ router.get('/:id', isAuthenticated, async (req, res) => {
 // Edit participant form
 router.get('/:id/edit', isAuthenticated, isManager, async (req, res) => {
   try {
-    const participant = await db('participants').where('id', req.params.id).first();
+    const participant = await db('Participant').where('ParticipantID', req.params.id).first();
     
     if (!participant) {
       req.flash('error_msg', 'Participant not found');
@@ -164,25 +166,23 @@ router.post('/:id', isAuthenticated, isManager, async (req, res) => {
   try {
     const {
       first_name, last_name, email, phone, date_of_birth,
-      school, grade_level, parent_guardian_name, parent_guardian_email,
-      parent_guardian_phone, interests, notes, is_active
+      school, employer, field_of_interest, 
+      city, state, zip, role
     } = req.body;
     
-    await db('participants').where('id', req.params.id).update({
-      first_name,
-      last_name,
-      email,
-      phone,
-      date_of_birth: date_of_birth || null,
-      school,
-      grade_level,
-      parent_guardian_name,
-      parent_guardian_email,
-      parent_guardian_phone,
-      interests,
-      notes,
-      is_active: is_active === 'on',
-      updated_at: new Date()
+    await db('Participant').where('ParticipantID', req.params.id).update({
+      "ParticipantFirstName": first_name,
+      "ParticipantLastName": last_name,
+      "ParticipantEmail": email,
+      "ParticipantPhone": phone,
+      "ParticipantDOB": date_of_birth || null,
+      "ParticipantSchool": school,
+      "ParticipantEmployer": employer,
+      "ParticipantFieldOfInterest": field_of_interest,
+      "ParticipantCity": city,
+      "ParticipantState": state,
+      "ParticipantZip": zip,
+      "ParticipantRole": role
     });
     
     req.flash('success_msg', 'Participant updated successfully');
@@ -197,7 +197,7 @@ router.post('/:id', isAuthenticated, isManager, async (req, res) => {
 // Delete participant
 router.post('/:id/delete', isAuthenticated, isManager, async (req, res) => {
   try {
-    await db('participants').where('id', req.params.id).del();
+    await db('Participant').where('ParticipantID', req.params.id).del();
     req.flash('success_msg', 'Participant deleted successfully');
     res.redirect('/portal/participants');
   } catch (error) {
@@ -207,32 +207,31 @@ router.post('/:id/delete', isAuthenticated, isManager, async (req, res) => {
   }
 });
 
-// Assign milestone to participant
+// Assign milestone (Create new Milestone record)
 router.post('/:id/milestones', isAuthenticated, isManager, async (req, res) => {
   try {
-    const { milestone_id, achieved_date, notes } = req.body;
+    const { title, date, notes } = req.body; // title and date from form
     
-    await db('participant_milestones').insert({
-      participant_id: req.params.id,
-      milestone_id,
-      achieved_date,
-      notes,
-      verified_by: req.session.user.id
+    await db('Milestone').insert({
+      "ParticipantID": req.params.id,
+      "MilestoneTitle": title,
+      "MilestoneDate": date || new Date(),
+      // MilestoneNo could be auto-incremented or passed if needed
     });
     
-    req.flash('success_msg', 'Milestone assigned successfully');
+    req.flash('success_msg', 'Milestone added successfully');
     res.redirect(`/portal/participants/${req.params.id}`);
   } catch (error) {
-    console.error('Error assigning milestone:', error);
-    req.flash('error_msg', 'Error assigning milestone');
+    console.error('Error adding milestone:', error);
+    req.flash('error_msg', 'Error adding milestone');
     res.redirect(`/portal/participants/${req.params.id}`);
   }
 });
 
-// Remove milestone from participant
-router.post('/:id/milestones/:pmId/delete', isAuthenticated, isManager, async (req, res) => {
+// Remove milestone
+router.post('/:id/milestones/:mid/delete', isAuthenticated, isManager, async (req, res) => {
   try {
-    await db('participant_milestones').where('id', req.params.pmId).del();
+    await db('Milestone').where('MilestoneID', req.params.mid).del();
     req.flash('success_msg', 'Milestone removed successfully');
     res.redirect(`/portal/participants/${req.params.id}`);
   } catch (error) {
@@ -243,4 +242,3 @@ router.post('/:id/milestones/:pmId/delete', isAuthenticated, isManager, async (r
 });
 
 module.exports = router;
-
