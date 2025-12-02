@@ -3,6 +3,7 @@ require('dotenv').config();
 console.log('======================================');
 console.log('KNEXFILE LOADED');
 console.log('NODE_ENV at knexfile load:', process.env.NODE_ENV);
+console.log('Database will be:', process.env.RDS_DB_NAME || process.env.DB_NAME || 'ella_rises');
 console.log('======================================');
 
 module.exports = {
