@@ -1,5 +1,10 @@
 require('dotenv').config();
 
+console.log('======================================');
+console.log('KNEXFILE LOADED');
+console.log('NODE_ENV at knexfile load:', process.env.NODE_ENV);
+console.log('======================================');
+
 module.exports = {
   development: {
     client: 'pg',

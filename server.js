@@ -99,8 +99,14 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
+  console.log('======================================');
+  console.log('SERVER STARTUP');
+  console.log('======================================');
   console.log(`Ella Rises server running on port ${PORT}`);
   console.log(`Visit http://localhost:${PORT}`);
+  console.log('NODE_ENV:', process.env.NODE_ENV || 'NOT SET');
+  console.log('Environment:', process.env.NODE_ENV || 'development');
+  console.log('======================================');
 });
 
 module.exports = app;
