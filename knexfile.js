@@ -25,12 +25,12 @@ module.exports = {
 
   production: {
     client: 'pg',
-    connection: process.env.DATABASE_URL || {
-      host: process.env.DB_HOST,
-      port: process.env.DB_PORT || 5432,
-      database: process.env.DB_NAME,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
+    connection: {
+      host: process.env.RDS_HOSTNAME || process.env.DB_HOST,
+      port: process.env.RDS_PORT || process.env.DB_PORT || 5432,
+      database: process.env.RDS_DB_NAME || process.env.DB_NAME,
+      user: process.env.RDS_USERNAME || process.env.DB_USER,
+      password: process.env.RDS_PASSWORD || process.env.DB_PASSWORD,
       ssl: process.env.DB_SSL === 'false' ? false : { rejectUnauthorized: false }
     },
     pool: {
