@@ -36,6 +36,72 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // ============================================
+  // Dropdown Navigation
+  // ============================================
+  const dropdownToggles = document.querySelectorAll('.nav-dropdown-toggle');
+  
+  dropdownToggles.forEach(function(toggle) {
+    const dropdown = toggle.closest('.nav-dropdown');
+    
+    // Toggle dropdown on click
+    toggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Close other dropdowns
+      document.querySelectorAll('.nav-dropdown').forEach(function(otherDropdown) {
+        if (otherDropdown !== dropdown) {
+          otherDropdown.classList.remove('active');
+          const otherToggle = otherDropdown.querySelector('.nav-dropdown-toggle');
+          if (otherToggle) {
+            otherToggle.setAttribute('aria-expanded', 'false');
+          }
+        }
+      });
+      
+      // Toggle current dropdown
+      dropdown.classList.toggle('active');
+      const isExpanded = dropdown.classList.contains('active');
+      toggle.setAttribute('aria-expanded', isExpanded);
+    });
+    
+    // Keyboard navigation
+    toggle.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggle.click();
+      }
+    });
+  });
+  
+  // Close dropdowns when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.nav-dropdown')) {
+      document.querySelectorAll('.nav-dropdown').forEach(function(dropdown) {
+        dropdown.classList.remove('active');
+        const toggle = dropdown.querySelector('.nav-dropdown-toggle');
+        if (toggle) {
+          toggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+  });
+  
+  // Close dropdowns on escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.nav-dropdown').forEach(function(dropdown) {
+        dropdown.classList.remove('active');
+        const toggle = dropdown.querySelector('.nav-dropdown-toggle');
+        if (toggle) {
+          toggle.setAttribute('aria-expanded', 'false');
+          toggle.focus();
+        }
+      });
+    }
+  });
+  
+  // ============================================
   // Flash Messages Auto-dismiss
   // ============================================
   const flashMessages = document.querySelectorAll('.flash-message');

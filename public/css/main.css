@@ -230,9 +230,9 @@ a:hover {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  max-width: var(--container-max);
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 var(--space-lg);
+  padding: 0 var(--space-xl);
   height: 100%;
 }
 
@@ -240,6 +240,7 @@ a:hover {
   display: flex;
   align-items: center;
   text-decoration: none;
+  margin-left: var(--space-xl);
 }
 
 .nav-logo:hover {
@@ -297,8 +298,10 @@ a:hover {
 .nav-menu {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--space-2xl);
   list-style: none;
+  flex: 1;
+  justify-content: center;
 }
 
 .nav-link {
@@ -320,6 +323,71 @@ a:hover {
 
 .nav-link--secondary {
   color: var(--color-primary);
+}
+
+/* Dropdown Navigation */
+.nav-dropdown {
+  position: relative;
+}
+
+.nav-dropdown-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.dropdown-arrow {
+  font-size: 0.8em;
+  transition: transform var(--transition-fast);
+}
+
+.nav-dropdown.active .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.nav-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--color-white);
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-md);
+  list-style: none;
+  padding: var(--space-sm) 0;
+  min-width: 180px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all var(--transition-fast);
+  z-index: 1000;
+  margin-top: var(--space-xs);
+}
+
+.nav-dropdown.active .nav-dropdown-menu,
+.nav-dropdown:hover .nav-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.nav-dropdown-link {
+  display: block;
+  padding: var(--space-sm) var(--space-lg);
+  color: var(--color-gray-700);
+  font-weight: 500;
+  font-size: var(--text-sm);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.nav-dropdown-link:hover {
+  background: var(--color-gray-100);
+  color: var(--color-primary);
+  text-decoration: none;
 }
 
 .nav-cta {
@@ -399,6 +467,40 @@ a:hover {
   .nav-cta {
     margin-top: var(--space-md);
     text-align: center;
+  }
+  
+  /* Mobile Dropdown */
+  .nav-dropdown {
+    width: 100%;
+  }
+  
+  .nav-dropdown-toggle {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .nav-dropdown-menu {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    box-shadow: none;
+    background: var(--color-gray-100);
+    border-radius: 0;
+    margin: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height var(--transition-base);
+    padding: 0;
+  }
+  
+  .nav-dropdown.active .nav-dropdown-menu {
+    max-height: 200px;
+    padding: var(--space-sm) 0;
+  }
+  
+  .nav-dropdown-link {
+    padding-left: var(--space-xl);
   }
 }
 
@@ -775,6 +877,7 @@ section {
 
 .section-header h2 {
   margin-bottom: var(--space-md);
+  font-size: var(--text-4xl);
 }
 
 .section-header p {
@@ -798,6 +901,22 @@ section {
   inset: 0;
   background-image: radial-gradient(circle at 30% 70%, rgba(154, 181, 157, 0.15) 0%, transparent 50%);
   pointer-events: none;
+}
+
+.page-header-simple {
+  background: var(--color-white);
+  color: var(--color-primary);
+  padding: var(--space-2xl) 0 var(--space-lg);
+  text-align: center;
+  position: relative;
+}
+
+.page-header-simple h1 {
+  font-family: var(--font-display);
+  color: var(--color-primary);
+  margin-bottom: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .page-header h1 {
@@ -1415,7 +1534,20 @@ section {
 
 .team-photo {
   background: linear-gradient(135deg, var(--color-accent-sage) 0%, var(--color-accent-lavender) 100%);
-  padding: var(--space-xl);
+  padding: 0;
+  overflow: hidden;
+}
+
+.team-photo img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  border-radius: 0;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  border: none;
+  box-shadow: none;
 }
 
 .photo-placeholder {
@@ -1432,8 +1564,17 @@ section {
   color: var(--color-primary);
 }
 
-.team-card h3 {
+.team-name-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
   padding: var(--space-lg) var(--space-lg) var(--space-xs);
+}
+
+.team-card h3 {
+  padding: 0;
+  margin: 0;
 }
 
 .team-title {
@@ -1445,12 +1586,100 @@ section {
 }
 
 .team-bio {
-  padding: var(--space-md) var(--space-lg) var(--space-xl);
+  padding: var(--space-md) var(--space-lg) var(--space-md);
   color: var(--color-gray-600);
   font-size: var(--text-sm);
 }
 
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-primary);
+  text-decoration: none;
+  padding: var(--space-xs);
+  border-radius: var(--radius-md);
+  transition: all 0.3s ease;
+}
+
+.social-link:hover {
+  opacity: 0.7;
+  transform: scale(1.1);
+}
+
+.social-link svg {
+  flex-shrink: 0;
+}
+
+/* Team Section with Hero Background */
+.team-section-hero {
+  background: linear-gradient(135deg, var(--color-accent-pink) 0%, var(--color-accent-cream) 100%);
+  padding: var(--space-4xl) 0;
+  position: relative;
+}
+
+.team-section-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 30% 70%, rgba(154, 181, 157, 0.15) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.team-section-hero .container {
+  position: relative;
+  z-index: 1;
+}
+
 /* Board Section */
+.board-team-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-lg);
+}
+
+@media (max-width: 968px) {
+  .board-team-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .board-team-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.board-team-grid .team-card {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  text-align: center;
+}
+
+.board-team-grid .team-photo img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.board-team-grid .team-card h3 {
+  font-size: var(--text-base);
+  padding: 0;
+  margin: 0;
+}
+
+.board-team-grid .team-title {
+  font-size: var(--text-xs);
+  padding: 0 var(--space-md) var(--space-md);
+}
+
+.board-team-grid .team-name-header {
+  padding: var(--space-md) var(--space-md) var(--space-xs);
+}
+
 .board-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));

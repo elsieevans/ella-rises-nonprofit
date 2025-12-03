@@ -35,9 +35,17 @@
       
       <ul class="nav-menu" role="menubar">
         <li role="none"><a href="/" class="nav-link" role="menuitem">Home</a></li>
-        <li role="none"><a href="/mission" class="nav-link" role="menuitem">Our Mission</a></li>
+        <li role="none" class="nav-dropdown">
+          <button class="nav-link nav-dropdown-toggle" role="menuitem" aria-haspopup="true" aria-expanded="false">
+            About
+            <span class="dropdown-arrow">▾</span>
+          </button>
+          <ul class="nav-dropdown-menu" role="menu">
+            <li role="none"><a href="/mission" class="nav-dropdown-link" role="menuitem">Our Mission</a></li>
+            <li role="none"><a href="/team" class="nav-dropdown-link" role="menuitem">Our Team</a></li>
+          </ul>
+        </li>
         <li role="none"><a href="/programs" class="nav-link" role="menuitem">Programs</a></li>
-        <li role="none"><a href="/team" class="nav-link" role="menuitem">Our Team</a></li>
         <li role="none"><a href="/get-involved" class="nav-link" role="menuitem">Get Involved</a></li>
         <li role="none"><a href="/contact" class="nav-link" role="menuitem">Contact</a></li>
         <% if (user) { %>
