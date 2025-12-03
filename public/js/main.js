@@ -149,16 +149,49 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   
   // ============================================
-  // Accessible Dropdown Enhancement
+  // Enhanced Dropdown/Select Styling & Interaction
   // ============================================
   const selects = document.querySelectorAll('select');
   
   selects.forEach(function(select) {
+    // Add keyboard support
     select.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
         // Trigger change event on Enter
         const event = new Event('change', { bubbles: true });
         select.dispatchEvent(event);
+      }
+    });
+    
+    // Add visual feedback on change
+    select.addEventListener('change', function() {
+      // Add brief success animation
+      this.classList.add('success');
+      setTimeout(function() {
+        select.classList.remove('success');
+      }, 800);
+    });
+    
+    // Wrap select in a styled container if not already wrapped
+    if (!select.parentElement.classList.contains('select-wrapper') && 
+        !select.parentElement.classList.contains('filter-group') &&
+        !select.parentElement.classList.contains('form-group')) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'select-wrapper';
+      select.parentNode.insertBefore(wrapper, select);
+      wrapper.appendChild(select);
+    }
+    
+    // Add focus class to parent for styling
+    select.addEventListener('focus', function() {
+      if (this.parentElement.classList.contains('form-group')) {
+        this.parentElement.classList.add('focused');
+      }
+    });
+    
+    select.addEventListener('blur', function() {
+      if (this.parentElement.classList.contains('form-group')) {
+        this.parentElement.classList.remove('focused');
       }
     });
   });

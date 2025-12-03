@@ -329,6 +329,56 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   
   // ============================================
+  // Enhanced Dropdown/Select Styling & Interaction (Portal)
+  // ============================================
+  const portalSelects = document.querySelectorAll('select');
+  
+  portalSelects.forEach(function(select) {
+    // Add keyboard support
+    select.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        // Trigger change event on Enter
+        const event = new Event('change', { bubbles: true });
+        select.dispatchEvent(event);
+      }
+    });
+    
+    // Add visual feedback on change
+    select.addEventListener('change', function() {
+      // Add brief success animation
+      this.classList.add('success');
+      setTimeout(function() {
+        select.classList.remove('success');
+      }, 800);
+    });
+    
+    // Add focus class to parent for styling
+    select.addEventListener('focus', function() {
+      const filterGroup = this.closest('.filter-group');
+      const formGroup = this.closest('.form-group');
+      
+      if (filterGroup) {
+        filterGroup.classList.add('focused');
+      }
+      if (formGroup) {
+        formGroup.classList.add('focused');
+      }
+    });
+    
+    select.addEventListener('blur', function() {
+      const filterGroup = this.closest('.filter-group');
+      const formGroup = this.closest('.form-group');
+      
+      if (filterGroup) {
+        filterGroup.classList.remove('focused');
+      }
+      if (formGroup) {
+        formGroup.classList.remove('focused');
+      }
+    });
+  });
+  
+  // ============================================
   // Keyboard Navigation Enhancement
   // ============================================
   document.addEventListener('keydown', function(e) {

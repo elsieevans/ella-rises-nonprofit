@@ -72,7 +72,7 @@
 }
 
 .sidebar-header {
-  padding: var(--space-xl) var(--space-lg);
+  padding: var(--space-lg) var(--space-md);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   text-align: center;
 }
@@ -626,6 +626,12 @@
 .filter-group {
   flex: 1;
   min-width: 150px;
+  position: relative;
+}
+
+.filter-group.focused label {
+  color: var(--color-accent-magenta);
+  transform: translateX(2px);
 }
 
 .filter-group label {
@@ -634,15 +640,111 @@
   font-weight: 600;
   margin-bottom: var(--space-xs);
   color: var(--color-gray-700);
+  transition: all var(--transition-fast);
 }
 
 .filter-group input,
 .filter-group select {
   width: 100%;
   padding: var(--space-sm) var(--space-md);
-  border: 1px solid var(--color-gray-300);
+  border: 2px solid var(--color-gray-300);
   border-radius: var(--radius-md);
   font-size: var(--text-sm);
+  transition: all var(--transition-base);
+  background-color: var(--color-white);
+}
+
+.filter-group input:hover,
+.filter-group select:hover {
+  border-color: var(--color-accent-sage);
+  background-color: var(--color-gray-100);
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+  border-color: var(--color-accent-magenta);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(206, 50, 91, 0.1);
+  background-color: var(--color-white);
+}
+
+/* Custom Select Dropdown Styling for Filters */
+.filter-group select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 12 12'%3E%3Cpath fill='%233A3F3B' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--space-sm) center;
+  background-size: 10px;
+  padding-right: calc(var(--space-md) * 2.5);
+  cursor: pointer;
+}
+
+.filter-group select:hover {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 12 12'%3E%3Cpath fill='%239AB59D' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+}
+
+.filter-group select:focus {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 12 12'%3E%3Cpath fill='%23CE325B' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+}
+
+.filter-group select:disabled {
+  background-color: var(--color-gray-100);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Select option styling for portal */
+.filter-group select option {
+  padding: var(--space-sm);
+  background-color: var(--color-white);
+  color: var(--color-gray-800);
+}
+
+.filter-group select option:hover,
+.filter-group select option:focus,
+.filter-group select option:checked {
+  background-color: var(--color-accent-pink);
+  color: var(--color-primary);
+}
+
+/* Success state for filter selects */
+.filter-group select.success,
+.filter-group input.success {
+  border-color: var(--color-success);
+  background-color: var(--color-success-light);
+  animation: successPulsePortal 0.5s ease-out;
+}
+
+@keyframes successPulsePortal {
+  0% {
+    box-shadow: 0 0 0 0 rgba(45, 122, 77, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(45, 122, 77, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(45, 122, 77, 0);
+  }
+}
+
+/* Enhanced select interaction */
+.filter-group select:active,
+.filter-group select:focus {
+  transform: translateY(-1px);
+}
+
+/* Error state for filter inputs */
+.filter-group input.error,
+.filter-group select.error {
+  border-color: var(--color-error);
+  background-color: var(--color-error-light);
+}
+
+.filter-group input.error:focus,
+.filter-group select.error:focus {
+  box-shadow: 0 0 0 3px rgba(206, 50, 91, 0.2);
 }
 
 /* ============================================
@@ -957,6 +1059,8 @@
   flex: 1;
   height: 8px;
   -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
   background: var(--color-gray-200);
   border-radius: var(--radius-full);
 }

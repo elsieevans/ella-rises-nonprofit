@@ -2095,6 +2095,13 @@ section {
    ============================================ */
 .form-group {
   margin-bottom: var(--space-lg);
+  position: relative;
+}
+
+.form-group.focused label {
+  color: var(--color-accent-magenta);
+  transform: translateX(2px);
+  transition: all var(--transition-fast);
 }
 
 .form-group label {
@@ -2102,6 +2109,7 @@ section {
   font-weight: 600;
   margin-bottom: var(--space-sm);
   color: var(--color-gray-800);
+  transition: all var(--transition-fast);
 }
 
 .form-group input,
@@ -2113,19 +2121,153 @@ section {
   border-radius: var(--radius-md);
   font-family: var(--font-primary);
   font-size: var(--text-base);
-  transition: border-color var(--transition-fast);
+  transition: all var(--transition-base);
+  background-color: var(--color-white);
+}
+
+.form-group input:hover,
+.form-group select:hover,
+.form-group textarea:hover {
+  border-color: var(--color-accent-sage);
+  background-color: var(--color-gray-100);
 }
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-  border-color: var(--color-primary);
+  border-color: var(--color-accent-magenta);
   outline: none;
+  box-shadow: 0 0 0 3px rgba(206, 50, 91, 0.1);
+  background-color: var(--color-white);
+}
+
+/* Custom Select Dropdown Styling */
+.form-group select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%233A3F3B' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--space-md) center;
+  background-size: 12px;
+  padding-right: calc(var(--space-md) * 3);
+  cursor: pointer;
+}
+
+.form-group select:hover {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239AB59D' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+}
+
+.form-group select:focus {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23CE325B' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+}
+
+.form-group select:disabled {
+  background-color: var(--color-gray-100);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Select option styling */
+.form-group select option {
+  padding: var(--space-sm);
+  background-color: var(--color-white);
+  color: var(--color-gray-800);
+}
+
+.form-group select option:hover,
+.form-group select option:focus,
+.form-group select option:checked {
+  background-color: var(--color-accent-pink);
+  color: var(--color-primary);
 }
 
 .form-group textarea {
   resize: vertical;
   min-height: 100px;
+}
+
+/* Enhanced Select Dropdown with Icon Animation */
+.form-group select:focus,
+.form-group select:active {
+  transform: translateY(-1px);
+}
+
+/* Dropdown wrapper for additional styling */
+.select-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.select-wrapper::after {
+  content: '';
+  position: absolute;
+  right: var(--space-md);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid var(--color-gray-600);
+  pointer-events: none;
+  transition: all var(--transition-fast);
+}
+
+.select-wrapper:hover::after {
+  border-top-color: var(--color-accent-sage);
+}
+
+.select-wrapper:focus-within::after {
+  border-top-color: var(--color-accent-magenta);
+  transform: translateY(-50%) rotate(180deg);
+}
+
+/* Error state for form inputs including selects */
+.form-group input.error,
+.form-group select.error,
+.form-group textarea.error {
+  border-color: var(--color-error);
+  background-color: var(--color-error-light);
+}
+
+.form-group input.error:focus,
+.form-group select.error:focus,
+.form-group textarea.error:focus {
+  box-shadow: 0 0 0 3px rgba(206, 50, 91, 0.2);
+}
+
+/* Success state for form inputs */
+.form-group input.success,
+.form-group select.success,
+.form-group textarea.success {
+  border-color: var(--color-success);
+  background-color: var(--color-success-light);
+  animation: successPulse 0.5s ease-out;
+}
+
+@keyframes successPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(45, 122, 77, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(45, 122, 77, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(45, 122, 77, 0);
+  }
+}
+
+/* Loading state for selects */
+.form-group select.loading {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%23CE325B' d='M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83'/%3E%3C/svg%3E");
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { background-position: right var(--space-md) center; }
+  to { background-position: right var(--space-md) center; }
 }
 
 .required {
