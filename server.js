@@ -35,11 +35,13 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://public.tableau.com"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'"],
+      connectSrc: ["'self'", "https://public.tableau.com"],
+      frameSrc: ["'self'", "https://public.tableau.com"],
+      childSrc: ["'self'", "https://public.tableau.com"],
       upgradeInsecureRequests: null
     }
   }
@@ -101,6 +103,7 @@ const surveyRoutes = require('./routes/surveys');
 const milestoneRoutes = require('./routes/milestones');
 const donationRoutes = require('./routes/donations');
 const dashboardRoutes = require('./routes/dashboard');
+const analyticsRoutes = require('./routes/analytics');
 
 app.use('/', publicRoutes);
 app.use('/auth', authRoutes);
@@ -111,6 +114,7 @@ app.use('/portal/surveys', surveyRoutes);
 app.use('/portal/milestones', milestoneRoutes);
 app.use('/portal/donations', donationRoutes);
 app.use('/portal/dashboard', dashboardRoutes);
+app.use('/portal/analytics', analyticsRoutes);
 
 // 404 handler
 app.use((req, res) => {

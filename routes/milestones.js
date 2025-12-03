@@ -3,42 +3,37 @@ const router = express.Router();
 const { isAuthenticated, isManager } = require('../middleware/auth');
 const db = require('../config/database');
 
-// List all milestone achievements
+// List unique milestones (grouped by title, alphabetically)
 router.get('/', isAuthenticated, async (req, res) => {
   try {
     const { search } = req.query;
     
+    // Get unique milestones with participant count, sorted alphabetically
     let query = db('Milestone')
-      .leftJoin('Participant', 'Milestone.ParticipantID', 'Participant.ParticipantID')
-      .select(
-        'Milestone.*',
-        'Participant.ParticipantFirstName',
-        'Participant.ParticipantLastName'
-      )
-      .orderBy('Milestone.MilestoneDate', 'desc');
+      .select('MilestoneTitle')
+      .count('MilestoneID as achieverCount')
+      .max('MilestoneDate as latestDate')
+      .groupBy('MilestoneTitle')
+      .orderBy('MilestoneTitle', 'asc');
     
     if (search) {
-      query = query.where(function() {
-        this.where('Milestone.MilestoneTitle', 'ilike', `%${search}%`)
-          .orWhere('Participant.ParticipantFirstName', 'ilike', `%${search}%`)
-          .orWhere('Participant.ParticipantLastName', 'ilike', `%${search}%`);
-      });
+      query = query.where('MilestoneTitle', 'ilike', `%${search}%`);
     }
     
     const milestones = await query;
     
-    // Aggregate counts by Title (to show "Popular Milestones")
-    const counts = await db('Milestone')
-      .select('MilestoneTitle')
-      .count('MilestoneID as count')
-      .groupBy('MilestoneTitle')
-      .orderBy('count', 'desc')
-      .limit(5);
+    // Get total unique milestones count and total achievements
+    const stats = await db('Milestone')
+      .select(
+        db.raw('COUNT(DISTINCT "MilestoneTitle") as uniquecount'),
+        db.raw('COUNT("MilestoneID") as totalachievements')
+      )
+      .first();
 
     res.render('portal/milestones/index', {
       title: 'Milestones - Ella Rises Portal',
       milestones,
-      popular: counts,
+      stats,
       filters: { search }
     });
   } catch (error) {

@@ -1,0 +1,241 @@
+<%- include('../../partials/portal-header', { currentPage: 'analytics', pageTitle: 'Analytics Dashboard' }) %>
+
+<div class="analytics-container">
+  <div class="dashboard-card dashboard-card--full">
+    <div class="card-header analytics-header">
+      <div class="analytics-title-section">
+        <h2>Program Analytics</h2>
+        <p class="card-description">Interactive data visualizations powered by Tableau</p>
+      </div>
+      <div class="analytics-mobile-tip">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 16v-4"/>
+          <path d="M12 8h.01"/>
+        </svg>
+        <span>Rotate device for best viewing experience</span>
+      </div>
+    </div>
+    <div class="card-body analytics-body">
+      <div class="tableau-wrapper">
+        <div class='tableauPlaceholder' id='viz1764786412582' style='position: relative'>
+          <noscript>
+            <a href='#'>
+              <img alt='Dashboard 1' src='https://public.tableau.com/static/images/Da/Dashboard_17647836264370/Dashboard1/1_rss.png' style='border: none; width: 100%; height: auto;' />
+            </a>
+          </noscript>
+          <object class='tableauViz' style='display:none;'>
+            <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
+            <param name='embed_code_version' value='3' />
+            <param name='site_root' value='' />
+            <param name='name' value='Dashboard_17647836264370/Dashboard1' />
+            <param name='tabs' value='no' />
+            <param name='toolbar' value='yes' />
+            <param name='static_image' value='https://public.tableau.com/static/images/Da/Dashboard_17647836264370/Dashboard1/1.png' />
+            <param name='animate_transition' value='yes' />
+            <param name='display_static_image' value='yes' />
+            <param name='display_spinner' value='yes' />
+            <param name='display_overlay' value='yes' />
+            <param name='display_count' value='yes' />
+            <param name='language' value='en-US' />
+          </object>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type='text/javascript'>
+  function resizeTableau() {
+    var divElement = document.getElementById('viz1764786412582');
+    if (!divElement) return;
+    
+    var vizElement = divElement.getElementsByTagName('object')[0];
+    if (!vizElement) return;
+    
+    var containerWidth = divElement.offsetWidth;
+    var windowHeight = window.innerHeight;
+    
+    // Set width to 100% for all screen sizes
+    vizElement.style.width = '100%';
+    
+    // Responsive height based on screen size
+    if (containerWidth > 1000) {
+      // Desktop: larger height
+      vizElement.style.height = '1127px';
+    } else if (containerWidth > 768) {
+      // Tablet landscape
+      vizElement.style.height = '1000px';
+    } else if (containerWidth > 500) {
+      // Tablet portrait
+      vizElement.style.height = '900px';
+    } else {
+      // Mobile: taller to accommodate stacked layout
+      vizElement.style.height = Math.max(windowHeight * 1.5, 1400) + 'px';
+    }
+  }
+  
+  // Initial setup
+  var divElement = document.getElementById('viz1764786412582');
+  var vizElement = divElement.getElementsByTagName('object')[0];
+  
+  // Initial sizing
+  resizeTableau();
+  
+  // Load Tableau script
+  var scriptElement = document.createElement('script');
+  scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
+  vizElement.parentNode.insertBefore(scriptElement, vizElement);
+  
+  // Resize on window resize and orientation change
+  window.addEventListener('resize', resizeTableau);
+  window.addEventListener('orientationchange', function() {
+    setTimeout(resizeTableau, 100);
+  });
+</script>
+
+<style>
+  .analytics-container {
+    max-width: 100%;
+    padding: 0;
+  }
+  
+  .dashboard-card--full {
+    width: 100%;
+    margin: 0;
+  }
+  
+  .analytics-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .analytics-title-section h2 {
+    margin-bottom: 0.25rem;
+  }
+  
+  .card-description {
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 4px;
+  }
+  
+  .analytics-mobile-tip {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e8f4fd 100%);
+    border: 1px solid #bde0fe;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    color: #0077b6;
+  }
+  
+  .analytics-mobile-tip svg {
+    flex-shrink: 0;
+  }
+  
+  .analytics-body {
+    padding: 0.5rem;
+  }
+  
+  .tableau-wrapper {
+    width: 100%;
+    min-height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .tableauPlaceholder {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  /* Tablet styles */
+  @media screen and (max-width: 1024px) {
+    .analytics-body {
+      padding: 0.25rem;
+    }
+    
+    .tableau-wrapper {
+      min-height: 500px;
+    }
+  }
+  
+  /* Mobile styles */
+  @media screen and (max-width: 768px) {
+    .analytics-header {
+      flex-direction: column;
+    }
+    
+    .analytics-mobile-tip {
+      display: flex;
+      width: 100%;
+    }
+    
+    .analytics-body {
+      padding: 0;
+    }
+    
+    .tableau-wrapper {
+      min-height: 600px;
+      padding: 0;
+      border-radius: 0;
+    }
+    
+    .tableauPlaceholder {
+      max-width: 100%;
+    }
+    
+    .card-description {
+      font-size: 0.85rem;
+    }
+  }
+  
+  /* Small mobile */
+  @media screen and (max-width: 480px) {
+    .analytics-container {
+      margin: -0.5rem;
+    }
+    
+    .dashboard-card--full {
+      border-radius: 0;
+      box-shadow: none;
+    }
+    
+    .analytics-header {
+      padding: 1rem;
+    }
+    
+    .analytics-mobile-tip {
+      font-size: 0.75rem;
+      padding: 0.4rem 0.6rem;
+    }
+    
+    .tableau-wrapper {
+      min-height: 800px;
+    }
+  }
+  
+  /* Landscape mobile - hide tip since orientation is good */
+  @media screen and (max-width: 900px) and (orientation: landscape) {
+    .analytics-mobile-tip {
+      display: none;
+    }
+    
+    .tableau-wrapper {
+      min-height: 400px;
+    }
+  }
+</style>
+
+<%- include('../../partials/portal-footer') %>
+

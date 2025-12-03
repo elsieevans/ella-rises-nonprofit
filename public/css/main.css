@@ -635,6 +635,56 @@ main {
   line-height: 1.7;
 }
 
+/* STEAM Acronym Breakdown */
+.steam-acronym {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  border-radius: var(--radius-full);
+  max-width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.steam-letter {
+  font-size: var(--text-sm);
+  color: var(--color-gray-700);
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+.steam-letter strong {
+  color: var(--color-accent-magenta);
+  font-weight: 700;
+}
+
+.steam-dot {
+  color: var(--color-accent-sage);
+  font-weight: 300;
+  opacity: 0.7;
+}
+
+@media (max-width: 600px) {
+  .steam-acronym {
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+  }
+  
+  .steam-letter {
+    font-size: var(--text-xs);
+  }
+  
+  .steam-dot {
+    display: none;
+  }
+}
+
 .hero-cta {
   display: flex;
   gap: var(--space-md);

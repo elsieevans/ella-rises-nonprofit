@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/database');
+const { sendEmail, emailTemplates } = require('../config/email');
 
 // Home page - Landing page for donors and supporters
 router.get('/', async (req, res) => {
@@ -97,10 +98,44 @@ router.get('/contact', (req, res) => {
 router.post('/contact', async (req, res) => {
   const { name, email, subject, message } = req.body;
   
-  // In production, you would send an email here using nodemailer
-  // For now, just flash a success message
-  req.flash('success_msg', 'Thank you for your message! We will get back to you soon.');
-  res.redirect('/contact');
+  // Validate required fields
+  if (!name || !email || !subject || !message) {
+    req.flash('error_msg', 'Please fill in all fields');
+    return res.redirect('/contact');
+  }
+
+  try {
+    const contactData = { name, email, subject, message };
+
+    // Send notification email to admin/organization
+    const adminEmail = process.env.CONTACT_EMAIL || process.env.EMAIL_USER;
+    if (adminEmail) {
+      const notificationTemplate = emailTemplates.contactNotification(contactData);
+      await sendEmail({
+        to: adminEmail,
+        subject: notificationTemplate.subject,
+        text: notificationTemplate.text,
+        html: notificationTemplate.html
+      });
+    }
+
+    // Send auto-reply to the person who submitted the form
+    const autoReplyTemplate = emailTemplates.contactAutoReply(contactData);
+    await sendEmail({
+      to: email,
+      subject: autoReplyTemplate.subject,
+      text: autoReplyTemplate.text,
+      html: autoReplyTemplate.html
+    });
+
+    req.flash('success_msg', 'Thank you for your message! We will get back to you soon.');
+    res.redirect('/contact');
+  } catch (error) {
+    console.error('Contact form error:', error);
+    // Still show success to user even if email fails (form was received)
+    req.flash('success_msg', 'Thank you for your message! We will get back to you soon.');
+    res.redirect('/contact');
+  }
 });
 
 module.exports = router;
