@@ -17,7 +17,7 @@ router.get('/', isAuthenticated, async (req, res) => {
         'EventDetails.EventDescription',
         'EventDetails.EventDefaultCapacity'
       )
-      .orderBy('Event.EventDateTimeStart', 'desc');
+      .orderByRaw('"Event"."EventDateTimeStart" DESC NULLS LAST');
     
     if (search) {
       query = query.where(function() {

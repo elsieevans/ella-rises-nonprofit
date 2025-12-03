@@ -17,11 +17,13 @@
   <!-- Main Info Card -->
   <div class="detail-card detail-card--wide">
     <div class="event-header">
+      <% if (event.EventDateTimeStart) { %>
       <div class="event-date-large">
         <span class="month"><%= new Date(event.EventDateTimeStart).toLocaleString('en-US', { month: 'short' }) %></span>
         <span class="day"><%= new Date(event.EventDateTimeStart).getDate() %></span>
         <span class="year"><%= new Date(event.EventDateTimeStart).getFullYear() %></span>
       </div>
+      <% } %>
       <div class="event-title-section">
         <span class="type-badge type-<%= event.EventType %>"><%= event.EventType %></span>
         <h2><%= event.EventName %></h2>
@@ -39,11 +41,15 @@
       <h3>Event Details</h3>
       <dl class="detail-list detail-list--horizontal">
         <dt>Date</dt>
-        <dd><%= new Date(event.EventDateTimeStart).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></dd>
+        <dd><%= event.EventDateTimeStart ? new Date(event.EventDateTimeStart).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'Not set' %></dd>
         <dt>Time</dt>
         <dd>
+          <% if (event.EventDateTimeStart) { %>
           <%= new Date(event.EventDateTimeStart).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %>
           <% if (event.EventDateTimeEnd) { %> - <%= new Date(event.EventDateTimeEnd).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %><% } %>
+          <% } else { %>
+            Not set
+          <% } %>
         </dd>
         <dt>Location</dt>
         <dd><%= event.EventLocation || '-' %></dd>

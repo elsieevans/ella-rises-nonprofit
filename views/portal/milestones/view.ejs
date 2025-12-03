@@ -7,40 +7,40 @@
   </a>
 </div>
 
-<div class="detail-card">
-  <div class="milestone-detail-header">
+  <div class="detail-card">
+    <div class="milestone-detail-header">
     <div class="milestone-badge-large">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
-    </div>
-    <div>
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+      </div>
+      <div>
       <h2><%= milestoneTitle %></h2>
       <p class="text-muted"><%= achievers.length %> participant<%= achievers.length !== 1 ? 's' : '' %> achieved this milestone</p>
     </div>
-  </div>
-</div>
-
-<div class="table-card">
-  <div class="card-header">
-    <h3>Participants Who Achieved This Milestone</h3>
+    </div>
   </div>
   
-  <% if (achievers && achievers.length > 0) { %>
-    <div class="table-responsive">
+<div class="table-card">
+    <div class="card-header">
+    <h3>Participants Who Achieved This Milestone</h3>
+    </div>
+    
+    <% if (achievers && achievers.length > 0) { %>
+      <div class="table-responsive">
       <table class="data-table" role="table" aria-label="Achievers list">
-        <thead>
-          <tr>
+          <thead>
+            <tr>
             <th scope="col">Participant</th>
             <th scope="col">Date Achieved</th>
             <% if (achievers[0].MilestoneNo !== undefined) { %>
               <th scope="col">Milestone #</th>
             <% } %>
             <th scope="col" class="actions-col">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% achievers.forEach(a => { %>
-            <tr>
-              <td data-label="Participant">
+            </tr>
+          </thead>
+          <tbody>
+            <% achievers.forEach(a => { %>
+              <tr>
+                <td data-label="Participant">
                 <a href="/portal/participants/<%= a.ParticipantID %>">
                   <%= a.ParticipantFirstName %> <%= a.ParticipantLastName %>
                 </a>
@@ -67,15 +67,15 @@
                     </form>
                   <% } %>
                 </div>
-              </td>
-            </tr>
-          <% }) %>
-        </tbody>
-      </table>
-    </div>
-  <% } else { %>
-    <p class="no-data">No participants have achieved this milestone yet</p>
-  <% } %>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <p class="no-data">No participants have achieved this milestone yet</p>
+    <% } %>
 </div>
 
 <%- include('../../partials/portal-footer') %>

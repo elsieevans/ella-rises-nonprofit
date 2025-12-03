@@ -34,7 +34,7 @@
         <dt>Amount</dt>
         <dd><strong>$<%= parseFloat(donation.DonationAmount || 0).toLocaleString() %></strong></dd>
         <dt>Date</dt>
-        <dd><%= new Date(donation.DonationDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></dd>
+        <dd><%= donation.DonationDate ? new Date(donation.DonationDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Not set' %></dd>
         <% if (donation.DonationNo) { %>
         <dt>Donation Number</dt>
         <dd><%= donation.DonationNo %></dd>

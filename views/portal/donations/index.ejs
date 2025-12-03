@@ -54,7 +54,7 @@
         <% if (donations && donations.length > 0) { %>
           <% donations.forEach(d => { %>
             <tr>
-              <td data-label="Date"><%= new Date(d.DonationDate).toLocaleDateString() %></td>
+              <td data-label="Date"><%= d.DonationDate ? new Date(d.DonationDate).toLocaleDateString() : '-' %></td>
               <td data-label="Donor" class="donor-cell">
                 <strong><%= d.ParticipantFirstName %> <%= d.ParticipantLastName %></strong>
               </td>

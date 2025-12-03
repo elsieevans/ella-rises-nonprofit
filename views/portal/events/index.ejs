@@ -57,17 +57,23 @@
           <% events.forEach(e => { %>
             <tr>
               <td data-label="Date">
+                <% if (e.EventDateTimeStart) { %>
                 <div class="event-date-cell">
                   <span class="date-month"><%= new Date(e.EventDateTimeStart).toLocaleString('en-US', { month: 'short' }) %></span>
                   <span class="date-day"><%= new Date(e.EventDateTimeStart).getDate() %></span>
                 </div>
+                <% } else { %>
+                <span>-</span>
+                <% } %>
               </td>
               <td data-label="Event">
                 <strong><%= e.EventName %></strong>
+                <% if (e.EventDateTimeStart) { %>
                 <br><small>
                   <%= new Date(e.EventDateTimeStart).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %>
                   <% if (e.EventDateTimeEnd) { %> - <%= new Date(e.EventDateTimeEnd).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %><% } %>
                 </small>
+                <% } %>
               </td>
               <td data-label="Type"><span class="type-badge type-<%= e.EventType %>"><%= e.EventType %></span></td>
               <td data-label="Location"><%= e.EventLocation || '-' %></td>
