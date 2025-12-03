@@ -16,63 +16,44 @@ router.get('/login', (req, res) => {
 // Handle login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
-  
-  console.log('Login attempt for:', email);
 
   try {
     // Find user by email
     const user = await db('Participant')
       .where('ParticipantEmail', email.toLowerCase())
       .first();
-    
-    console.log('User found:', user ? 'Yes' : 'No');
-    if (user) {
-        console.log('User details (partial):', { 
-            id: user.ParticipantID, 
-            email: user.ParticipantEmail, 
-            hasPassword: !!user.Password 
-        });
-    }
 
     if (!user) {
-      console.log('Login failed: User not found');
       req.flash('error_msg', 'Invalid email or password');
       return res.redirect('/auth/login');
     }
     
-    // Check password (assuming ParticipantPassword column exists)
-    // If using a different auth mechanism, this needs to be adjusted
+    // Check password
     let isMatch = await bcrypt.compare(password, user.Password);
     
     // Fallback: If bcrypt check fails, check if the password is stored as plain text
     // This handles legacy data or initial seeds that weren't hashed
     if (!isMatch && password === user.Password) {
-      console.log('Plain text password match found. Converting to hash...');
       isMatch = true;
       
-      // Optional: Upgrade the password to a hash for security
+      // Upgrade the password to a hash for security
       try {
         const newHash = await bcrypt.hash(password, 10);
         await db('Participant')
           .where('ParticipantID', user.ParticipantID)
           .update({ Password: newHash });
-        console.log('Password automatically upgraded to bcrypt hash.');
       } catch (err) {
         console.error('Failed to upgrade password hash:', err);
       }
     }
-
-    console.log('Password match final result:', isMatch);
     
     if (!isMatch) {
-      console.log('Login failed: Password incorrect');
       req.flash('error_msg', 'Invalid email or password');
       return res.redirect('/auth/login');
     }
     
     // Map role: admin -> Admin, participant -> user/viewer
     const role = user.ParticipantRole === 'admin' ? 'Admin' : 'user';
-    console.log('User role:', role);
 
     // Set session
     req.session.user = {
@@ -83,9 +64,16 @@ router.post('/login', async (req, res) => {
       role: role
     };
     
-    console.log('Session set for user:', req.session.user.email);
-    req.flash('success_msg', `Welcome back, ${user.first_name}!`);
-    res.redirect('/portal/dashboard');
+    // Save session before redirect (important for production)
+    req.session.save((err) => {
+      if (err) {
+        console.error('Session save error:', err);
+        req.flash('error_msg', 'Login failed. Please try again.');
+        return res.redirect('/auth/login');
+      }
+      req.flash('success_msg', `Welcome back, ${user.ParticipantFirstName}!`);
+      res.redirect('/portal/dashboard');
+    });
     
   } catch (error) {
     console.error('Login error:', error);
@@ -146,14 +134,12 @@ router.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     
     // Create user (default role is 'participant')
-    // Note: Assuming ParticipantPassword column exists
     await db('Participant').insert({
       "ParticipantFirstName": first_name,
       "ParticipantLastName": last_name,
       "ParticipantEmail": email.toLowerCase(),
       "Password": hashedPassword,
       "ParticipantRole": 'participant'
-      // Removing is_active as it's not in the new schema
     });
     
     req.flash('success_msg', 'Registration successful! Please log in.');
@@ -177,4 +163,3 @@ router.get('/logout', (req, res) => {
 });
 
 module.exports = router;
-
