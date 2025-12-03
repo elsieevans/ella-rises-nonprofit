@@ -94,6 +94,13 @@ router.get('/contact', (req, res) => {
   });
 });
 
+// Teapot page - HTTP 418 Easter Egg
+router.get('/teapot', (req, res) => {
+  res.status(418).render('public/teapot', {
+    title: "I'm a Teapot - Ella Rises"
+  });
+});
+
 // Handle contact form submission
 router.post('/contact', async (req, res) => {
   const { name, email, subject, message } = req.body;

@@ -1,0 +1,208 @@
+<%- include('../partials/header') %>
+
+<style>
+  .teapot-section {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .teapot-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 20% 80%, rgba(120, 200, 180, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(200, 150, 100, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .teapot-container {
+    text-align: center;
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .teapot-status {
+    font-family: 'Courier New', monospace;
+    font-size: 8rem;
+    font-weight: 700;
+    color: #78c8b4;
+    text-shadow: 0 0 40px rgba(120, 200, 180, 0.5);
+    margin-bottom: 0.5rem;
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes glow {
+    from { text-shadow: 0 0 20px rgba(120, 200, 180, 0.3); }
+    to { text-shadow: 0 0 60px rgba(120, 200, 180, 0.6); }
+  }
+
+  .teapot-title {
+    font-size: 2.5rem;
+    color: #f5f5f5;
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+
+  .teapot-subtitle {
+    font-size: 1.2rem;
+    color: #a0a0a0;
+    margin-bottom: 2rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .teapot-art {
+    font-size: 10rem;
+    margin: 2rem 0;
+    animation: steam 3s ease-in-out infinite;
+    display: block;
+  }
+
+  @keyframes steam {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translateY(-10px) rotate(-2deg); }
+    75% { transform: translateY(-5px) rotate(2deg); }
+  }
+
+  .steam-particles {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .steam-particle {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    animation: rise 4s ease-out infinite;
+  }
+
+  .steam-particle:nth-child(1) { left: -30px; animation-delay: 0s; }
+  .steam-particle:nth-child(2) { left: 0px; animation-delay: 1s; }
+  .steam-particle:nth-child(3) { left: 30px; animation-delay: 2s; }
+  .steam-particle:nth-child(4) { left: -15px; animation-delay: 0.5s; }
+  .steam-particle:nth-child(5) { left: 15px; animation-delay: 1.5s; }
+
+  @keyframes rise {
+    0% {
+      transform: translateY(0) scale(1);
+      opacity: 0.6;
+    }
+    100% {
+      transform: translateY(-150px) scale(2);
+      opacity: 0;
+    }
+  }
+
+  .teapot-info {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    max-width: 600px;
+    margin: 2rem auto;
+    backdrop-filter: blur(10px);
+  }
+
+  .teapot-info h3 {
+    color: #78c8b4;
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .teapot-info p {
+    color: #c0c0c0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .teapot-info code {
+    background: rgba(120, 200, 180, 0.2);
+    color: #78c8b4;
+    padding: 0.2em 0.5em;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+  }
+
+  .teapot-btn {
+    display: inline-block;
+    margin-top: 2rem;
+    padding: 0.875rem 2rem;
+    background: linear-gradient(135deg, #78c8b4 0%, #5ab59d 100%);
+    color: #1a1a2e;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(120, 200, 180, 0.3);
+  }
+
+  .teapot-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(120, 200, 180, 0.4);
+  }
+
+  @media (max-width: 768px) {
+    .teapot-status {
+      font-size: 5rem;
+    }
+    .teapot-title {
+      font-size: 1.75rem;
+    }
+    .teapot-art {
+      font-size: 6rem;
+    }
+  }
+</style>
+
+<section class="teapot-section">
+  <div class="steam-particles">
+    <div class="steam-particle"></div>
+    <div class="steam-particle"></div>
+    <div class="steam-particle"></div>
+    <div class="steam-particle"></div>
+    <div class="steam-particle"></div>
+  </div>
+  
+  <div class="teapot-container">
+    <div class="teapot-status">418</div>
+    <h1 class="teapot-title">I'm a Teapot</h1>
+    <p class="teapot-subtitle">The server refuses to brew coffee because it is, permanently, a teapot.</p>
+    
+    <span class="teapot-art">🫖</span>
+    
+    <div class="teapot-info">
+      <h3>What's this about?</h3>
+      <p>
+        HTTP status code <code>418 I'm a teapot</code> is an April Fools' joke from 1998, 
+        defined in <code>RFC 2324</code> (Hyper Text Coffee Pot Control Protocol). 
+        It's a reminder that the web can be fun! ☕
+      </p>
+    </div>
+    
+    <a href="/" class="teapot-btn">← Back to Home</a>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>
+
