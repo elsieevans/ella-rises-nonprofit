@@ -25,13 +25,6 @@
       <a href="/programs" class="btn btn-primary btn-lg">Explore Programs</a>
       <a href="https://givebutter.com/EllaRises" class="btn btn-secondary btn-lg" target="_blank" rel="noopener noreferrer">Support Our Mission</a>
     </div>
-    <div class="hero-partners">
-      <span>In partnership with</span>
-      <div class="partner-logos">
-        <span class="partner-name">UVU</span>
-        <span class="partner-name">BYU</span>
-      </div>
-    </div>
   </div>
 </section>
 
@@ -50,10 +43,6 @@
       <div class="stat-card">
         <span class="stat-number"><%= stats.milestones %>+</span>
         <span class="stat-label">Milestones Achieved</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-number">2</span>
-        <span class="stat-label">University Partners</span>
       </div>
     </div>
   </div>
@@ -87,116 +76,17 @@
         </ul>
         <a href="/mission" class="btn btn-outline">Learn More About Our Mission</a>
       </div>
-      <div class="mission-visual">
-        <div class="visual-card visual-card--1">
-          <span class="visual-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-              <path d="M6 12v5c3 3 9 3 12 0v-5"/>
-            </svg>
-          </span>
-          <span class="visual-text">Higher Education</span>
-        </div>
-        <div class="visual-card visual-card--2">
-          <span class="visual-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-              <line x1="8" y1="21" x2="16" y2="21"/>
-              <line x1="12" y1="17" x2="12" y2="21"/>
-            </svg>
-          </span>
-          <span class="visual-text">STEAM Skills</span>
-        </div>
-        <div class="visual-card visual-card--3">
-          <span class="visual-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M12 2a10 10 0 0 1 0 20"/>
-              <circle cx="12" cy="12" r="4"/>
-              <circle cx="12" cy="12" r="1"/>
-            </svg>
-          </span>
-          <span class="visual-text">Cultural Arts</span>
-        </div>
-        <div class="visual-card visual-card--4">
-          <span class="visual-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-            </svg>
-          </span>
-          <span class="visual-text">Leadership</span>
-        </div>
+      <div class="mission-visual" style="display: block;">
+        <img src="/images/fixedcutegirls.png" alt="Young women in our program" style="width: 100%; height: 100%; min-height: 500px; object-fit: cover; border-radius: 12px; box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);">
       </div>
     </div>
   </div>
 </section>
 
-<!-- Programs Preview -->
-<section class="programs-preview" aria-labelledby="programs-heading">
+<!-- Programs Button -->
+<section class="programs-cta" style="padding: var(--space-3xl) 0; text-align: center;">
   <div class="container">
-    <div class="section-header text-center">
-      <span class="section-label">Our Programs</span>
-      <h2 id="programs-heading">Discover What We Offer</h2>
-      <p>From coding workshops to cultural arts, we provide diverse opportunities for growth and learning.</p>
-    </div>
-    
-    <div class="programs-grid">
-      <article class="program-card">
-        <div class="program-icon program-icon--steam">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-        </div>
-        <h3>STEAM Workshops</h3>
-        <p>Hands-on workshops in coding, robotics, engineering, and mathematics designed to build technical skills and confidence.</p>
-        <ul class="program-features">
-          <li>Python & Web Development</li>
-          <li>Robotics Competitions</li>
-          <li>Engineering Projects</li>
-        </ul>
-      </article>
-      
-      <article class="program-card">
-        <div class="program-icon program-icon--mentoring">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        </div>
-        <h3>Mentoring Program</h3>
-        <p>Connect with successful women in STEM fields who provide guidance, support, and real-world insights.</p>
-        <ul class="program-features">
-          <li>One-on-One Mentoring</li>
-          <li>Career Guidance</li>
-          <li>Networking Events</li>
-        </ul>
-      </article>
-      
-      <article class="program-card">
-        <div class="program-icon program-icon--leadership">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        </div>
-        <h3>Leadership Development</h3>
-        <p>Build leadership skills through public speaking, project management, and community engagement opportunities.</p>
-        <ul class="program-features">
-          <li>Public Speaking Training</li>
-          <li>Project Leadership</li>
-          <li>Ambassador Program</li>
-        </ul>
-      </article>
-      
-      <article class="program-card">
-        <div class="program-icon program-icon--arts">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
-        </div>
-        <h3>Cultural Arts</h3>
-        <p>Celebrate and embrace cultural heritage through music, art, and creative expression programs.</p>
-        <ul class="program-features">
-          <li>Mariachi Music</li>
-          <li>Visual Arts</li>
-          <li>Heritage Projects</li>
-        </ul>
-      </article>
-    </div>
-    
-    <div class="text-center mt-lg">
-      <a href="/programs" class="btn btn-primary">View All Programs</a>
-    </div>
+    <a href="/programs" class="btn btn-primary btn-lg">Discover Our Programs</a>
   </div>
 </section>
 
