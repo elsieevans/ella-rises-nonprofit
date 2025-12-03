@@ -320,6 +320,27 @@
   flex-wrap: wrap;
 }
 
+/* Page Header with Stats - combines stats and actions */
+.page-header-with-stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xl);
+  margin-bottom: var(--space-xl);
+  flex-wrap: wrap;
+}
+
+.page-header-with-stats .stats-row,
+.page-header-with-stats .milestone-stats-overview {
+  margin-bottom: 0;
+  flex: 1;
+}
+
+.page-header-with-stats .page-actions {
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
 /* ============================================
    Dashboard Stats
    ============================================ */
@@ -1627,6 +1648,17 @@
   
   .page-actions .btn {
     width: 100%;
+    justify-content: center;
+  }
+  
+  /* Page Header with Stats - Stack on mobile */
+  .page-header-with-stats {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-lg);
+  }
+  
+  .page-header-with-stats .page-actions {
     justify-content: center;
   }
   

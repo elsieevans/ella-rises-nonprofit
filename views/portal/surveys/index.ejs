@@ -1,31 +1,32 @@
 <%- include('../../partials/portal-header', { currentPage: 'surveys', pageTitle: 'Surveys' }) %>
 
-<div class="page-actions">
-  <% if (user && user.role === 'Admin') { %>
-    <a href="/portal/surveys/new" class="btn btn-primary">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Add Survey
-    </a>
-  <% } %>
-</div>
-
-<!-- Stats Cards -->
-<div class="stats-row">
-  <div class="mini-stat">
-    <span class="mini-stat-value"><%= stats.total_responses %></span>
-    <span class="mini-stat-label">Total Responses</span>
+<!-- Stats Cards with Add Button -->
+<div class="page-header-with-stats">
+  <div class="stats-row">
+    <div class="mini-stat">
+      <span class="mini-stat-value"><%= stats.total_responses %></span>
+      <span class="mini-stat-label">Total Responses</span>
+    </div>
+    <div class="mini-stat">
+      <span class="mini-stat-value"><%= parseFloat(stats.avg_satisfaction || 0).toFixed(1) %>/5</span>
+      <span class="mini-stat-label">Avg. Satisfaction</span>
+    </div>
+    <div class="mini-stat">
+      <span class="mini-stat-value"><%= parseFloat(stats.avg_usefulness || 0).toFixed(1) %>/5</span>
+      <span class="mini-stat-label">Avg. Usefulness</span>
+    </div>
+    <div class="mini-stat">
+      <span class="mini-stat-value"><%= parseFloat(stats.avg_recommendation || 0).toFixed(1) %>/5</span>
+      <span class="mini-stat-label">Avg. NPS</span>
+    </div>
   </div>
-  <div class="mini-stat">
-    <span class="mini-stat-value"><%= parseFloat(stats.avg_satisfaction || 0).toFixed(1) %>/5</span>
-    <span class="mini-stat-label">Avg. Satisfaction</span>
-  </div>
-  <div class="mini-stat">
-    <span class="mini-stat-value"><%= parseFloat(stats.avg_usefulness || 0).toFixed(1) %>/5</span>
-    <span class="mini-stat-label">Avg. Usefulness</span>
-  </div>
-  <div class="mini-stat">
-    <span class="mini-stat-value"><%= parseFloat(stats.avg_recommendation || 0).toFixed(1) %>/10</span>
-    <span class="mini-stat-label">Avg. NPS</span>
+  <div class="page-actions">
+    <% if (user && user.role === 'Admin') { %>
+      <a href="/portal/surveys/new" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Survey
+      </a>
+    <% } %>
   </div>
 </div>
 
@@ -45,9 +46,9 @@
       <label for="score_filter">Score</label>
       <select id="score_filter" name="score_filter">
         <option value="">All Scores</option>
-        <option value="high" <%= filters.score_filter === 'high' ? 'selected' : '' %>>High (8-10)</option>
-        <option value="medium" <%= filters.score_filter === 'medium' ? 'selected' : '' %>>Medium (5-7)</option>
-        <option value="low" <%= filters.score_filter === 'low' ? 'selected' : '' %>>Low (1-4)</option>
+        <option value="high" <%= filters.score_filter === 'high' ? 'selected' : '' %>>High (4-5)</option>
+        <option value="medium" <%= filters.score_filter === 'medium' ? 'selected' : '' %>>Medium (3)</option>
+        <option value="low" <%= filters.score_filter === 'low' ? 'selected' : '' %>>Low (1-2)</option>
       </select>
     </div>
     <button type="submit" class="btn btn-secondary">Filter</button>
@@ -79,7 +80,7 @@
               <td data-label="Participant"><%= s.ParticipantFirstName ? s.ParticipantFirstName + ' ' + s.ParticipantLastName : '-' %></td>
               <td data-label="Satisfaction"><span class="score-badge score-<%= s.SurveySatisfactionScore >= 4 ? 'high' : s.SurveySatisfactionScore >= 3 ? 'medium' : 'low' %>"><%= s.SurveySatisfactionScore || 0 %>/5</span></td>
               <td data-label="Usefulness"><span class="score-badge score-<%= s.SurveyUsefulnessScore >= 4 ? 'high' : s.SurveyUsefulnessScore >= 3 ? 'medium' : 'low' %>"><%= s.SurveyUsefulnessScore || 0 %>/5</span></td>
-              <td data-label="NPS"><span class="score-badge score-<%= s.SurveyRecommendationScore >= 8 ? 'high' : s.SurveyRecommendationScore >= 5 ? 'medium' : 'low' %>"><%= s.SurveyRecommendationScore || 0 %>/10</span></td>
+              <td data-label="NPS"><span class="score-badge score-<%= s.SurveyRecommendationScore >= 4 ? 'high' : s.SurveyRecommendationScore >= 3 ? 'medium' : 'low' %>"><%= s.SurveyRecommendationScore || 0 %>/5</span></td>
               <td class="actions-col">
                 <div class="action-buttons">
                   <a href="/portal/surveys/<%= s.SurveyID %>" class="btn-icon" title="View" aria-label="View survey">

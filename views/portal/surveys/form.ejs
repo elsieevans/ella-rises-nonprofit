@@ -61,10 +61,10 @@
       </div>
       
       <div class="form-group">
-        <label for="recommendation_score">Recommendation Score (1-10) <span class="required">*</span></label>
+        <label for="recommendation_score">Recommendation Score (1-5) <span class="required">*</span></label>
         <div class="score-input">
-          <input type="range" id="recommendation_score" name="recommendation_score" min="1" max="10" value="<%= survey.SurveyRecommendationScore || 5 %>" oninput="this.nextElementSibling.textContent = this.value">
-          <span class="score-display"><%= survey.SurveyRecommendationScore || 5 %></span>
+          <input type="range" id="recommendation_score" name="recommendation_score" min="1" max="5" value="<%= survey.SurveyRecommendationScore || 3 %>" oninput="this.nextElementSibling.textContent = this.value">
+          <span class="score-display"><%= survey.SurveyRecommendationScore || 3 %></span>
         </div>
         <small>How likely to recommend to others? (NPS)</small>
       </div>

@@ -25,11 +25,11 @@ router.get('/', isAuthenticated, async (req, res) => {
     }
     
     if (score_filter === 'high') {
-      query = query.where('Survey.SurveyRecommendationScore', '>=', 8);
+      query = query.where('Survey.SurveyRecommendationScore', '>=', 4);
     } else if (score_filter === 'medium') {
-      query = query.whereBetween('Survey.SurveyRecommendationScore', [5, 7]);
+      query = query.where('Survey.SurveyRecommendationScore', '=', 3);
     } else if (score_filter === 'low') {
-      query = query.where('Survey.SurveyRecommendationScore', '<', 5);
+      query = query.where('Survey.SurveyRecommendationScore', '<=', 2);
     }
     
     const surveys = await query;
@@ -101,8 +101,8 @@ router.post('/', isAuthenticated, isManager, async (req, res) => {
     // Calculate NPS Bucket
     let npsBucket = 'Passive';
     const recScore = parseInt(recommendation_score);
-    if (recScore >= 9) npsBucket = 'Promoter';
-    else if (recScore <= 6) npsBucket = 'Detractor';
+    if (recScore >= 5) npsBucket = 'Promoter';
+    else if (recScore <= 2) npsBucket = 'Detractor';
 
     // Calculate Overall Score (simple average)
     const overallScore = Math.round((parseInt(satisfaction_score) + parseInt(usefulness_score) + parseInt(instructor_score || 0) + recScore) / 4);
@@ -207,8 +207,8 @@ router.post('/:id', isAuthenticated, isManager, async (req, res) => {
     // Calculate NPS Bucket
     let npsBucket = 'Passive';
     const recScore = parseInt(recommendation_score);
-    if (recScore >= 9) npsBucket = 'Promoter';
-    else if (recScore <= 6) npsBucket = 'Detractor';
+    if (recScore >= 5) npsBucket = 'Promoter';
+    else if (recScore <= 2) npsBucket = 'Detractor';
 
     const overallScore = Math.round((parseInt(satisfaction_score) + parseInt(usefulness_score) + parseInt(instructor_score || 0) + recScore) / 4);
 

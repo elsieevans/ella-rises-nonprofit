@@ -56,11 +56,11 @@
       </div>
       
       <div class="score-item-large">
-        <div class="score-circle score-<%= survey.SurveyRecommendationScore >= 8 ? 'high' : survey.SurveyRecommendationScore >= 5 ? 'medium' : 'low' %>">
+        <div class="score-circle score-<%= survey.SurveyRecommendationScore >= 4 ? 'high' : survey.SurveyRecommendationScore >= 3 ? 'medium' : 'low' %>">
           <%= survey.SurveyRecommendationScore || 0 %>
         </div>
         <span class="score-label">NPS</span>
-        <span class="score-max">/10</span>
+        <span class="score-max">/5</span>
       </div>
     </div>
   </div>

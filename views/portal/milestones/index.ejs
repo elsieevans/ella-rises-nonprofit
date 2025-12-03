@@ -1,35 +1,45 @@
 <%- include('../../partials/portal-header', { currentPage: 'milestones', pageTitle: 'Milestones' }) %>
 
-<div class="page-actions">
+<!-- Stats Overview with Add Button -->
+<% if (stats) { %>
+<div class="page-header-with-stats">
+  <div class="milestone-stats-overview">
+    <div class="milestone-stat-item">
+      <div class="milestone-stat-icon milestone-stat-icon--types">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </div>
+      <div class="milestone-stat-content">
+        <span class="milestone-stat-value"><%= stats.uniquecount || 0 %></span>
+        <span class="milestone-stat-label">Milestone Types</span>
+      </div>
+    </div>
+    <div class="milestone-stat-item">
+      <div class="milestone-stat-icon milestone-stat-icon--achievements">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+      </div>
+      <div class="milestone-stat-content">
+        <span class="milestone-stat-value"><%= stats.totalachievements || 0 %></span>
+        <span class="milestone-stat-label">Total Achievements</span>
+      </div>
+    </div>
+  </div>
+  <div class="page-actions">
+    <% if (user && user.role === 'Admin') { %>
+      <a href="/portal/milestones/new" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Milestone
+      </a>
+    <% } %>
+  </div>
+</div>
+<% } else { %>
+<div class="page-actions" style="justify-content: flex-end;">
   <% if (user && user.role === 'Admin') { %>
     <a href="/portal/milestones/new" class="btn btn-primary">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       Add Milestone
     </a>
   <% } %>
-</div>
-
-<!-- Stats Overview -->
-<% if (stats) { %>
-<div class="milestone-stats-overview">
-  <div class="milestone-stat-item">
-    <div class="milestone-stat-icon milestone-stat-icon--types">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-    </div>
-    <div class="milestone-stat-content">
-      <span class="milestone-stat-value"><%= stats.uniquecount || 0 %></span>
-      <span class="milestone-stat-label">Milestone Types</span>
-    </div>
-  </div>
-  <div class="milestone-stat-item">
-    <div class="milestone-stat-icon milestone-stat-icon--achievements">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
-    </div>
-    <div class="milestone-stat-content">
-      <span class="milestone-stat-value"><%= stats.totalachievements || 0 %></span>
-      <span class="milestone-stat-label">Total Achievements</span>
-    </div>
-  </div>
 </div>
 <% } %>
 
@@ -106,6 +116,10 @@
   margin-bottom: var(--space-xl);
 }
 
+.page-header-with-stats .milestone-stats-overview {
+  margin-bottom: 0;
+}
+
 .milestone-stat-item {
   display: flex;
   align-items: center;
@@ -131,11 +145,11 @@
 }
 
 .milestone-stat-icon--types {
-  background: linear-gradient(135deg, var(--color-accent-magenta) 0%, #9c27b0 100%);
+  background: linear-gradient(135deg, #F8BBD0 0%, #f48fb1 100%);
 }
 
 .milestone-stat-icon--achievements {
-  background: linear-gradient(135deg, var(--color-accent-sage) 0%, #2e7d32 100%);
+  background: linear-gradient(135deg, #F8BBD0 0%, #f48fb1 100%);
 }
 
 .milestone-stat-content {
@@ -212,23 +226,23 @@
 }
 
 /* Color variations */
-.milestone-gallery-card--rose::before { background: linear-gradient(180deg, var(--color-accent-rose), #f48fb1); }
-.milestone-gallery-card--rose .milestone-gallery-icon { background: linear-gradient(135deg, var(--color-accent-rose), #f48fb1); }
+.milestone-gallery-card--rose::before { background: linear-gradient(180deg, #F8BBD0, #f48fb1); }
+.milestone-gallery-card--rose .milestone-gallery-icon { background: linear-gradient(135deg, #F8BBD0, #f48fb1); }
 
-.milestone-gallery-card--sage::before { background: linear-gradient(180deg, var(--color-accent-sage), #66bb6a); }
-.milestone-gallery-card--sage .milestone-gallery-icon { background: linear-gradient(135deg, var(--color-accent-sage), #66bb6a); }
+.milestone-gallery-card--sage::before { background: linear-gradient(180deg, #F8BBD0, #f48fb1); }
+.milestone-gallery-card--sage .milestone-gallery-icon { background: linear-gradient(135deg, #F8BBD0, #f48fb1); }
 
-.milestone-gallery-card--lavender::before { background: linear-gradient(180deg, var(--color-accent-lavender), #9575cd); }
-.milestone-gallery-card--lavender .milestone-gallery-icon { background: linear-gradient(135deg, var(--color-accent-lavender), #9575cd); }
+.milestone-gallery-card--lavender::before { background: linear-gradient(180deg, #F8BBD0, #f48fb1); }
+.milestone-gallery-card--lavender .milestone-gallery-icon { background: linear-gradient(135deg, #F8BBD0, #f48fb1); }
 
-.milestone-gallery-card--peach::before { background: linear-gradient(180deg, var(--color-accent-peach), #ffab91); }
-.milestone-gallery-card--peach .milestone-gallery-icon { background: linear-gradient(135deg, var(--color-accent-peach), #ffab91); }
+.milestone-gallery-card--peach::before { background: linear-gradient(180deg, #F8BBD0, #f48fb1); }
+.milestone-gallery-card--peach .milestone-gallery-icon { background: linear-gradient(135deg, #F8BBD0, #f48fb1); }
 
-.milestone-gallery-card--sky::before { background: linear-gradient(180deg, var(--color-accent-sky), #4fc3f7); }
-.milestone-gallery-card--sky .milestone-gallery-icon { background: linear-gradient(135deg, var(--color-accent-sky), #4fc3f7); }
+.milestone-gallery-card--sky::before { background: linear-gradient(180deg, #F8BBD0, #f48fb1); }
+.milestone-gallery-card--sky .milestone-gallery-icon { background: linear-gradient(135deg, #F8BBD0, #f48fb1); }
 
-.milestone-gallery-card--magenta::before { background: linear-gradient(180deg, var(--color-accent-magenta), #ab47bc); }
-.milestone-gallery-card--magenta .milestone-gallery-icon { background: linear-gradient(135deg, var(--color-accent-magenta), #ab47bc); }
+.milestone-gallery-card--magenta::before { background: linear-gradient(180deg, #F8BBD0, #f48fb1); }
+.milestone-gallery-card--magenta .milestone-gallery-icon { background: linear-gradient(135deg, #F8BBD0, #f48fb1); }
 
 .milestone-gallery-icon {
   width: 64px;
@@ -327,6 +341,10 @@
 @media (max-width: 768px) {
   .milestone-stats-overview {
     flex-direction: column;
+  }
+  
+  .page-header-with-stats .milestone-stats-overview {
+    width: 100%;
   }
   
   .milestone-gallery {

@@ -64,15 +64,15 @@
       <div class="survey-scores">
         <div class="score-item">
           <span class="score-label">Satisfaction</span>
-          <span class="score-value"><%= parseFloat(surveyStats.avg_satisfaction).toFixed(1) %>/5</span>
+          <span class="score-value"><%= parseFloat(surveyStats.avg_satisfaction) % 1 === 0 ? Math.round(parseFloat(surveyStats.avg_satisfaction)) : parseFloat(surveyStats.avg_satisfaction).toFixed(1) %>/5</span>
         </div>
         <div class="score-item">
           <span class="score-label">Usefulness</span>
-          <span class="score-value"><%= parseFloat(surveyStats.avg_usefulness).toFixed(1) %>/5</span>
+          <span class="score-value"><%= parseFloat(surveyStats.avg_usefulness) % 1 === 0 ? Math.round(parseFloat(surveyStats.avg_usefulness)) : parseFloat(surveyStats.avg_usefulness).toFixed(1) %>/5</span>
         </div>
         <div class="score-item">
           <span class="score-label">Recommendation</span>
-          <span class="score-value"><%= parseFloat(surveyStats.avg_recommendation).toFixed(1) %>/10</span>
+          <span class="score-value"><%= parseFloat(surveyStats.avg_recommendation) % 1 === 0 ? Math.round(parseFloat(surveyStats.avg_recommendation)) : parseFloat(surveyStats.avg_recommendation).toFixed(1) %>/5</span>
         </div>
       </div>
     </div>
@@ -154,7 +154,7 @@
             <div class="survey-scores-mini">
               <span title="Satisfaction">😊 <%= s.SurveySatisfactionScore %>/5</span>
               <span title="Usefulness">📚 <%= s.SurveyUsefulnessScore %>/5</span>
-              <span title="Recommendation">👍 <%= s.SurveyRecommendationScore %>/10</span>
+              <span title="Recommendation">👍 <%= s.SurveyRecommendationScore %>/5</span>
             </div>
             <% if (s.ParticipantFirstName) { %>
               <span class="survey-respondent"><%= s.ParticipantFirstName %> <%= s.ParticipantLastName %></span>

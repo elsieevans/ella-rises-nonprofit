@@ -46,11 +46,9 @@
   <div class="achievers-grid">
     <% achievers.forEach((a, index) => { 
       const initials = (a.ParticipantFirstName || '?').charAt(0) + (a.ParticipantLastName || '?').charAt(0);
-      const avatarColors = ['#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#00bcd4', '#009688', '#4caf50', '#ff9800'];
-      const colorIndex = (a.ParticipantFirstName || '').charCodeAt(0) % avatarColors.length;
     %>
     <div class="achiever-card" style="animation-delay: <%= index * 0.05 %>s">
-      <div class="achiever-avatar" style="background: <%= avatarColors[colorIndex] %>">
+      <div class="achiever-avatar" style="background: var(--color-accent-sage)">
         <%= initials %>
       </div>
       <div class="achiever-info">
@@ -99,7 +97,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-xl);
-  background: linear-gradient(135deg, var(--color-primary) 0%, #1a237e 100%);
+  background: linear-gradient(135deg, var(--color-accent-sage) 0%, #66bb6a 100%);
   padding: var(--space-2xl);
   border-radius: var(--radius-xl);
   margin-bottom: var(--space-xl);
@@ -132,7 +130,7 @@
 .milestone-hero-badge {
   width: 100px;
   height: 100px;
-  background: linear-gradient(135deg, var(--color-accent-rose) 0%, #f48fb1 100%);
+  background: linear-gradient(135deg, #F8BBD0 0%, #f48fb1 100%);
   border-radius: var(--radius-xl);
   display: flex;
   align-items: center;

@@ -1,27 +1,28 @@
 <%- include('../../partials/portal-header', { currentPage: 'donations', pageTitle: 'Donations' }) %>
 
-<div class="page-actions">
-  <% if (user && user.role === 'Admin') { %>
-    <a href="/portal/donations/new" class="btn btn-primary">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Add Donation
-    </a>
-  <% } %>
-</div>
-
-<!-- Stats Cards -->
-<div class="stats-row">
-  <div class="mini-stat mini-stat--large">
-    <span class="mini-stat-value">$<%= parseFloat(stats.total || 0).toLocaleString() %></span>
-    <span class="mini-stat-label">Total Donations</span>
+<!-- Stats Cards with Add Button -->
+<div class="page-header-with-stats">
+  <div class="stats-row">
+    <div class="mini-stat mini-stat--large">
+      <span class="mini-stat-value">$<%= parseFloat(stats.total || 0).toLocaleString() %></span>
+      <span class="mini-stat-label">Total Donations</span>
+    </div>
+    <div class="mini-stat">
+      <span class="mini-stat-value"><%= stats.count %></span>
+      <span class="mini-stat-label">Total Gifts</span>
+    </div>
+    <div class="mini-stat">
+      <span class="mini-stat-value">$<%= parseFloat(stats.average || 0).toLocaleString(undefined, {maximumFractionDigits: 0}) %></span>
+      <span class="mini-stat-label">Avg. Gift</span>
+    </div>
   </div>
-  <div class="mini-stat">
-    <span class="mini-stat-value"><%= stats.count %></span>
-    <span class="mini-stat-label">Total Gifts</span>
-  </div>
-  <div class="mini-stat">
-    <span class="mini-stat-value">$<%= parseFloat(stats.average || 0).toLocaleString(undefined, {maximumFractionDigits: 0}) %></span>
-    <span class="mini-stat-label">Avg. Gift</span>
+  <div class="page-actions">
+    <% if (user && user.role === 'Admin') { %>
+      <a href="/portal/donations/new" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Donation
+      </a>
+    <% } %>
   </div>
 </div>
 
