@@ -34,11 +34,11 @@
       </button>
       
       <ul class="nav-menu" role="menubar">
+        <div class="nav-main-links">
         <li role="none"><a href="/" class="nav-link" role="menuitem">Home</a></li>
         <li role="none" class="nav-dropdown">
           <button class="nav-link nav-dropdown-toggle" role="menuitem" aria-haspopup="true" aria-expanded="false">
             About
-            <span class="dropdown-arrow">▾</span>
           </button>
           <ul class="nav-dropdown-menu" role="menu">
             <li role="none"><a href="/mission" class="nav-dropdown-link" role="menuitem">Our Mission</a></li>
@@ -48,13 +48,16 @@
         <li role="none"><a href="/programs" class="nav-link" role="menuitem">Programs</a></li>
         <li role="none"><a href="/get-involved" class="nav-link" role="menuitem">Get Involved</a></li>
         <li role="none"><a href="/contact" class="nav-link" role="menuitem">Contact</a></li>
+        </div>
+        <div class="nav-auth-links">
         <% if (user) { %>
+            <li role="none"><a href="/donate" class="nav-link nav-cta" role="menuitem">Donate</a></li>
           <li role="none"><a href="/portal/dashboard" class="nav-link" role="menuitem">Portal</a></li>
-          <li role="none"><a href="/auth/logout" class="nav-link" role="menuitem">Logout</a></li>
         <% } else { %>
+            <li role="none"><a href="/donate" class="nav-link nav-cta" role="menuitem">Donate</a></li>
           <li role="none"><a href="/auth/login" class="nav-link nav-link--secondary" role="menuitem">Login</a></li>
         <% } %>
-        <li role="none"><a href="/donate" class="nav-link nav-cta" role="menuitem">Donate</a></li>
+        </div>
       </ul>
     </div>
   </nav>
