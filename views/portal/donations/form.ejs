@@ -8,31 +8,20 @@
 </div>
 
 <div class="form-card">
-  <form action="/portal/donations<%= isEdit ? '/' + donation.id : '' %>" method="POST" class="crud-form">
+  <form action="/portal/donations<%= isEdit ? '/' + donation.DonationID : '' %>" method="POST" class="crud-form">
     <div class="form-section">
       <h3>Donor Information</h3>
       
       <div class="form-group">
-        <label for="donor_name">Donor Name <span class="required">*</span></label>
-        <input type="text" id="donor_name" name="donor_name" value="<%= donation.donor_name || '' %>" required>
-      </div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label for="donor_email">Email</label>
-          <input type="email" id="donor_email" name="donor_email" value="<%= donation.donor_email || '' %>">
-        </div>
-        <div class="form-group">
-          <label for="donor_phone">Phone</label>
-          <input type="tel" id="donor_phone" name="donor_phone" value="<%= donation.donor_phone || '' %>">
-        </div>
-      </div>
-      
-      <div class="form-group">
-        <label class="checkbox-label">
-          <input type="checkbox" name="is_anonymous" <%= donation.is_anonymous ? 'checked' : '' %>>
-          <span>Anonymous Donation</span>
-        </label>
+        <label for="participant_id">Participant <span class="required">*</span></label>
+        <select id="participant_id" name="participant_id" required>
+          <option value="">Select a participant...</option>
+          <% participants.forEach(p => { %>
+            <option value="<%= p.ParticipantID %>" <%= (donation.ParticipantID == p.ParticipantID) ? 'selected' : '' %>>
+              <%= p.ParticipantLastName %>, <%= p.ParticipantFirstName %>
+            </option>
+          <% }) %>
+        </select>
       </div>
     </div>
     
@@ -44,72 +33,18 @@
           <label for="amount">Amount <span class="required">*</span></label>
           <div class="input-with-prefix">
             <span class="input-prefix">$</span>
-            <input type="number" id="amount" name="amount" value="<%= donation.amount || '' %>" step="0.01" min="0" required>
+            <input type="number" id="amount" name="amount" value="<%= donation.DonationAmount || '' %>" step="0.01" min="0" required>
           </div>
         </div>
         <div class="form-group">
           <label for="donation_date">Date <span class="required">*</span></label>
-          <input type="date" id="donation_date" name="donation_date" value="<%= donation.donation_date ? new Date(donation.donation_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0] %>" required>
-        </div>
-      </div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label for="donation_type">Donation Type <span class="required">*</span></label>
-          <select id="donation_type" name="donation_type" required>
-            <% donationTypes.forEach(t => { %>
-              <option value="<%= t %>" <%= donation.donation_type === t ? 'selected' : '' %>><%= t %></option>
-            <% }) %>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="payment_method">Payment Method <span class="required">*</span></label>
-          <select id="payment_method" name="payment_method" required>
-            <% paymentMethods.forEach(m => { %>
-              <option value="<%= m %>" <%= donation.payment_method === m ? 'selected' : '' %>><%= m.replace('_', ' ') %></option>
-            <% }) %>
-          </select>
-        </div>
-      </div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label for="campaign">Campaign</label>
-          <input type="text" id="campaign" name="campaign" value="<%= donation.campaign || '' %>" list="campaign-list" placeholder="Enter or select campaign">
-          <datalist id="campaign-list">
-            <% campaigns.forEach(c => { %>
-              <option value="<%= c %>">
-            <% }) %>
-          </datalist>
-        </div>
-        <div class="form-group">
-          <label for="transaction_id">Transaction ID</label>
-          <input type="text" id="transaction_id" name="transaction_id" value="<%= donation.transaction_id || '' %>">
-        </div>
-      </div>
-    </div>
-    
-    <div class="form-section">
-      <h3>Status & Notes</h3>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label class="checkbox-label">
-            <input type="checkbox" name="receipt_sent" <%= donation.receipt_sent ? 'checked' : '' %>>
-            <span>Receipt Sent</span>
-          </label>
-        </div>
-        <div class="form-group">
-          <label class="checkbox-label">
-            <input type="checkbox" name="thank_you_sent" <%= donation.thank_you_sent ? 'checked' : '' %>>
-            <span>Thank You Sent</span>
-          </label>
+          <input type="date" id="donation_date" name="donation_date" value="<%= donation.DonationDate ? new Date(donation.DonationDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0] %>" required>
         </div>
       </div>
       
       <div class="form-group">
-        <label for="notes">Notes</label>
-        <textarea id="notes" name="notes" rows="3"><%= donation.notes || '' %></textarea>
+        <label for="donation_no">Donation Number</label>
+        <input type="number" id="donation_no" name="donation_no" value="<%= donation.DonationNo || '' %>" min="1">
       </div>
     </div>
     

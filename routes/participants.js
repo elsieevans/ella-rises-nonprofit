@@ -56,11 +56,13 @@ router.get('/new', isAuthenticated, isManager, (req, res) => {
 
 // Create participant
 router.post('/', isAuthenticated, isManager, async (req, res) => {
+  const bcrypt = require('bcrypt');
+  
   try {
     const {
       first_name, last_name, email, phone, date_of_birth,
       school, employer, field_of_interest, 
-      city, state, zip, role
+      city, state, zip, role, password
     } = req.body;
     
     // Validate required fields
@@ -69,10 +71,29 @@ router.post('/', isAuthenticated, isManager, async (req, res) => {
       return res.redirect('/portal/participants/new');
     }
 
+    // Check if email already exists
+    const existingParticipant = await db('Participant')
+      .where('ParticipantEmail', email.toLowerCase())
+      .first();
+    
+    if (existingParticipant) {
+      req.flash('error_msg', 'A participant with this email already exists');
+      return res.redirect('/portal/participants/new');
+    }
+
+    // Get the next ParticipantID (max + 1)
+    const maxIdResult = await db('Participant').max('ParticipantID as maxId').first();
+    const nextId = (maxIdResult.maxId || 0) + 1;
+
+    // Hash password if provided, otherwise generate a random one
+    const passwordToUse = password || Math.random().toString(36).slice(-10);
+    const hashedPassword = await bcrypt.hash(passwordToUse, 10);
+
     await db('Participant').insert({
+      "ParticipantID": nextId,
       "ParticipantFirstName": first_name,
       "ParticipantLastName": last_name,
-      "ParticipantEmail": email,
+      "ParticipantEmail": email.toLowerCase(),
       "ParticipantPhone": phone,
       "ParticipantDOB": date_of_birth || null,
       "ParticipantSchool": school,
@@ -81,15 +102,15 @@ router.post('/', isAuthenticated, isManager, async (req, res) => {
       "ParticipantCity": city,
       "ParticipantState": state,
       "ParticipantZip": zip,
-      "ParticipantRole": role || 'participant'
-      // Missing: password (if required for login, assuming default or handled elsewhere)
+      "ParticipantRole": role || 'participant',
+      "Password": hashedPassword
     });
     
     req.flash('success_msg', 'Participant added successfully');
     res.redirect('/portal/participants');
   } catch (error) {
     console.error('Error creating participant:', error);
-    req.flash('error_msg', 'Error adding participant. Email may already exist.');
+    req.flash('error_msg', 'Error adding participant: ' + error.message);
     res.redirect('/portal/participants/new');
   }
 });

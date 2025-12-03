@@ -45,8 +45,8 @@
         <tr>
           <th scope="col">Date</th>
           <th scope="col">Donor</th>
-          <th scope="col">Email</th>
           <th scope="col">Amount</th>
+          <th scope="col">Email</th>
           <th scope="col" class="actions-col">Actions</th>
         </tr>
       </thead>
@@ -58,10 +58,8 @@
               <td data-label="Donor" class="donor-cell">
                 <strong><%= d.ParticipantFirstName %> <%= d.ParticipantLastName %></strong>
               </td>
-              <td data-label="Email" class="mobile-only-cell">
-                <%= d.ParticipantEmail || '-' %>
-              </td>
               <td data-label="Amount" class="amount-cell">$<%= parseFloat(d.DonationAmount).toLocaleString() %></td>
+              <td data-label="Email"><%= d.ParticipantEmail || '-' %></td>
               <td class="actions-col">
                 <div class="action-buttons">
                   <a href="/portal/donations/<%= d.DonationID %>" class="btn-icon" title="View" aria-label="View donation">

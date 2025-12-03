@@ -6,7 +6,7 @@
     Back to Surveys
   </a>
   <% if (user && user.role === 'Admin') { %>
-    <a href="/portal/surveys/<%= survey.id %>/edit" class="btn btn-primary">
+    <a href="/portal/surveys/<%= survey.SurveyID %>/edit" class="btn btn-primary">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
       Edit
     </a>
@@ -23,13 +23,11 @@
     <div class="detail-section">
       <dl class="detail-list">
         <dt>Survey Date</dt>
-        <dd><%= survey.survey_date ? new Date(survey.survey_date).toLocaleDateString() : '-' %></dd>
+        <dd><%= survey.SurveySubmissionDate ? new Date(survey.SurveySubmissionDate).toLocaleDateString() : '-' %></dd>
         <dt>Event</dt>
-        <dd><%= survey.event_title ? '<a href="/portal/events/' + survey.event_id + '">' + survey.event_title + '</a>' : 'N/A' %></dd>
+        <dd><%- survey.event_title ? '<a href="/portal/events/' + survey.EventID + '">' + survey.event_title + '</a>' : 'N/A' %></dd>
         <dt>Participant</dt>
-        <dd><%= survey.first_name ? '<a href="/portal/participants/' + survey.participant_id + '">' + survey.first_name + ' ' + survey.last_name + '</a>' : 'Anonymous' %></dd>
-        <dt>Would Attend Again</dt>
-        <dd><%= survey.would_attend_again ? 'Yes' : 'No' %></dd>
+        <dd><%- survey.ParticipantFirstName ? '<a href="/portal/participants/' + survey.ParticipantID + '">' + survey.ParticipantFirstName + ' ' + survey.ParticipantLastName + '</a>' : 'Anonymous' %></dd>
       </dl>
     </div>
   </div>
@@ -42,24 +40,24 @@
     
     <div class="scores-display">
       <div class="score-item-large">
-        <div class="score-circle score-<%= survey.satisfaction_score >= 4 ? 'high' : survey.satisfaction_score >= 3 ? 'medium' : 'low' %>">
-          <%= survey.satisfaction_score %>
+        <div class="score-circle score-<%= survey.SurveySatisfactionScore >= 4 ? 'high' : survey.SurveySatisfactionScore >= 3 ? 'medium' : 'low' %>">
+          <%= survey.SurveySatisfactionScore || 0 %>
         </div>
         <span class="score-label">Satisfaction</span>
         <span class="score-max">/5</span>
       </div>
       
       <div class="score-item-large">
-        <div class="score-circle score-<%= survey.usefulness_score >= 4 ? 'high' : survey.usefulness_score >= 3 ? 'medium' : 'low' %>">
-          <%= survey.usefulness_score %>
+        <div class="score-circle score-<%= survey.SurveyUsefulnessScore >= 4 ? 'high' : survey.SurveyUsefulnessScore >= 3 ? 'medium' : 'low' %>">
+          <%= survey.SurveyUsefulnessScore || 0 %>
         </div>
         <span class="score-label">Usefulness</span>
         <span class="score-max">/5</span>
       </div>
       
       <div class="score-item-large">
-        <div class="score-circle score-<%= survey.recommendation_score >= 8 ? 'high' : survey.recommendation_score >= 5 ? 'medium' : 'low' %>">
-          <%= survey.recommendation_score %>
+        <div class="score-circle score-<%= survey.SurveyRecommendationScore >= 8 ? 'high' : survey.SurveyRecommendationScore >= 5 ? 'medium' : 'low' %>">
+          <%= survey.SurveyRecommendationScore || 0 %>
         </div>
         <span class="score-label">NPS</span>
         <span class="score-max">/10</span>
@@ -73,28 +71,12 @@
       <h3>Written Feedback</h3>
     </div>
     
-    <% if (survey.what_liked) { %>
+    <% if (survey.SurveyComments) { %>
     <div class="detail-section">
-      <h4>What they liked</h4>
-      <p class="feedback-text"><%= survey.what_liked %></p>
+      <h4>Comments</h4>
+      <p class="feedback-text"><%= survey.SurveyComments %></p>
     </div>
-    <% } %>
-    
-    <% if (survey.what_improve) { %>
-    <div class="detail-section">
-      <h4>Areas for improvement</h4>
-      <p class="feedback-text"><%= survey.what_improve %></p>
-    </div>
-    <% } %>
-    
-    <% if (survey.additional_comments) { %>
-    <div class="detail-section">
-      <h4>Additional comments</h4>
-      <p class="feedback-text"><%= survey.additional_comments %></p>
-    </div>
-    <% } %>
-    
-    <% if (!survey.what_liked && !survey.what_improve && !survey.additional_comments) { %>
+    <% } else { %>
       <p class="no-data">No written feedback provided</p>
     <% } %>
   </div>

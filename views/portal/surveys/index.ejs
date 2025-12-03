@@ -74,22 +74,22 @@
         <% if (surveys && surveys.length > 0) { %>
           <% surveys.forEach(s => { %>
             <tr>
-              <td data-label="Date"><%= s.survey_date ? new Date(s.survey_date).toLocaleDateString() : '-' %></td>
+              <td data-label="Date"><%= s.SurveySubmissionDate ? new Date(s.SurveySubmissionDate).toLocaleDateString() : '-' %></td>
               <td data-label="Event"><%= s.event_title || '-' %></td>
-              <td data-label="Participant"><%= s.first_name ? s.first_name + ' ' + s.last_name : '-' %></td>
-              <td data-label="Satisfaction"><span class="score-badge score-<%= s.satisfaction_score >= 4 ? 'high' : s.satisfaction_score >= 3 ? 'medium' : 'low' %>"><%= s.satisfaction_score %>/5</span></td>
-              <td data-label="Usefulness"><span class="score-badge score-<%= s.usefulness_score >= 4 ? 'high' : s.usefulness_score >= 3 ? 'medium' : 'low' %>"><%= s.usefulness_score %>/5</span></td>
-              <td data-label="NPS"><span class="score-badge score-<%= s.recommendation_score >= 8 ? 'high' : s.recommendation_score >= 5 ? 'medium' : 'low' %>"><%= s.recommendation_score %>/10</span></td>
+              <td data-label="Participant"><%= s.ParticipantFirstName ? s.ParticipantFirstName + ' ' + s.ParticipantLastName : '-' %></td>
+              <td data-label="Satisfaction"><span class="score-badge score-<%= s.SurveySatisfactionScore >= 4 ? 'high' : s.SurveySatisfactionScore >= 3 ? 'medium' : 'low' %>"><%= s.SurveySatisfactionScore || 0 %>/5</span></td>
+              <td data-label="Usefulness"><span class="score-badge score-<%= s.SurveyUsefulnessScore >= 4 ? 'high' : s.SurveyUsefulnessScore >= 3 ? 'medium' : 'low' %>"><%= s.SurveyUsefulnessScore || 0 %>/5</span></td>
+              <td data-label="NPS"><span class="score-badge score-<%= s.SurveyRecommendationScore >= 8 ? 'high' : s.SurveyRecommendationScore >= 5 ? 'medium' : 'low' %>"><%= s.SurveyRecommendationScore || 0 %>/10</span></td>
               <td class="actions-col">
                 <div class="action-buttons">
-                  <a href="/portal/surveys/<%= s.id %>" class="btn-icon" title="View" aria-label="View survey">
+                  <a href="/portal/surveys/<%= s.SurveyID %>" class="btn-icon" title="View" aria-label="View survey">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                   </a>
                   <% if (user && user.role === 'Admin') { %>
-                    <a href="/portal/surveys/<%= s.id %>/edit" class="btn-icon" title="Edit" aria-label="Edit survey">
+                    <a href="/portal/surveys/<%= s.SurveyID %>/edit" class="btn-icon" title="Edit" aria-label="Edit survey">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                     </a>
-                    <form action="/portal/surveys/<%= s.id %>/delete" method="POST" class="inline-form" onsubmit="return confirm('Delete this survey response?')">
+                    <form action="/portal/surveys/<%= s.SurveyID %>/delete" method="POST" class="inline-form" onsubmit="return confirm('Delete this survey response?')">
                       <button type="submit" class="btn-icon btn-icon--danger" title="Delete" aria-label="Delete survey">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                       </button>

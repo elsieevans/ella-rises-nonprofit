@@ -15,7 +15,7 @@ const app = express();
 const sessionPool = new Pool({
   host: process.env.RDS_HOSTNAME || process.env.DB_HOST || 'localhost',
   port: process.env.RDS_PORT || process.env.DB_PORT || 5432,
-  database: process.env.RDS_DB_NAME || process.env.DB_NAME || 'ebdb',
+  database: process.env.RDS_DB_NAME || process.env.DB_NAME || 'ella_rises',
   user: process.env.RDS_USERNAME || process.env.DB_USER || 'postgres',
   password: process.env.RDS_PASSWORD || process.env.DB_PASSWORD,
   ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false

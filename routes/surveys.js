@@ -18,7 +18,7 @@ router.get('/', isAuthenticated, async (req, res) => {
         'Participant.ParticipantFirstName',
         'Participant.ParticipantLastName'
       )
-      .orderBy('Survey.SurveySubmissionDate', 'desc');
+      .orderByRaw('"SurveySubmissionDate" DESC NULLS LAST');
     
     if (event_id) {
       query = query.where('Survey.EventID', event_id);

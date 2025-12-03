@@ -91,7 +91,41 @@ router.post('/', isAuthenticated, isManager, async (req, res) => {
   }
 });
 
-// View milestone details
+// View milestone by title - shows all participants who achieved it
+router.get('/view/:title', isAuthenticated, async (req, res) => {
+  try {
+    const milestoneTitle = decodeURIComponent(req.params.title);
+    
+    // Get all participants who achieved this milestone
+    const achievers = await db('Milestone')
+      .leftJoin('Participant', 'Milestone.ParticipantID', 'Participant.ParticipantID')
+      .where('Milestone.MilestoneTitle', milestoneTitle)
+      .select(
+        'Milestone.*',
+        'Participant.ParticipantID',
+        'Participant.ParticipantFirstName',
+        'Participant.ParticipantLastName'
+      )
+      .orderBy('Milestone.MilestoneDate', 'desc');
+    
+    if (achievers.length === 0) {
+      req.flash('error_msg', 'Milestone not found');
+      return res.redirect('/portal/milestones');
+    }
+    
+    res.render('portal/milestones/view', {
+      title: `${milestoneTitle} - Ella Rises Portal`,
+      milestoneTitle,
+      achievers
+    });
+  } catch (error) {
+    console.error('Error fetching milestone:', error);
+    req.flash('error_msg', 'Error loading milestone');
+    res.redirect('/portal/milestones');
+  }
+});
+
+// View individual milestone record details
 router.get('/:id', isAuthenticated, async (req, res) => {
   try {
     const milestone = await db('Milestone')
@@ -109,7 +143,7 @@ router.get('/:id', isAuthenticated, async (req, res) => {
       return res.redirect('/portal/milestones');
     }
     
-    res.render('portal/milestones/view', {
+    res.render('portal/milestones/view-single', {
       title: 'Milestone Details - Ella Rises Portal',
       milestone
     });

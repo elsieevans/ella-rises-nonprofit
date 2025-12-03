@@ -50,13 +50,15 @@
           <% milestones.forEach(m => { %>
             <tr>
               <td data-label="Date"><%= new Date(m.MilestoneDate).toLocaleDateString() %></td>
-              <td data-label="Title"><strong><%= m.MilestoneTitle %></strong></td>
+              <td data-label="Title">
+                <a href="/portal/milestones/view/<%= encodeURIComponent(m.MilestoneTitle) %>"><strong><%= m.MilestoneTitle %></strong></a>
+              </td>
               <td data-label="Participant">
-                <%= m.ParticipantFirstName %> <%= m.ParticipantLastName %>
+                <a href="/portal/participants/<%= m.ParticipantID %>"><%= m.ParticipantFirstName %> <%= m.ParticipantLastName %></a>
               </td>
               <td class="actions-col">
                 <div class="action-buttons">
-                  <a href="/portal/milestones/<%= m.MilestoneID %>" class="btn-icon" title="View" aria-label="View milestone">
+                  <a href="/portal/milestones/<%= m.MilestoneID %>" class="btn-icon" title="View Record" aria-label="View milestone record">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                   </a>
                   <% if (user && user.role === 'Admin') { %>

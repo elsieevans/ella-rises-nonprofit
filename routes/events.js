@@ -134,23 +134,31 @@ router.get('/:id', isAuthenticated, async (req, res) => {
       .select('Participant.*', 'Registration.RegistrationStatus', 'Registration.RegistrationCheckInTime', 'Registration.RegistrationID')
       .orderBy('Participant.ParticipantLastName');
     
-    // Get surveys for this event
-    const surveys = await db('Survey')
-      .leftJoin('Participant', 'Survey.ParticipantID', 'Participant.ParticipantID')
-      .where('Survey.EventID', req.params.id)
-      .select('Survey.*', 'Participant.ParticipantFirstName', 'Participant.ParticipantLastName')
-      .orderBy('Survey.SurveySubmissionDate', 'desc');
+    // Get surveys for this event - with error handling for missing columns
+    let surveys = [];
+    let surveyStats = { total_responses: 0, avg_satisfaction: null, avg_usefulness: null, avg_recommendation: null };
     
-    // Calculate survey stats
-    const surveyStats = await db('Survey')
-      .where('EventID', req.params.id)
-      .select(
-        db.raw('AVG("SurveySatisfactionScore") as avg_satisfaction'),
-        db.raw('AVG("SurveyUsefulnessScore") as avg_usefulness'),
-        db.raw('AVG("SurveyRecommendationScore") as avg_recommendation'),
-        db.raw('COUNT(*) as total_responses')
-      )
-      .first();
+    try {
+      surveys = await db('Survey')
+        .leftJoin('Participant', 'Survey.ParticipantID', 'Participant.ParticipantID')
+        .where('Survey.EventID', req.params.id)
+        .select('Survey.*', 'Participant.ParticipantFirstName', 'Participant.ParticipantLastName')
+        .orderBy('Survey.SurveySubmissionDate', 'desc');
+      
+      // Calculate survey stats
+      surveyStats = await db('Survey')
+        .where('EventID', req.params.id)
+        .select(
+          db.raw('AVG("SurveySatisfactionScore") as avg_satisfaction'),
+          db.raw('AVG("SurveyUsefulnessScore") as avg_usefulness'),
+          db.raw('AVG("SurveyRecommendationScore") as avg_recommendation'),
+          db.raw('COUNT(*) as total_responses')
+        )
+        .first();
+    } catch (surveyError) {
+      console.error('Error fetching surveys (table or columns may not exist):', surveyError.message);
+      // Continue without survey data
+    }
     
     // Get available participants (simple list, not checking double booking for now)
     const availableParticipants = await db('Participant')
