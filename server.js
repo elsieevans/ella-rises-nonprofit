@@ -93,6 +93,11 @@ app.use((req, res, next) => {
   next();
 });
 
+// Health check endpoint for Elastic Beanstalk
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'healthy', timestamp: new Date().toISOString() });
+});
+
 // Routes
 const publicRoutes = require('./routes/public');
 const authRoutes = require('./routes/auth');
@@ -130,18 +135,42 @@ app.use((err, req, res, next) => {
   res.status(500).render('errors/500', { title: 'Server Error' });
 });
 
-const PORT = process.env.PORT || 3000;
+// Elastic Beanstalk expects port 8080 by default
+const PORT = process.env.PORT || 8080;
 
 const startServer = async () => {
   try {
     console.log('Database migrations skipped (manual management).');
+    
+    // Test database connection but don't block startup
+    db.raw('SELECT 1')
+      .then(() => {
+        console.log('✓ Database connection successful');
+      })
+      .catch((err) => {
+        console.error('✗ Database connection failed (app will continue):', err.message);
+        console.error('Please check your RDS configuration and environment variables');
+      });
+      
   } catch (err) {
     console.error('Startup error:', err);
   }
 
-  app.listen(PORT, () => {
+  // Start server immediately (don't wait for database)
+  const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Ella Rises server running on port ${PORT}`);
     console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`Server ready to accept connections`);
+  });
+  
+  // Graceful shutdown
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM received, shutting down gracefully');
+    server.close(() => {
+      console.log('Server closed');
+      sessionPool.end();
+      process.exit(0);
+    });
   });
 };
 
