@@ -39,6 +39,7 @@ app.use(helmet({
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "https:"],
+      mediaSrc: ["'self'"],
       connectSrc: ["'self'", "https://public.tableau.com"],
       frameSrc: ["'self'", "https://public.tableau.com"],
       childSrc: ["'self'", "https://public.tableau.com"],
