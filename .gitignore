@@ -32,3 +32,6 @@ build/
 # Test coverage
 coverage/
 
+
+# Deployment zip files
+*.zip
