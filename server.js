@@ -40,7 +40,7 @@ app.use(helmet({
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "https:"],
       mediaSrc: ["'self'"],
-      connectSrc: ["'self'", "https://public.tableau.com"],
+      connectSrc: ["'self'", "https://public.tableau.com", "https://openrouter.ai"],
       frameSrc: ["'self'", "https://public.tableau.com"],
       childSrc: ["'self'", "https://public.tableau.com"],
       upgradeInsecureRequests: null
@@ -110,6 +110,7 @@ const milestoneRoutes = require('./routes/milestones');
 const donationRoutes = require('./routes/donations');
 const dashboardRoutes = require('./routes/dashboard');
 const analyticsRoutes = require('./routes/analytics');
+const aiAssistantRoutes = require('./routes/ai-assistant');
 
 app.use('/', publicRoutes);
 app.use('/auth', authRoutes);
@@ -121,6 +122,7 @@ app.use('/portal/milestones', milestoneRoutes);
 app.use('/portal/donations', donationRoutes);
 app.use('/portal/dashboard', dashboardRoutes);
 app.use('/portal/analytics', analyticsRoutes);
+app.use('/portal/ai-assistant', aiAssistantRoutes);
 
 // 404 handler
 app.use((req, res) => {
