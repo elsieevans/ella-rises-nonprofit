@@ -972,6 +972,7 @@
 .type-mentoring { background: var(--color-accent-rose); color: var(--color-gray-900); }
 .type-leadership { background: var(--color-accent-peach); color: var(--color-gray-900); }
 .type-steam { background: var(--color-primary); color: white; }
+.type-stem { background: var(--color-primary); color: white; }
 .type-arts { background: var(--color-accent-lavender); color: white; }
 .type-community { background: var(--color-accent-sage); color: white; }
 .type-other { background: var(--color-gray-400); color: white; }

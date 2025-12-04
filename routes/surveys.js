@@ -65,7 +65,7 @@ router.get('/', isAuthenticated, async (req, res) => {
 });
 
 // New survey form
-router.get('/new', isAuthenticated, isManager, async (req, res) => {
+router.get('/new', isAuthenticated, async (req, res) => {
   try {
     const events = await db('Event')
       .join('EventDetails', 'Event.EventDetailsID', 'EventDetails.EventDetailsID')
@@ -91,7 +91,7 @@ router.get('/new', isAuthenticated, isManager, async (req, res) => {
 });
 
 // Create survey
-router.post('/', isAuthenticated, isManager, async (req, res) => {
+router.post('/', isAuthenticated, async (req, res) => {
   try {
     const {
       event_id, participant_id, satisfaction_score, usefulness_score,

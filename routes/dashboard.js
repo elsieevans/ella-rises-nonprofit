@@ -32,10 +32,11 @@ router.get('/', isAuthenticated, async (req, res) => {
       .orderBy('Event.EventDateTimeStart', 'asc')
       .limit(5);
     
-    // Get recent donations
+    // Get recent donations (exclude null dates and show most recent first)
     const recentDonations = await db('Donation')
       .leftJoin('Participant', 'Donation.ParticipantID', 'Participant.ParticipantID')
       .select('Donation.*', 'Participant.ParticipantFirstName', 'Participant.ParticipantLastName')
+      .whereNotNull('Donation.DonationDate')
       .orderBy('Donation.DonationDate', 'desc')
       .limit(5);
     

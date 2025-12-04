@@ -75,7 +75,7 @@
                 </small>
                 <% } %>
               </td>
-              <td data-label="Type"><span class="type-badge type-<%= e.EventType %>"><%= e.EventType %></span></td>
+              <td data-label="Type"><span class="type-badge type-<%= e.EventType ? e.EventType.toLowerCase() : 'other' %>"><%= e.EventType %></span></td>
               <td data-label="Location"><%= e.EventLocation || '-' %></td>
               <td data-label="Capacity">
                 <%= e.EventCapacity || '-' %>

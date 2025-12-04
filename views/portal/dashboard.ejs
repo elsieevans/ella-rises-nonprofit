@@ -102,7 +102,7 @@
   <!-- Recent Participants -->
   <div class="dashboard-card">
     <div class="card-header">
-      <h2>Recent Participants</h2>
+      <h2>New Participants</h2>
       <a href="/portal/participants" class="card-link">View All</a>
     </div>
     <div class="card-body">
@@ -113,7 +113,7 @@
               <div class="recent-avatar"><%= p.ParticipantFirstName.charAt(0) %><%= p.ParticipantLastName.charAt(0) %></div>
               <div class="recent-info">
                 <a href="/portal/participants/<%= p.ParticipantID %>" class="recent-name"><%= p.ParticipantFirstName %> <%= p.ParticipantLastName %></a>
-                <span class="recent-meta"><%= p.ParticipantSchool || 'N/A' %></span>
+                
               </div>
             </li>
           <% }) %>
@@ -192,7 +192,7 @@ function initDonationChart(data) {
   const totalDisplay = document.getElementById('yearTotalDisplay');
   if (totalDisplay) {
     const total = parseFloat(data.yearTotal || 0);
-    totalDisplay.textContent = `Total: $${total.toLocaleString()}`;
+    totalDisplay.textContent = `Year Total: $${total.toLocaleString()}`;
   }
 
   const donationCtx = document.getElementById('donationChart').getContext('2d');

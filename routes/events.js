@@ -283,9 +283,17 @@ router.post('/:id/delete', isAuthenticated, isManager, async (req, res) => {
 });
 
 // Register participant
-router.post('/:id/participants', isAuthenticated, isManager, async (req, res) => {
+router.post('/:id/participants', isAuthenticated, async (req, res) => {
   try {
     const { participant_id } = req.body;
+    
+    // Non-admin users can only register themselves
+    if (req.session.user.role !== 'Admin') {
+      if (parseInt(participant_id) !== req.session.user.id) {
+        req.flash('error_msg', 'You can only register yourself for events');
+        return res.redirect(`/portal/events/${req.params.id}`);
+      }
+    }
     
     await db('Registration').insert({
       "EventID": req.params.id,

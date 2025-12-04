@@ -25,7 +25,7 @@
       </div>
       <% } %>
       <div class="event-title-section">
-        <span class="type-badge type-<%= event.EventType %>"><%= event.EventType %></span>
+        <span class="type-badge type-<%= event.EventType ? event.EventType.toLowerCase() : 'other' %>"><%= event.EventType %></span>
         <h2><%= event.EventName %></h2>
       </div>
     </div>
@@ -125,19 +125,35 @@
       <p class="no-data">No participants registered</p>
     <% } %>
     
-    <% if (user && user.role === 'Admin' && availableParticipants && availableParticipants.length > 0) { %>
-      <div class="card-footer">
-        <h4>Register Participant</h4>
-        <form action="/portal/events/<%= event.EventID %>/participants" method="POST" class="inline-form">
-          <select name="participant_id" required>
-            <option value="">Select participant...</option>
-            <% availableParticipants.forEach(p => { %>
-              <option value="<%= p.ParticipantID %>"><%= p.ParticipantFirstName %> <%= p.ParticipantLastName %></option>
-            <% }) %>
-          </select>
-          <button type="submit" class="btn btn-secondary btn-sm">Register</button>
-        </form>
-      </div>
+    <% if (user && user.role === 'Admin') { %>
+      <% if (availableParticipants && availableParticipants.length > 0) { %>
+        <div class="card-footer">
+          <h4>Register Participant</h4>
+          <form action="/portal/events/<%= event.EventID %>/participants" method="POST" class="inline-form">
+            <select name="participant_id" required>
+              <option value="">Select participant...</option>
+              <% availableParticipants.forEach(p => { %>
+                <option value="<%= p.ParticipantID %>"><%= p.ParticipantFirstName %> <%= p.ParticipantLastName %></option>
+              <% }) %>
+            </select>
+            <button type="submit" class="btn btn-secondary btn-sm">Register</button>
+          </form>
+        </div>
+      <% } %>
+    <% } else { %>
+      <% const isUserRegistered = participants.some(p => p.ParticipantID === user.id); %>
+      <% if (!isUserRegistered) { %>
+        <div class="card-footer">
+          <form action="/portal/events/<%= event.EventID %>/participants" method="POST" class="inline-form">
+            <input type="hidden" name="participant_id" value="<%= user.id %>">
+            <button type="submit" class="btn btn-primary btn-sm">Register Me for This Event</button>
+          </form>
+        </div>
+      <% } else { %>
+        <div class="card-footer">
+          <p class="text-success">✓ You are registered for this event</p>
+        </div>
+      <% } %>
     <% } %>
   </div>
   
