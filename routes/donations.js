@@ -5,51 +5,56 @@ const db = require('../config/database');
 
 // List all donations
 router.get('/', isAuthenticated, async (req, res) => {
-  try {
-    const { search } = req.query;
-    
-    let query = db('Donation')
-      .leftJoin('Participant', 'Donation.ParticipantID', 'Participant.ParticipantID')
-      .select(
-        'Donation.*',
-        'Participant.ParticipantFirstName',
-        'Participant.ParticipantLastName',
-        'Participant.ParticipantEmail'
-      )
-      .orderByRaw('"Donation"."DonationDate" DESC NULLS LAST');
-    
-    if (search) {
-      query = query.where(function() {
-        this.where('Participant.ParticipantFirstName', 'ilike', `%${search}%`)
-          .orWhere('Participant.ParticipantLastName', 'ilike', `%${search}%`)
-          .orWhere('Participant.ParticipantEmail', 'ilike', `%${search}%`);
-      });
-    }
-    
-    const donations = await query;
-    
-    // Get aggregate stats
-    const stats = await db('Donation')
-      .select(
-        db.raw('SUM("DonationAmount") as total'),
-        db.raw('COUNT(*) as count'),
-        db.raw('AVG("DonationAmount") as average')
-      )
-      .first();
-    
-    res.render('portal/donations/index', {
-      title: 'Donations - Ella Rises Portal',
-      donations,
-      stats,
-      campaigns: [], // Removed as not in schema
-      donationTypes: [], // Removed as not in schema
-      filters: { search }
-    });
-  } catch (error) {
-    console.error('Error fetching donations:', error);
-    req.flash('error_msg', 'Error loading donations');
-    res.redirect('/portal/dashboard');
-  }
+  try {
+    const { search } = req.query;
+    const isAdmin = req.session.user.role === 'Admin';
+    
+    // Get aggregate stats (visible to all users)
+    const stats = await db('Donation')
+      .select(
+        db.raw('SUM("DonationAmount") as total'),
+        db.raw('COUNT(*) as count'),
+        db.raw('AVG("DonationAmount") as average')
+      )
+      .first();
+    
+    // Only fetch individual donations for Admin users
+    let donations = [];
+    if (isAdmin) {
+      let query = db('Donation')
+        .leftJoin('Participant', 'Donation.ParticipantID', 'Participant.ParticipantID')
+        .select(
+          'Donation.*',
+          'Participant.ParticipantFirstName',
+          'Participant.ParticipantLastName',
+          'Participant.ParticipantEmail'
+        )
+        .orderByRaw('"Donation"."DonationDate" DESC NULLS LAST');
+      
+      if (search) {
+        query = query.where(function() {
+          this.where('Participant.ParticipantFirstName', 'ilike', `%${search}%`)
+            .orWhere('Participant.ParticipantLastName', 'ilike', `%${search}%`)
+            .orWhere('Participant.ParticipantEmail', 'ilike', `%${search}%`);
+        });
+      }
+      
+      donations = await query;
+    }
+    
+    res.render('portal/donations/index', {
+      title: 'Donations - Ella Rises Portal',
+      donations,
+      stats,
+      campaigns: [], // Removed as not in schema
+      donationTypes: [], // Removed as not in schema
+      filters: { search }
+    });
+  } catch (error) {
+    console.error('Error fetching donations:', error);
+    req.flash('error_msg', 'Error loading donations');
+    res.redirect('/portal/participants');
+  }
 });
 
 // New donation form
@@ -112,34 +117,40 @@ router.post('/', isAuthenticated, isManager, async (req, res) => {
   }
 });
 
-// View donation details
+// View donation details - Admin only
 router.get('/:id', isAuthenticated, async (req, res) => {
-  try {
-    const donation = await db('Donation')
-      .leftJoin('Participant', 'Donation.ParticipantID', 'Participant.ParticipantID')
-      .where('Donation.DonationID', req.params.id)
-      .select(
-        'Donation.*',
-        'Participant.ParticipantFirstName',
-        'Participant.ParticipantLastName',
-        'Participant.ParticipantEmail'
-      )
-      .first();
-    
-    if (!donation) {
-      req.flash('error_msg', 'Donation not found');
-      return res.redirect('/portal/donations');
-    }
-    
-    res.render('portal/donations/view', {
-      title: 'Donation Details - Ella Rises Portal',
-      donation
-    });
-  } catch (error) {
-    console.error('Error fetching donation:', error);
-    req.flash('error_msg', 'Error loading donation');
-    res.redirect('/portal/donations');
-  }
+  // Check if user is admin
+  if (req.session.user.role !== 'Admin') {
+    req.flash('error_msg', 'You do not have permission to view individual donation details');
+    return res.redirect('/portal/donations');
+  }
+  
+  try {
+    const donation = await db('Donation')
+      .leftJoin('Participant', 'Donation.ParticipantID', 'Participant.ParticipantID')
+      .where('Donation.DonationID', req.params.id)
+      .select(
+        'Donation.*',
+        'Participant.ParticipantFirstName',
+        'Participant.ParticipantLastName',
+        'Participant.ParticipantEmail'
+      )
+      .first();
+    
+    if (!donation) {
+      req.flash('error_msg', 'Donation not found');
+      return res.redirect('/portal/donations');
+    }
+    
+    res.render('portal/donations/view', {
+      title: 'Donation Details - Ella Rises Portal',
+      donation
+    });
+  } catch (error) {
+    console.error('Error fetching donation:', error);
+    req.flash('error_msg', 'Error loading donation');
+    res.redirect('/portal/donations');
+  }
 });
 
 // Edit donation form

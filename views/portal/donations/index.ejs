@@ -26,6 +26,7 @@
   </div>
 </div>
 
+<% if (user && user.role === 'Admin') { %>
 <!-- Filters -->
 <div class="filters-card">
   <form class="filters-form" method="GET" action="/portal/donations">
@@ -66,16 +67,14 @@
                   <a href="/portal/donations/<%= d.DonationID %>" class="btn-icon" title="View" aria-label="View donation">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                   </a>
-                  <% if (user && user.role === 'Admin') { %>
-                    <a href="/portal/donations/<%= d.DonationID %>/edit" class="btn-icon" title="Edit" aria-label="Edit donation">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                    </a>
-                    <form action="/portal/donations/<%= d.DonationID %>/delete" method="POST" class="inline-form" onsubmit="return confirm('Delete this donation record?')">
-                      <button type="submit" class="btn-icon btn-icon--danger" title="Delete" aria-label="Delete donation">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                      </button>
-                    </form>
-                  <% } %>
+                  <a href="/portal/donations/<%= d.DonationID %>/edit" class="btn-icon" title="Edit" aria-label="Edit donation">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </a>
+                  <form action="/portal/donations/<%= d.DonationID %>/delete" method="POST" class="inline-form" onsubmit="return confirm('Delete this donation record?')">
+                    <button type="submit" class="btn-icon btn-icon--danger" title="Delete" aria-label="Delete donation">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </button>
+                  </form>
                 </div>
               </td>
             </tr>
@@ -89,5 +88,24 @@
     </table>
   </div>
 </div>
+<% } else { %>
+<!-- Confidentiality Notice for Viewers -->
+<div class="info-card" style="max-width: 800px; margin: 2rem auto;">
+  <div style="text-align: center; padding: 2rem;">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 1rem; color: var(--color-accent-sage);">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </svg>
+    <h2 style="margin-bottom: 1rem; color: var(--color-primary);">Donation Information is Confidential</h2>
+    <p style="color: var(--color-gray-600); font-size: var(--text-lg); line-height: 1.7; margin-bottom: 1.5rem;">
+      To protect the privacy of our donors, individual donation details are only accessible to administrators. 
+      You can see the total amount raised above.
+    </p>
+    <p style="color: var(--color-gray-500); font-size: var(--text-sm);">
+      If you have questions about donations, please contact an administrator.
+    </p>
+  </div>
+</div>
+<% } %>
 
 <%- include('../../partials/portal-footer') %>

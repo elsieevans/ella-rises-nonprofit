@@ -1,10 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const { isAuthenticated } = require('../middleware/auth');
+const { isAuthenticated, isManager } = require('../middleware/auth');
 const db = require('../config/database');
 
-// Dashboard home
+// Dashboard home - Admin only
 router.get('/', isAuthenticated, async (req, res) => {
+  // Check if user is admin, redirect participants to their page
+  if (req.session.user.role !== 'Admin') {
+    req.flash('error_msg', 'You do not have permission to access the dashboard');
+    return res.redirect('/portal/participants');
+  }
+  
   try {
     // Get counts for dashboard cards
     const participantCount = await db('Participant').count('ParticipantID as count').first();
@@ -68,8 +74,13 @@ router.get('/', isAuthenticated, async (req, res) => {
   }
 });
 
-// API endpoint for chart data
+// API endpoint for chart data - Admin only
 router.get('/api/chart-data', isAuthenticated, async (req, res) => {
+  // Check if user is admin
+  if (req.session.user.role !== 'Admin') {
+    return res.status(403).json({ error: 'Forbidden - Admin access required' });
+  }
+  
   try {
     const year = req.query.year || new Date().getFullYear();
 
