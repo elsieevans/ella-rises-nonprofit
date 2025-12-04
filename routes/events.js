@@ -175,7 +175,7 @@ router.get('/:id', isAuthenticated, async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching event:', error);
-    req.flash('error_msg', 'Error loading event details');
+    req.flash('error_msg', 'Error loading event details: ' + error.message);
     res.redirect('/portal/events');
   }
 });

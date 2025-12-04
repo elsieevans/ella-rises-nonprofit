@@ -155,7 +155,7 @@ router.get('/:id', isAuthenticated, async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching participant:', error);
-    req.flash('error_msg', 'Error loading participant details');
+    req.flash('error_msg', 'Error loading participant details: ' + error.message);
     res.redirect('/portal/participants');
   }
 });
