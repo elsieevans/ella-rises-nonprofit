@@ -700,25 +700,24 @@ main {
   z-index: -1;
 }
 
-.hero-gradient {
+.hero-image {
+  position: absolute;
+  inset: 0;
+  background-image: url('/images/ER UMFA Mural_072.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.hero-overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(
-    135deg,
-    var(--color-accent-pink) 0%,
-    #fce8e4 40%,
-    var(--color-accent-cream) 100%
+    to bottom,
+    rgba(255, 255, 255, 0.7) 0%,
+    rgba(255, 255, 255, 0.8) 50%,
+    rgba(255, 255, 255, 0.75) 100%
   );
-  opacity: 1;
-}
-
-.hero-pattern {
-  position: absolute;
-  inset: 0;
-  background-image: 
-    radial-gradient(circle at 20% 80%, rgba(154, 181, 157, 0.2) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(151, 142, 196, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 50% 50%, rgba(249, 175, 177, 0.1) 0%, transparent 60%);
 }
 
 .hero-content {
