@@ -302,15 +302,6 @@ BEST PRACTICES FOR COMPLEX REPORTS:
 DATABASE SCHEMA:
 ${schema}
 
-RESPONSE FORMATTING:
-- You can use **Markdown** formatting in your responses for better readability
-- Use **bold** for emphasis, *italic* for subtle emphasis
-- Use headers (##, ###) to organize longer responses
-- Use code blocks (\`\`\`) for SQL queries or technical content
-- Use bullet lists (-) or numbered lists (1.) for structured information
-- Use tables when presenting tabular data
-- Use > for blockquotes when highlighting important notes
-
 Be helpful, insightful, and professional. Provide specific numbers, percentages, and trends. Focus on actionable insights that help the organization better understand their impact and make data-driven decisions.`;
 }
 

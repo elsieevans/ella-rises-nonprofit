@@ -29,21 +29,6 @@
       return;
     }
 
-    // Add initial greeting with markdown formatting
-    const welcomeMessage = `## Hello! 👋
-
-I'm your **AI Data Analyst Assistant**. I can help you understand and analyze data from your Ella Rises database.
-
-### Try asking me questions like:
-
-- "How many participants do we have?"
-- "What were our total donations last month?"
-- "Show me upcoming events"
-- "Which schools have the most participants?"
-
-
-    addMessage(welcomeMessage, 'ai');
-
     // Event listeners
     helpButton.addEventListener('click', openChat);
     closeButton.addEventListener('click', closeChat);
@@ -175,49 +160,28 @@ I'm your **AI Data Analyst Assistant**. I can help you understand and analyze da
   }
 
   function formatMessage(content) {
-    // Use marked.js for comprehensive markdown rendering
-    if (typeof marked === 'undefined') {
-      // Fallback to basic formatting if marked.js is not loaded
-      return content
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/\n/g, '<br>');
-    }
+    // Simple formatting: convert line breaks and create basic HTML
+    let formatted = content
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\n/g, '<br>');
 
-    // Configure marked for safe rendering
-    marked.setOptions({
-      breaks: true, // Convert line breaks to <br>
-      gfm: true, // GitHub Flavored Markdown
-      headerIds: false, // Disable header IDs for security
-      mangle: false, // Don't mangle email addresses
-      sanitize: false, // We'll handle XSS with DOMPurify if needed
-      highlight: function(code, lang) {
-        // Syntax highlighting for code blocks
-        if (typeof hljs !== 'undefined' && lang && hljs.getLanguage(lang)) {
-          try {
-            return hljs.highlight(code, { language: lang }).value;
-          } catch (err) {
-            console.error('Highlight.js error:', err);
-          }
-        }
-        return code; // Return plain code if highlighting fails
-      }
+    // Convert **bold** to <strong>
+    formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    
+    // Convert *italic* to <em>
+    formatted = formatted.replace(/\*(.+?)\*/g, '<em>$1</em>');
+
+    // Convert bullet points
+    formatted = formatted.replace(/^[-•]\s+(.+)$/gm, '<li>$1</li>');
+    
+    // Wrap consecutive list items in <ul>
+    formatted = formatted.replace(/(<li>.*<\/li>(?:<br>)?)+/g, function(match) {
+      return '<ul>' + match.replace(/<br>/g, '') + '</ul>';
     });
 
-    try {
-      // Parse markdown to HTML
-      const html = marked.parse(content);
-      return html;
-    } catch (error) {
-      console.error('Markdown parsing error:', error);
-      // Fallback to escaped content
-      return content
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/\n/g, '<br>');
-    }
+    return formatted;
   }
 
   function showLoading() {
