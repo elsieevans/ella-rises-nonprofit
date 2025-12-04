@@ -7,7 +7,6 @@ const db = require('../config/database');
 router.get('/', isAuthenticated, async (req, res) => {
   try {
     const { search } = req.query;
-    const isAdmin = req.session.user.role === 'Admin';
     
     // Get aggregate stats (visible to all users)
     const stats = await db('Donation')
@@ -18,29 +17,26 @@ router.get('/', isAuthenticated, async (req, res) => {
       )
       .first();
     
-    // Only fetch individual donations for Admin users
-    let donations = [];
-    if (isAdmin) {
-      let query = db('Donation')
-        .leftJoin('Participant', 'Donation.ParticipantID', 'Participant.ParticipantID')
-        .select(
-          'Donation.*',
-          'Participant.ParticipantFirstName',
-          'Participant.ParticipantLastName',
-          'Participant.ParticipantEmail'
-        )
-        .orderByRaw('"Donation"."DonationDate" DESC NULLS LAST');
-      
-      if (search) {
-        query = query.where(function() {
-          this.where('Participant.ParticipantFirstName', 'ilike', `%${search}%`)
-            .orWhere('Participant.ParticipantLastName', 'ilike', `%${search}%`)
-            .orWhere('Participant.ParticipantEmail', 'ilike', `%${search}%`);
-        });
-      }
-      
-      donations = await query;
+    // Fetch donations for all users
+    let query = db('Donation')
+      .leftJoin('Participant', 'Donation.ParticipantID', 'Participant.ParticipantID')
+      .select(
+        'Donation.*',
+        'Participant.ParticipantFirstName',
+        'Participant.ParticipantLastName',
+        'Participant.ParticipantEmail'
+      )
+      .orderByRaw('"Donation"."DonationDate" DESC NULLS LAST');
+    
+    if (search) {
+      query = query.where(function() {
+        this.where('Participant.ParticipantFirstName', 'ilike', `%${search}%`)
+          .orWhere('Participant.ParticipantLastName', 'ilike', `%${search}%`)
+          .orWhere('Participant.ParticipantEmail', 'ilike', `%${search}%`);
+      });
     }
+    
+    const donations = await query;
     
     res.render('portal/donations/index', {
       title: 'Donations - Ella Rises Portal',

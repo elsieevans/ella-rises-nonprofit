@@ -11,10 +11,12 @@
       <span class="mini-stat-value"><%= stats.count %></span>
       <span class="mini-stat-label">Total Gifts</span>
     </div>
-    <div class="mini-stat">
-      <span class="mini-stat-value">$<%= parseFloat(stats.average || 0).toLocaleString(undefined, {maximumFractionDigits: 0}) %></span>
-      <span class="mini-stat-label">Avg. Gift</span>
-    </div>
+    <% if (user && user.role === 'Admin') { %>
+      <div class="mini-stat">
+        <span class="mini-stat-value">$<%= parseFloat(stats.average || 0).toLocaleString(undefined, {maximumFractionDigits: 0}) %></span>
+        <span class="mini-stat-label">Avg. Gift</span>
+      </div>
+    <% } %>
   </div>
   <div class="page-actions">
     <% if (user && user.role === 'Admin') { %>
@@ -26,7 +28,6 @@
   </div>
 </div>
 
-<% if (user && user.role === 'Admin') { %>
 <!-- Filters -->
 <div class="filters-card">
   <form class="filters-form" method="GET" action="/portal/donations">
@@ -39,6 +40,21 @@
   </form>
 </div>
 
+<% if (user && user.role !== 'Admin') { %>
+<!-- Confidentiality Notice for Viewers -->
+<div class="info-card" style="margin-bottom: 2rem;">
+  <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem;">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-accent-sage); flex-shrink: 0;">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </svg>
+    <p style="color: var(--color-gray-600); margin: 0;">
+      <strong>Privacy Notice:</strong> Donation amounts are confidential and only visible to administrators.
+    </p>
+  </div>
+</div>
+<% } %>
+
 <!-- Data Table -->
 <div class="table-card">
   <div class="table-responsive">
@@ -47,9 +63,13 @@
         <tr>
           <th scope="col">Date</th>
           <th scope="col">Donor</th>
-          <th scope="col">Amount</th>
+          <% if (user && user.role === 'Admin') { %>
+            <th scope="col">Amount</th>
+          <% } %>
           <th scope="col">Email</th>
-          <th scope="col" class="actions-col">Actions</th>
+          <% if (user && user.role === 'Admin') { %>
+            <th scope="col" class="actions-col">Actions</th>
+          <% } %>
         </tr>
       </thead>
       <tbody>
@@ -60,52 +80,37 @@
               <td data-label="Donor" class="donor-cell">
                 <strong><%= d.ParticipantFirstName %> <%= d.ParticipantLastName %></strong>
               </td>
-              <td data-label="Amount" class="amount-cell">$<%= parseFloat(d.DonationAmount).toLocaleString() %></td>
+              <% if (user && user.role === 'Admin') { %>
+                <td data-label="Amount" class="amount-cell">$<%= parseFloat(d.DonationAmount).toLocaleString() %></td>
+              <% } %>
               <td data-label="Email"><%= d.ParticipantEmail || '-' %></td>
-              <td class="actions-col">
-                <div class="action-buttons">
-                  <a href="/portal/donations/<%= d.DonationID %>" class="btn-icon" title="View" aria-label="View donation">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  </a>
-                  <a href="/portal/donations/<%= d.DonationID %>/edit" class="btn-icon" title="Edit" aria-label="Edit donation">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                  </a>
-                  <form action="/portal/donations/<%= d.DonationID %>/delete" method="POST" class="inline-form" onsubmit="return confirm('Delete this donation record?')">
-                    <button type="submit" class="btn-icon btn-icon--danger" title="Delete" aria-label="Delete donation">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                    </button>
-                  </form>
-                </div>
-              </td>
+              <% if (user && user.role === 'Admin') { %>
+                <td class="actions-col">
+                  <div class="action-buttons">
+                    <a href="/portal/donations/<%= d.DonationID %>" class="btn-icon" title="View" aria-label="View donation">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </a>
+                    <a href="/portal/donations/<%= d.DonationID %>/edit" class="btn-icon" title="Edit" aria-label="Edit donation">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </a>
+                    <form action="/portal/donations/<%= d.DonationID %>/delete" method="POST" class="inline-form" onsubmit="return confirm('Delete this donation record?')">
+                      <button type="submit" class="btn-icon btn-icon--danger" title="Delete" aria-label="Delete donation">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              <% } %>
             </tr>
           <% }) %>
         <% } else { %>
           <tr>
-            <td colspan="5" class="no-data">No donations found</td>
+            <td colspan="<%= user && user.role === 'Admin' ? '5' : '3' %>" class="no-data">No donations found</td>
           </tr>
         <% } %>
       </tbody>
     </table>
   </div>
 </div>
-<% } else { %>
-<!-- Confidentiality Notice for Viewers -->
-<div class="info-card" style="max-width: 800px; margin: 2rem auto;">
-  <div style="text-align: center; padding: 2rem;">
-    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin: 0 auto 1rem; color: var(--color-accent-sage);">
-      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-    </svg>
-    <h2 style="margin-bottom: 1rem; color: var(--color-primary);">Donation Information is Confidential</h2>
-    <p style="color: var(--color-gray-600); font-size: var(--text-lg); line-height: 1.7; margin-bottom: 1.5rem;">
-      To protect the privacy of our donors, individual donation details are only accessible to administrators. 
-      You can see the total amount raised above.
-    </p>
-    <p style="color: var(--color-gray-500); font-size: var(--text-sm);">
-      If you have questions about donations, please contact an administrator.
-    </p>
-  </div>
-</div>
-<% } %>
 
 <%- include('../../partials/portal-footer') %>
