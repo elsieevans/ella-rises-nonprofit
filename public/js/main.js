@@ -331,5 +331,64 @@ document.addEventListener('DOMContentLoaded', function() {
       observer.observe(el);
     });
   }
-});
 
+  // ============================================
+  // Image Carousel
+  // ============================================
+  const track = document.querySelector('.carousel-track');
+  
+  if (track) {
+    const slides = Array.from(track.children);
+    const nextButton = document.querySelector('.next-btn');
+    const prevButton = document.querySelector('.prev-btn');
+    
+    // Function to update slide display
+    const updateSlides = (currentSlide, targetSlide) => {
+      currentSlide.classList.remove('current-slide');
+      targetSlide.classList.add('current-slide');
+    }
+    
+    // Next button click
+    nextButton.addEventListener('click', e => {
+      const currentSlide = track.querySelector('.current-slide');
+      let nextSlide = currentSlide.nextElementSibling;
+      
+      // Loop back to start if at end
+      if (!nextSlide) {
+        nextSlide = slides[0];
+      }
+      
+      updateSlides(currentSlide, nextSlide);
+    });
+    
+    // Previous button click
+    prevButton.addEventListener('click', e => {
+      const currentSlide = track.querySelector('.current-slide');
+      let prevSlide = currentSlide.previousElementSibling;
+      
+      // Loop to end if at start
+      if (!prevSlide) {
+        prevSlide = slides[slides.length - 1];
+      }
+      
+      updateSlides(currentSlide, prevSlide);
+    });
+    
+    // Auto advance every 5 seconds
+    let autoAdvance = setInterval(() => {
+      nextButton.click();
+    }, 5000);
+    
+    // Pause auto-advance on interaction
+    const carouselContainer = document.querySelector('.carousel-container');
+    carouselContainer.addEventListener('mouseenter', () => {
+      clearInterval(autoAdvance);
+    });
+    
+    carouselContainer.addEventListener('mouseleave', () => {
+      autoAdvance = setInterval(() => {
+        nextButton.click();
+      }, 5000);
+    });
+  }
+});
