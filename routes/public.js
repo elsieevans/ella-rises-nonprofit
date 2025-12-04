@@ -87,6 +87,82 @@ router.get('/donate', (req, res) => {
   });
 });
 
+// Handle donation form submission
+router.post('/donate', async (req, res) => {
+  const bcrypt = require('bcrypt');
+  const { 
+    amount, first_name, last_name, email, 
+    frequency, dedication, anonymous 
+  } = req.body;
+
+  // Validate required fields
+  if (!amount || !first_name || !last_name || !email) {
+    req.flash('error_msg', 'Please fill in all required fields');
+    return res.redirect('/donate');
+  }
+
+  try {
+    // Check if participant/donor already exists
+    let participant = await db('Participant')
+      .where('ParticipantEmail', email.toLowerCase())
+      .first();
+
+    let participantId;
+
+    if (participant) {
+      participantId = participant.ParticipantID;
+    } else {
+      // Create new participant/donor
+      // Get the next ParticipantID
+      const maxIdResult = await db('Participant').max('ParticipantID as maxId').first();
+      const nextId = (maxIdResult.maxId || 0) + 1;
+      participantId = nextId;
+
+      // Generate random password for the new account
+      const randomPassword = Math.random().toString(36).slice(-10);
+      const hashedPassword = await bcrypt.hash(randomPassword, 10);
+
+      await db('Participant').insert({
+        "ParticipantID": nextId,
+        "ParticipantFirstName": first_name,
+        "ParticipantLastName": last_name,
+        "ParticipantEmail": email.toLowerCase(),
+        "ParticipantRole": 'participant', // Default role
+        "Password": hashedPassword
+      });
+    }
+
+    // Create donation record
+    await db('Donation').insert({
+      "ParticipantID": participantId,
+      "DonationAmount": parseFloat(amount),
+      "DonationDate": new Date(),
+      "TotalDonations": parseFloat(amount) // Following existing pattern
+    });
+
+    // Send thank you email (if we had a template for it)
+    /*
+    try {
+      const donationData = { 
+        name: `${first_name} ${last_name}`, 
+        amount, 
+        date: new Date().toLocaleDateString() 
+      };
+      // await sendEmail({...}); 
+    } catch (emailError) {
+      console.error('Error sending donation receipt:', emailError);
+    }
+    */
+
+    req.flash('success_msg', 'Thank you for your donation! Your support makes a difference.');
+    res.redirect('/donate');
+  } catch (error) {
+    console.error('Donation error:', error);
+    req.flash('error_msg', 'An error occurred processing your donation. Please try again.');
+    res.redirect('/donate');
+  }
+});
+
 // Contact page
 router.get('/contact', (req, res) => {
   res.render('public/contact', {
