@@ -70,6 +70,12 @@ router.post('/', isAuthenticated, isManager, async (req, res) => {
       participant_id, title, date, milestone_no
     } = req.body;
     
+    // Validate required fields
+    if (!participant_id || !title || !date || !milestone_no) {
+      req.flash('error_msg', 'All fields are required');
+      return res.redirect('/portal/milestones/new');
+    }
+    
     await db('Milestone').insert({
       "ParticipantID": participant_id,
       "MilestoneTitle": title,
@@ -182,6 +188,12 @@ router.post('/:id', isAuthenticated, isManager, async (req, res) => {
     const {
       participant_id, title, date, milestone_no
     } = req.body;
+    
+    // Validate required fields
+    if (!participant_id || !title || !date || !milestone_no) {
+      req.flash('error_msg', 'All fields are required');
+      return res.redirect(`/portal/milestones/${req.params.id}/edit`);
+    }
     
     await db('Milestone').where('MilestoneID', req.params.id).update({
       "ParticipantID": participant_id,

@@ -71,6 +71,12 @@ router.post('/', isAuthenticated, isManager, async (req, res) => {
       location, max_participants
     } = req.body;
     
+    // Validate required fields
+    if (!title || !description || !event_type || !event_date || !start_time || !end_time || !location || !max_participants) {
+      req.flash('error_msg', 'All fields are required');
+      return res.redirect('/portal/events/new');
+    }
+    
     // Transaction to ensure consistency
     await db.transaction(async (trx) => {
       // 1. Create EventDetails
@@ -93,8 +99,7 @@ router.post('/', isAuthenticated, isManager, async (req, res) => {
         "EventDateTimeStart": startDateTime,
         "EventDateTimeEnd": endDateTime,
         "EventLocation": location,
-        "EventCapacity": max_participants,
-        "RegistrationCreatedAt": new Date()
+        "EventCapacity": max_participants
       });
     });
     
@@ -220,6 +225,12 @@ router.post('/:id', isAuthenticated, isManager, async (req, res) => {
       title, description, event_type, event_date, start_time, end_time,
       location, max_participants
     } = req.body;
+    
+    // Validate required fields
+    if (!title || !description || !event_type || !event_date || !start_time || !end_time || !location || !max_participants) {
+      req.flash('error_msg', 'All fields are required');
+      return res.redirect(`/portal/events/${req.params.id}/edit`);
+    }
     
     // Get EventDetailsID
     const event = await db('Event').where('EventID', req.params.id).first();

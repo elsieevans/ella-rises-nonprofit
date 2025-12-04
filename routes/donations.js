@@ -75,15 +75,27 @@ router.get('/new', isAuthenticated, isManager, async (req, res) => {
 
 // Create donation
 router.post('/', isAuthenticated, isManager, async (req, res) => {
-  try {
-    const {
-      participant_id, amount, donation_date, donation_no
-    } = req.body;
-    
-    // Calculate total donations for this participant (if that's what TotalDonations means)
-    // For now, just inserting the record.
-    
-    await db('Donation').insert({
+  try {
+    const {
+      participant_id, amount, donation_date, donation_no
+    } = req.body;
+    
+    // Validate required fields
+    if (!participant_id || !amount || !donation_date || !donation_no) {
+      req.flash('error_msg', 'All fields are required');
+      return res.redirect('/portal/donations/new');
+    }
+    
+    // Validate amount is a positive number
+    if (isNaN(amount) || parseFloat(amount) <= 0) {
+      req.flash('error_msg', 'Amount must be a positive number');
+      return res.redirect('/portal/donations/new');
+    }
+    
+    // Calculate total donations for this participant (if that's what TotalDonations means)
+    // For now, just inserting the record.
+    
+    await db('Donation').insert({
       "ParticipantID": participant_id,
       "DonationAmount": parseFloat(amount),
       "DonationDate": donation_date || new Date(),
@@ -159,12 +171,24 @@ router.get('/:id/edit', isAuthenticated, isManager, async (req, res) => {
 
 // Update donation
 router.post('/:id', isAuthenticated, isManager, async (req, res) => {
-  try {
-    const {
-      participant_id, amount, donation_date, donation_no
-    } = req.body;
-    
-    await db('Donation').where('DonationID', req.params.id).update({
+  try {
+    const {
+      participant_id, amount, donation_date, donation_no
+    } = req.body;
+    
+    // Validate required fields
+    if (!participant_id || !amount || !donation_date || !donation_no) {
+      req.flash('error_msg', 'All fields are required');
+      return res.redirect(`/portal/donations/${req.params.id}/edit`);
+    }
+    
+    // Validate amount is a positive number
+    if (isNaN(amount) || parseFloat(amount) <= 0) {
+      req.flash('error_msg', 'Amount must be a positive number');
+      return res.redirect(`/portal/donations/${req.params.id}/edit`);
+    }
+    
+    await db('Donation').where('DonationID', req.params.id).update({
       "ParticipantID": participant_id,
       "DonationAmount": parseFloat(amount),
       "DonationDate": donation_date || new Date(),

@@ -98,6 +98,12 @@ router.post('/', isAuthenticated, isManager, async (req, res) => {
       recommendation_score, instructor_score, comments, survey_date
     } = req.body;
     
+    // Validate required fields
+    if (!event_id || !participant_id || !survey_date || !satisfaction_score || !usefulness_score || !recommendation_score || !instructor_score || !comments) {
+      req.flash('error_msg', 'All fields are required');
+      return res.redirect('/portal/surveys/new');
+    }
+    
     // Calculate NPS Bucket
     let npsBucket = 'Passive';
     const recScore = parseInt(recommendation_score);
@@ -203,6 +209,12 @@ router.post('/:id', isAuthenticated, isManager, async (req, res) => {
       event_id, participant_id, satisfaction_score, usefulness_score,
       recommendation_score, instructor_score, comments, survey_date
     } = req.body;
+    
+    // Validate required fields
+    if (!event_id || !participant_id || !survey_date || !satisfaction_score || !usefulness_score || !recommendation_score || !instructor_score || !comments) {
+      req.flash('error_msg', 'All fields are required');
+      return res.redirect(`/portal/surveys/${req.params.id}/edit`);
+    }
     
     // Calculate NPS Bucket
     let npsBucket = 'Passive';

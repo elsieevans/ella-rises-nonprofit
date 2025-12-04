@@ -14,18 +14,18 @@
       
       <div class="form-row">
         <div class="form-group">
-          <label for="event_id">Event</label>
-          <select id="event_id" name="event_id">
-            <option value="">Select Event (Optional)</option>
+          <label for="event_id">Event <span class="required">*</span></label>
+          <select id="event_id" name="event_id" required>
+            <option value="">Select Event</option>
             <% events.forEach(e => { %>
               <option value="<%= e.id %>" <%= survey.EventID == e.id ? 'selected' : '' %>><%= e.title %></option>
             <% }) %>
           </select>
         </div>
         <div class="form-group">
-          <label for="participant_id">Participant</label>
-          <select id="participant_id" name="participant_id">
-            <option value="">Select Participant (Optional)</option>
+          <label for="participant_id">Participant <span class="required">*</span></label>
+          <select id="participant_id" name="participant_id" required>
+            <option value="">Select Participant</option>
             <% participants.forEach(p => { %>
               <option value="<%= p.ParticipantID %>" <%= survey.ParticipantID == p.ParticipantID ? 'selected' : '' %>><%= p.ParticipantFirstName %> <%= p.ParticipantLastName %></option>
             <% }) %>
@@ -70,9 +70,9 @@
       </div>
       
       <div class="form-group">
-        <label for="instructor_score">Instructor Score (1-5)</label>
+        <label for="instructor_score">Instructor Score (1-5) <span class="required">*</span></label>
         <div class="score-input">
-          <input type="range" id="instructor_score" name="instructor_score" min="1" max="5" value="<%= survey.SurveyInstructorScore || 3 %>" oninput="this.nextElementSibling.textContent = this.value">
+          <input type="range" id="instructor_score" name="instructor_score" min="1" max="5" value="<%= survey.SurveyInstructorScore || 3 %>" oninput="this.nextElementSibling.textContent = this.value" required>
           <span class="score-display"><%= survey.SurveyInstructorScore || 3 %></span>
         </div>
         <small>Rate the instructor/facilitator</small>
@@ -83,8 +83,8 @@
       <h3>Feedback</h3>
       
       <div class="form-group">
-        <label for="comments">Comments</label>
-        <textarea id="comments" name="comments" rows="4"><%= survey.SurveyComments || '' %></textarea>
+        <label for="comments">Comments <span class="required">*</span></label>
+        <textarea id="comments" name="comments" rows="4" required><%= survey.SurveyComments || '' %></textarea>
       </div>
     </div>
     

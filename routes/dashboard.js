@@ -21,7 +21,7 @@ router.get('/', isAuthenticated, async (req, res) => {
 
     // Get recent participants
     const recentParticipants = await db('Participant')
-      .orderBy('ParticipantID', 'desc') // Assuming ID or we lack a created_at
+      .orderBy('ParticipantID', 'desc')
       .limit(5);
     
     // Get upcoming events
@@ -107,12 +107,12 @@ router.get('/api/chart-data', isAuthenticated, async (req, res) => {
       .orderBy('achieved_count', 'desc')
       .limit(5);
     
-    // Participants by School (replacing Grade)
-    const participantsByGrade = await db('Participant')
-      .select('ParticipantSchool as grade_level')
-      .count('ParticipantID as count')
-      .whereNotNull('ParticipantSchool')
-      .groupBy('ParticipantSchool')
+    // Participants by School - using JOIN through ParticipantSchool -> School
+    const participantsByGrade = await db('ParticipantSchool')
+      .join('School', 'ParticipantSchool.SchoolID', 'School.SchoolID')
+      .select('School.SchoolName as grade_level')
+      .count('ParticipantSchool.ParticipantID as count')
+      .groupBy('School.SchoolName')
       .orderBy('count', 'desc')
       .limit(5);
     
