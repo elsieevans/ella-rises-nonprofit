@@ -7,20 +7,42 @@ const db = require('../config/database');
 router.get('/', isAuthenticated, async (req, res) => {
   try {
     const { search } = req.query;
+    const currentParticipantId = req.session.user.id;
     
-    // Get unique milestones with participant count, sorted alphabetically
+    // Get unique milestones with participant count
     let query = db('Milestone')
       .select('MilestoneTitle')
       .count('MilestoneID as achieverCount')
       .max('MilestoneDate as latestDate')
-      .groupBy('MilestoneTitle')
-      .orderBy('MilestoneTitle', 'asc');
+      .groupBy('MilestoneTitle');
     
     if (search) {
       query = query.where('MilestoneTitle', 'ilike', `%${search}%`);
     }
     
-    const milestones = await query;
+    const allMilestones = await query;
+    
+    // Get milestones achieved by current participant
+    let userMilestonesQuery = db('Milestone')
+      .select('MilestoneTitle')
+      .where('ParticipantID', currentParticipantId)
+      .groupBy('MilestoneTitle');
+    
+    if (search) {
+      userMilestonesQuery = userMilestonesQuery.where('MilestoneTitle', 'ilike', `%${search}%`);
+    }
+    
+    const userMilestones = await userMilestonesQuery;
+    const userMilestoneSet = new Set(userMilestones.map(m => m.MilestoneTitle));
+    
+    // Separate current user's milestones from others
+    const myMilestones = allMilestones.filter(m => userMilestoneSet.has(m.MilestoneTitle));
+    const otherMilestones = allMilestones.filter(m => !userMilestoneSet.has(m.MilestoneTitle));
+    
+    // Sort each group alphabetically and combine
+    myMilestones.sort((a, b) => a.MilestoneTitle.localeCompare(b.MilestoneTitle));
+    otherMilestones.sort((a, b) => a.MilestoneTitle.localeCompare(b.MilestoneTitle));
+    const milestones = [...myMilestones, ...otherMilestones];
     
     // Get total unique milestones count and total achievements
     const stats = await db('Milestone')
@@ -34,7 +56,8 @@ router.get('/', isAuthenticated, async (req, res) => {
       title: 'Milestones - Ella Rises Portal',
       milestones,
       stats,
-      filters: { search }
+      filters: { search },
+      userMilestoneSet
     });
   } catch (error) {
     console.error('Error fetching milestones:', error);

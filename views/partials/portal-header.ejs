@@ -21,7 +21,9 @@
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
-  <!-- AI Chat -->
+  <!-- AI Chat Dependencies -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
   <script src="/js/ai-chat.js" defer></script>
 </head>
 <body class="portal-body">
@@ -119,6 +121,7 @@
   
   <!-- AI Chat Panel -->
   <div id="ai-chat-panel" class="ai-chat-panel">
+    <div id="ai-chat-resize-handle" class="ai-chat-resize-handle"></div>
     <div class="ai-chat-header">
       <div class="ai-chat-title">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

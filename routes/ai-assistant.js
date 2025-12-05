@@ -123,14 +123,75 @@ router.post('/chat', isAuthenticated, async (req, res) => {
     let queryResults = null;
 
     // Check if AI wants to execute a query
-    const sqlQuery = extractSqlQuery(aiResponse);
+    let sqlQuery = extractSqlQuery(aiResponse);
     
     if (sqlQuery) {
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('AI ASSISTANT - SQL Query Attempt #1');
+      console.log('User Question:', message);
+      console.log('Generated SQL:', sqlQuery);
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      
+      let queryError = null;
+      let retryAttempted = false;
+      
       try {
-        // Execute the query
+        // First attempt to execute the query
         queryResults = await executeSafeQuery(sqlQuery);
+        console.log('✓ Query executed successfully');
+        console.log('Result rows:', queryResults.length);
+      } catch (firstError) {
+        queryError = firstError;
+        console.error('✗ Query failed:', firstError.message);
+        
+        // SQL REPAIR LOOP - Give AI one chance to fix the error
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.log('AI ASSISTANT - Attempting SQL Repair');
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        
+        try {
+          const repairMessages = [
+            ...messages,
+            { role: 'assistant', content: aiResponse },
+            { 
+              role: 'user', 
+              content: `The SQL query failed with the following error:\n\n${firstError.message}\n\nPlease revise the SQL to fix ONLY the problem identified in the error message. Do not change the overall logic or intent of the query. Generate the corrected SQL using the [SQL_QUERY]...[/SQL_QUERY] tags.`
+            }
+          ];
 
-        // Send results back to AI for interpretation
+          const repairResponse = await openai.chat.completions.create({
+            model: process.env.OPENROUTER_MODEL || 'anthropic/claude-3-sonnet',
+            messages: repairMessages,
+            temperature: 0.5, // Lower temperature for more precise corrections
+            max_tokens: 1500
+          });
+
+          const repairedAiResponse = repairResponse.choices[0].message.content;
+          const repairedSql = extractSqlQuery(repairedAiResponse);
+          
+          if (repairedSql) {
+            retryAttempted = true;
+            console.log('Generated Repaired SQL:', repairedSql);
+            
+            // Try the repaired query
+            queryResults = await executeSafeQuery(repairedSql);
+            console.log('✓ Repaired query executed successfully');
+            console.log('Result rows:', queryResults.length);
+            
+            // Update the SQL query for logging
+            sqlQuery = repairedSql;
+            queryError = null; // Clear the error since repair succeeded
+          } else {
+            console.error('✗ AI did not generate a repaired SQL query');
+          }
+        } catch (secondError) {
+          console.error('✗ Repaired query also failed:', secondError.message);
+          queryError = secondError; // Keep the second error for user feedback
+        }
+      }
+      
+      // If we have successful query results, interpret them
+      if (queryResults !== null) {
         const followUpMessages = [
           ...messages,
           { role: 'assistant', content: aiResponse },
@@ -148,10 +209,17 @@ router.post('/chat', isAuthenticated, async (req, res) => {
         });
 
         aiResponse = finalResponse.choices[0].message.content;
-      } catch (queryError) {
-        console.error('Query execution error:', queryError);
-        aiResponse = `I encountered an error while querying the database: ${queryError.message}. Please try rephrasing your question or ask something else.`;
+      } else if (queryError) {
+        // Both attempts failed - provide clear feedback to user
+        if (retryAttempted) {
+          console.error('✗ Both query attempts failed. Asking user to rephrase.');
+          aiResponse = `I'm having trouble querying the database for that information. The query encountered an error: "${queryError.message}". Could you rephrase your question or ask for something more specific? For example, you could try asking for a simpler metric or a different time period.`;
+        } else {
+          aiResponse = `I encountered an error while querying the database: ${queryError.message}. Please try rephrasing your question or ask something else.`;
+        }
       }
+      
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
     }
 
     // Remove any remaining SQL query tags from response
