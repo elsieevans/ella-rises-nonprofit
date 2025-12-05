@@ -11,7 +11,7 @@
   let isWaitingForResponse = false;
 
   // DOM elements
-  let helpButton, chatPanel, closeButton, messagesContainer, input, sendButton;
+  let helpButton, chatPanel, closeButton, messagesContainer, input, sendButton, resizeHandle;
 
   // Initialize when DOM is ready
   document.addEventListener('DOMContentLoaded', function() {
@@ -22,11 +22,17 @@
     messagesContainer = document.getElementById('ai-chat-messages');
     input = document.getElementById('ai-chat-input');
     sendButton = document.getElementById('ai-chat-send');
+    resizeHandle = document.getElementById('ai-chat-resize-handle');
 
     // Check if elements exist
     if (!helpButton || !chatPanel || !closeButton || !messagesContainer || !input || !sendButton) {
       console.error('AI Chat: Required elements not found');
       return;
+    }
+
+    // Initialize resize functionality if resize handle exists
+    if (resizeHandle) {
+      initResizeFunctionality();
     }
 
     // Event listeners
@@ -160,27 +166,44 @@
   }
 
   function formatMessage(content) {
-    // Simple formatting: convert line breaks and create basic HTML
+    // Use marked library if available for robust Markdown parsing
+    if (typeof marked !== 'undefined') {
+      try {
+        // Configure marked options
+        marked.setOptions({
+          breaks: true, // Enable GFM line breaks
+          gfm: true,
+          headerIds: false, // Prevent automatic ID generation for headers
+          mangle: false // Prevent email address mangling
+        });
+        
+        // Parse markdown
+        let html = marked.parse(content);
+        
+        // Sanitize HTML if DOMPurify is available to prevent XSS
+        if (typeof DOMPurify !== 'undefined') {
+          // Allow specific attributes for links (target="_blank")
+          html = DOMPurify.sanitize(html, {
+            ADD_ATTR: ['target']
+          });
+        }
+        
+        return html;
+      } catch (e) {
+        console.error('Error parsing markdown:', e);
+        // Fallback to basic text if parsing fails
+      }
+    }
+
+    // Fallback if marked is not loaded or fails
     let formatted = content
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/\n/g, '<br>');
-
-    // Convert **bold** to <strong>
-    formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      .replace(/>/g, '&gt;');
+      
+    // Basic line breaks
+    formatted = formatted.replace(/\n/g, '<br>');
     
-    // Convert *italic* to <em>
-    formatted = formatted.replace(/\*(.+?)\*/g, '<em>$1</em>');
-
-    // Convert bullet points
-    formatted = formatted.replace(/^[-•]\s+(.+)$/gm, '<li>$1</li>');
-    
-    // Wrap consecutive list items in <ul>
-    formatted = formatted.replace(/(<li>.*<\/li>(?:<br>)?)+/g, function(match) {
-      return '<ul>' + match.replace(/<br>/g, '') + '</ul>';
-    });
-
     return formatted;
   }
 
@@ -217,13 +240,71 @@
   // Close chat when clicking outside
   document.addEventListener('click', function(e) {
     if (!chatPanel || !helpButton) return;
-    
-    if (chatPanel.classList.contains('open') && 
-        !chatPanel.contains(e.target) && 
+
+    if (chatPanel.classList.contains('open') &&
+        !chatPanel.contains(e.target) &&
         !helpButton.contains(e.target)) {
       closeChat();
     }
   });
+
+  // Resize functionality
+  function initResizeFunctionality() {
+    let isResizing = false;
+    let startX = 0;
+    let startWidth = 0;
+
+    // Load saved width from localStorage
+    const savedWidth = localStorage.getItem('ai-chat-panel-width');
+    if (savedWidth) {
+      chatPanel.style.width = savedWidth;
+    }
+
+    // Mouse down on resize handle
+    resizeHandle.addEventListener('mousedown', function(e) {
+      isResizing = true;
+      startX = e.clientX;
+      startWidth = chatPanel.offsetWidth;
+      chatPanel.classList.add('resizing');
+
+      // Prevent text selection during resize
+      document.body.style.userSelect = 'none';
+      document.body.style.cursor = 'ew-resize';
+
+      e.preventDefault();
+    });
+
+    // Mouse move
+    document.addEventListener('mousemove', function(e) {
+      if (!isResizing) return;
+
+      const deltaX = startX - e.clientX;
+      let newWidth = startWidth + deltaX;
+
+      // Set constraints
+      const minWidth = 300;
+      const maxWidth = window.innerWidth * 0.9;
+
+      newWidth = Math.max(minWidth, Math.min(maxWidth, newWidth));
+
+      chatPanel.style.width = newWidth + 'px';
+    });
+
+    // Mouse up
+    document.addEventListener('mouseup', function(e) {
+      if (!isResizing) return;
+
+      isResizing = false;
+      chatPanel.classList.remove('resizing');
+
+      // Restore normal cursor and selection
+      document.body.style.userSelect = '';
+      document.body.style.cursor = '';
+
+      // Save width to localStorage
+      localStorage.setItem('ai-chat-panel-width', chatPanel.style.width);
+    });
+  }
 
 })();
 
